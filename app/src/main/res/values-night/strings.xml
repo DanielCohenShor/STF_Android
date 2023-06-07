@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">STF</string>
     <string name="et_username">Username</string>
     <string name="et_password">Password</string>
     <string name="btn_login">Login</string>
