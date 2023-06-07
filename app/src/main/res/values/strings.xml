@@ -19,4 +19,5 @@
     <string name="cd_top_circle">topCircle</string>
     <string name="cd_show_password">showPasswordImg</string>
     <string name="cd_bottom_circle">bottomCircle</string>
+    <string name="cd_add_new_contact">addNewContact</string>
 </resources>
