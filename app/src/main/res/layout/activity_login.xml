@@ -1,70 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#E6E5E5"
     tools:context=".LoginActivity">
 
+    <ImageView
+        android:id="@+id/topCircle"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/top_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="-20dp"
+        android:layout_marginEnd="-50dp"/>
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="320dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:background="@drawable/linearlayout_background"
         android:gravity="center_vertical"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:elevation="2dp">
 
         <TextView
             android:id="@+id/tvLoginHeadline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tv_login_headline"
             android:gravity="center"
+            android:text="@string/tv_login_headline"
             android:textColor="#CADEED"
-            android:textStyle="bold"
             android:textSize="40sp"
-            android:fontFamily="@font/segoue_ui_bold_font"/>
+            android:textStyle="bold"
+            android:layout_marginTop="30dp" />
 
         <LinearLayout
-            android:layout_width="297dp"
+            android:layout_width="260dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingVertical="30dp">
+            android:paddingVertical="30dp"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/tvUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/segoue_ui_bold_font"
                 android:paddingBottom="5dp"
                 android:text="@string/tv_username"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/etUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/et_username"
-                android:inputType="text"
-                android:minHeight="48dp"
                 android:autofillHints="username"
                 android:background="@drawable/edittext_background"
                 android:drawableStart="@drawable/username_icon_drawable"
                 android:drawablePadding="8dp"
-                android:fontFamily="@font/segoe_ui_font"/>
+                android:ems="10"
+                android:hint="@string/et_username"
+                android:inputType="text"
+                android:minHeight="48dp" />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="297dp"
+            android:layout_width="260dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingVertical="30dp">
+            android:paddingVertical="30dp"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/tvPassword"
@@ -74,7 +86,7 @@
                 android:text="@string/tv_password"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:fontFamily="@font/segoue_ui_bold_font"/>
+                android:textStyle="bold" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -84,15 +96,14 @@
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/et_password"
-                    android:inputType="textPassword"
-                    android:minHeight="48dp"
                     android:autofillHints="password"
                     android:background="@drawable/edittext_background"
                     android:drawableStart="@drawable/password_icon_drawable"
                     android:drawablePadding="8dp"
-                    android:fontFamily="@font/segoe_ui_font"/>
+                    android:ems="10"
+                    android:hint="@string/et_password"
+                    android:inputType="textPassword"
+                    android:minHeight="48dp" />
 
                 <ImageButton
                     android:id="@+id/btnShowPassword"
@@ -105,18 +116,36 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/linkToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/link_to_register"
+            android:layout_gravity="center"
+            android:textStyle="normal|bold" />
+
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="185dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
             android:background="@drawable/rounded_button_background"
             android:gravity="center"
             android:text="@string/btn_login"
             android:textColor="#FFFFFF"
-            android:layout_marginTop="30dp"
-            android:fontFamily="@font/segoe_ui_font"
-            android:textSize="20sp"/>
+            android:textSize="20sp" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/bottomCircle"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/bottom_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="-20dp"
+        android:layout_marginStart="-50dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

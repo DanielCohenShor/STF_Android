@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">STF</string>
+    <string name="app_name">Speak, Talk, Friends</string>
     <string name="et_username">Username</string>
     <string name="et_password">Password</string>
     <string name="btn_login">Login</string>
     <string name="tv_username">Username</string>
     <string name="tv_password">Password</string>
     <string name="tv_login_headline">Sign in</string>
+    <string name="link_to_register">Not registered? <u>Click here</u> to sign in</string>
 </resources>

@@ -32,11 +32,11 @@ public class LoginActivity extends AppCompatActivity {
                 if (isPasswordVisible) {
                     btnPasswordVisibility.setImageDrawable(showPassword);
                     // Set the input type to hide the password
-                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 } else {
                     btnPasswordVisibility.setImageDrawable(hidePassword);
                     // Set the input type to show the password
-                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT);
+                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 }
                 isPasswordVisible = !isPasswordVisible;
 
