@@ -15,7 +15,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="-20dp"
-        android:layout_marginEnd="-50dp"/>
+        android:layout_marginEnd="-50dp"
+        android:contentDescription="@string/cd_top_circle"/>
 
     <LinearLayout
         android:layout_width="320dp"
@@ -111,7 +112,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|center_vertical"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/show_password_icon_drawable" />
+                    android:src="@drawable/show_password_icon_drawable"
+                    android:contentDescription="@string/cd_show_password"/>
             </FrameLayout>
 
         </LinearLayout>
@@ -120,7 +122,7 @@
             android:id="@+id/linkToRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/link_to_register"
+            android:text="@string/tv_link_to_register"
             android:layout_gravity="center"
             android:textStyle="normal|bold" />
 
@@ -147,5 +149,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="-20dp"
-        android:layout_marginStart="-50dp"/>
+        android:layout_marginStart="-50dp"
+        android:contentDescription="@string/cd_bottom_circle"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

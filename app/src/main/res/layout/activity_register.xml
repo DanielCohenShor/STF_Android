@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E6E5E5"
+    tools:context=".LoginActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#E6E5E5"
+        tools:context=".LoginActivity">
+
+        <ImageView
+            android:id="@+id/topCircle"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:background="@drawable/top_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="-20dp"
+            android:layout_marginEnd="-50dp"
+            android:contentDescription="@string/cd_top_circle"/>
+
+        <LinearLayout
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/linearlayout_background"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/tvRegisterHeadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/tv_register_headline"
+                android:textColor="#CADEED"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:layout_marginTop="30dp" />
+
+            <LinearLayout
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="@string/tv_username"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="username"
+                    android:background="@drawable/edittext_background"
+                    android:drawableStart="@drawable/username_icon_drawable"
+                    android:drawablePadding="8dp"
+                    android:ems="10"
+                    android:hint="@string/et_username"
+                    android:inputType="text"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="@string/tv_password"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="password"
+                        android:background="@drawable/edittext_background"
+                        android:drawableStart="@drawable/password_icon_drawable"
+                        android:drawablePadding="8dp"
+                        android:ems="10"
+                        android:hint="@string/et_password"
+                        android:inputType="textPassword"
+                        android:minHeight="48dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnShowPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/show_password_icon_drawable"
+                        android:contentDescription="@string/cd_show_password"/>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvPasswordVerification"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="@string/tv_password_verification"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/etPasswordVerification"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="password"
+                        android:background="@drawable/edittext_background"
+                        android:drawableStart="@drawable/password_icon_drawable"
+                        android:drawablePadding="8dp"
+                        android:ems="10"
+                        android:hint="@string/et_confirm_password"
+                        android:inputType="textPassword"
+                        android:minHeight="48dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnShowConfirmationPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/show_password_icon_drawable"
+                        android:contentDescription="@string/cd_show_password"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvDisplayName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="@string/tv_display_name"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etDisplayName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="username"
+                    android:background="@drawable/edittext_background"
+                    android:drawableStart="@drawable/display_name_icon_drawable"
+                    android:drawablePadding="8dp"
+                    android:ems="10"
+                    android:hint="@string/et_display_name"
+                    android:inputType="text"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvPicture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="@string/tv_picture"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etPicture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="username"
+                    android:background="@drawable/edittext_background"
+                    android:ems="10"
+                    android:hint="@string/et_picture"
+                    android:inputType="text"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/linkToRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_link_to_login"
+                android:layout_gravity="center"
+                android:textStyle="normal|bold" />
+
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="185dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/rounded_button_background"
+                android:gravity="center"
+                android:text="@string/btn_register"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/bottomCircle"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:background="@drawable/bottom_circle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="-20dp"
+            android:layout_marginStart="-50dp"
+            android:contentDescription="@string/cd_bottom_circle"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

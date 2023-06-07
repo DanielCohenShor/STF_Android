@@ -6,5 +6,17 @@
     <string name="tv_username">Username</string>
     <string name="tv_password">Password</string>
     <string name="tv_login_headline">Sign in</string>
-    <string name="link_to_register">Not registered? Click here to sign in</string>
+    <string name="tv_link_to_register">Not registered? Click here to sign in</string>
+    <string name="tv_register_headline">Create Account</string>
+    <string name="btn_register">REGISTER</string>
+    <string name="tv_link_to_login">Already registered? Click here to login</string>
+    <string name="tv_password_verification">Password Verification</string>
+    <string name="et_confirm_password">Confirm Password</string>
+    <string name="tv_display_name">Display Name</string>
+    <string name="et_display_name">Display Name</string>
+    <string name="tv_picture">Picture</string>
+    <string name="et_picture">Picture</string>
+    <string name="cd_top_circle">topCircle</string>
+    <string name="cd_show_password">showPasswordImg</string>
+    <string name="cd_bottom_circle">bottomCircle</string>
 </resources>
