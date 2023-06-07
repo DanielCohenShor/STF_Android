@@ -3,9 +3,5 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/Segoe_UI" />
-    <font
-        android:fontStyle="italic"
-        android:fontWeight="400"
-        android:font="@font/Segoe_UI_Italic" />
+        android:font="@font/segoe_ui_bold" />
 </font-family>

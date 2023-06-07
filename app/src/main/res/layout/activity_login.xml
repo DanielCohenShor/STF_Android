@@ -27,7 +27,7 @@
             android:textColor="#CADEED"
             android:textStyle="bold"
             android:textSize="40sp"
-            android:fontFamily="@font/Segoe_UI_Bold"/>
+            android:fontFamily="@font/segoue_ui_bold_font"/>
 
         <LinearLayout
             android:layout_width="297dp"
@@ -39,12 +39,11 @@
                 android:id="@+id/tvUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/Segoe_UI_Bold"
+                android:fontFamily="@font/segoue_ui_bold_font"
                 android:paddingBottom="5dp"
                 android:text="@string/tv_username"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/etUsername"
@@ -58,7 +57,7 @@
                 android:background="@drawable/edittext_background"
                 android:drawableStart="@drawable/username_icon_drawable"
                 android:drawablePadding="8dp"
-                android:fontFamily="@font/Segoe_UI"/>
+                android:fontFamily="@font/segoe_ui_font"/>
         </LinearLayout>
 
         <LinearLayout
@@ -75,8 +74,7 @@
                 android:text="@string/tv_password"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/Segoe_UI_Bold"/>
+                android:fontFamily="@font/segoue_ui_bold_font"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -94,7 +92,7 @@
                     android:background="@drawable/edittext_background"
                     android:drawableStart="@drawable/password_icon_drawable"
                     android:drawablePadding="8dp"
-                    android:fontFamily="@font/Segoe_UI"/>
+                    android:fontFamily="@font/segoe_ui_font"/>
 
                 <ImageButton
                     android:id="@+id/btnShowPassword"
@@ -117,7 +115,8 @@
             android:text="@string/btn_login"
             android:textColor="#FFFFFF"
             android:layout_marginTop="30dp"
-            android:fontFamily="@font/Segoe_UI"/>
+            android:fontFamily="@font/segoe_ui_font"
+            android:textSize="20sp"/>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
