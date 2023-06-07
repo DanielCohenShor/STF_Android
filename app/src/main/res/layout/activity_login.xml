@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/tvLoginHeadline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/tv_login_headline"
@@ -48,12 +48,14 @@
                 android:id="@+id/etUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#d8d6d6"
                 android:ems="10"
                 android:hint="@string/et_username"
                 android:inputType="text"
                 android:minHeight="48dp"
-                android:autofillHints="username"/>
+                android:autofillHints="username"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@drawable/username_icon_drawable"
+                android:drawablePadding="8dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -72,16 +74,33 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/etPassword"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#d8d6d6"
-                android:ems="10"
-                android:hint="@string/et_password"
-                android:inputType="textPassword"
-                android:minHeight="48dp"
-                android:autofillHints="password"/>
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/et_password"
+                    android:inputType="textPassword"
+                    android:minHeight="48dp"
+                    android:autofillHints="password"
+                    android:background="@drawable/edittext_background"
+                    android:drawableStart="@drawable/password_icon_drawable"
+                    android:drawablePadding="8dp" />
+
+                <ImageButton
+                    android:id="@+id/btnShowPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/show_password_icon_drawable" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
         <Button
@@ -92,7 +111,7 @@
             android:background="@drawable/rounded_button_background"
             android:gravity="center"
             android:text="@string/btn_login"
-            android:textColor="#00000" />
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
