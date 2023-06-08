@@ -17,6 +17,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageButton
+            android:id="@+id/btnExitChat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="0.1"
+            android:adjustViewBounds="true"
+            android:background="#00FFFFFF"
+            app:srcCompat="@drawable/ic_exit" />
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contactImg"
             android:layout_width="40dp"
@@ -36,18 +48,6 @@
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnExitChat"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="0.1"
-            android:adjustViewBounds="true"
-            android:background="#00FFFFFF"
-            app:srcCompat="@drawable/ic_exit_chat" />
     </LinearLayout>
 
     <LinearLayout
@@ -98,9 +98,10 @@
             android:layout_weight="1"
             android:background="@drawable/send_message_edit_text"
             android:ems="10"
-            android:hint="New message here..."
+            android:hint="@string/ed__new_message_hint"
             android:inputType="text"
-            android:paddingStart="10dp"/>
+            android:paddingStart="10dp"
+            android:autofillHints="true"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnSendMessage"
