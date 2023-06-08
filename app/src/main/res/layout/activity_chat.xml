@@ -57,28 +57,73 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <TextView
-            android:id="@+id/tvMyMessage"
+            android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/my_text_bubble_drawable"
+            android:background="@drawable/chat_date_bubble_drawable"
             android:padding="8dp"
-            android:text="Hello, this is a text bubble!"
-            android:textColor="@color/black"
-            android:layout_gravity="end"
+            android:text="08.06.2023"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="10dp"/>
 
-        <TextView
-            android:id="@+id/tvContactMessage"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/contact_text_bubble_drawable"
-            android:padding="8dp"
-            android:text="Hello, this is a text bubble!"
-            android:textColor="@color/black"
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvContactMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello, this is a text bubble!"
+                android:textColor="@color/black"
+                android:layout_gravity="end"
+                android:paddingBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/tvMessageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15:01"
+                android:layout_gravity="end"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/my_text_bubble_drawable"
+            android:padding="10dp"
+            android:orientation="vertical"
             android:layout_gravity="start"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvMyMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello, this is a text bubble!"
+                android:textColor="@color/black"
+                android:layout_gravity="end"
+                android:paddingBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/tvMessageTime1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15:02"
+                android:layout_gravity="end"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
