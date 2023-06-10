@@ -27,7 +27,7 @@ import java.util.Objects;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword,etPasswordVerification, etDisplayName;
-    private TextView tvPicture;
+    private TextView tvPicture, linkToRegister;
     private Button btnRegister;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
@@ -40,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
         //init the fileds of the xml activity.
         initView();
         //init the listener for the show password.
-        initListener();
+        initListeners();
         //init the view model
         initViewMOdel();
     }
@@ -109,10 +109,10 @@ public class RegisterActivity extends AppCompatActivity {
         btnPasswordVisibility = findViewById(R.id.btnShowPassword);
         btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
         btnRegister = findViewById(R.id.btnRegister);
-
+        linkToRegister = findViewById(R.id.linkToRegister);
     }
 
-    private void initListener() {
+    private void initListeners() {
         Context context = this; // 'this' refers to the current Activity instance
 
         btnPasswordVisibility.setOnClickListener(v -> {
@@ -153,6 +153,12 @@ public class RegisterActivity extends AppCompatActivity {
 
             // Move the cursor to the end of the text
             etPasswordVerification.setSelection(etPasswordVerification.getText().length());
+        });
+
+        linkToRegister.setOnClickListener(v -> {
+            // Start the new activity here
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
         });
     }
 
