@@ -17,10 +17,11 @@ import android.widget.TextView;
 
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
+import com.example.stf.Register.ViewModelRegister;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private ViewModelLogin viewModel;
+    private ViewModelLogin viewModelLogin;
     private EditText etUsername;
     private EditText etPassword;
     private ImageButton btnPasswordVisibility;
@@ -33,10 +34,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         // init the views item of the activity.
         initViewItem();
-        //create the view modela and to create observers
-//        createObservers();
         // createListenres
         createListeners();
+        //init the view model
+        initViewMOdel();
     }
 
     private void createListeners() {
@@ -75,5 +76,14 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister);
+    }
+    private void initViewMOdel() {
+        viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+        //create listener for the btnRegister
+        btnLogin.setOnClickListener(view -> {
+            // Call the registration method in the RegisterViewModel
+            viewModelLogin.performLogin(etUsername.getText().toString(),
+                    etPassword.getText().toString());
+        });
     }
 }
