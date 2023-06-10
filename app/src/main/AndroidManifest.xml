@@ -16,7 +16,7 @@
             android:name=".ContactsActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Register.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

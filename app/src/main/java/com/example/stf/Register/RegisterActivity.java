@@ -1,4 +1,4 @@
-package com.example.stf;
+package com.example.stf.Register;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -10,6 +10,8 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import com.example.stf.R;
 
 public class RegisterActivity extends AppCompatActivity {
 
