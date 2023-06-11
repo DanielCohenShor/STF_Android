@@ -1,15 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Speak, Talk, Friends</string>
     <string name="et_username">Username</string>
     <string name="et_password">Password</string>
     <string name="btn_login">Login</string>
     <string name="tv_username">Username</string>
     <string name="tv_password">Password</string>
     <string name="tv_login_headline">Sign in</string>
-    <string name="tv_link_to_register">Not registered? <u>Click here</u> to register</string>
+    <string name="tv_link_to_register">Not registered? Click here to sign in</string>
     <string name="tv_register_headline">Create Account</string>
     <string name="btn_register">REGISTER</string>
-    <string name="tv_link_to_login">Already registered? <u>Click here</u> to login</string>
+    <string name="tv_link_to_login">Already registered? Click here to login</string>
     <string name="tv_password_verification">Password Verification</string>
     <string name="et_confirm_password">Confirm Password</string>
     <string name="tv_display_name">Display Name</string>
@@ -20,5 +20,5 @@
     <string name="cd_show_password">showPasswordImg</string>
     <string name="cd_bottom_circle">bottomCircle</string>
     <string name="cd_add_new_contact">addNewContact</string>
-    <string name="BaseUrl">http://10.0.2.2:5000/api/</string>
+    <string name="BaseUrl">http://192.168.1.37:5000/api/</string>
 </resources>
