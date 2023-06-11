@@ -1,25 +1,28 @@
 package com.example.stf.api;
 
 import com.example.stf.entities.User;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
-import java.util.List;
-import java.util.Map;
-
+import okhttp3.RequestBody;
 import retrofit2.Call;
 
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface WebServiceAPI {
-    @GET("Users")
-    Call<User> getUser(@Body String username);
+    @GET("Users/{username}")
+    Call<User> getUser(@Header("Authorization") String token, @Path("username") String username);
+
 
     @POST("Users")
     Call<Void> createUser(@Body User user);
 
     @POST("Tokens")
-    Call<String> createToken(@Body Map<String, String> tokenRequest);
+    Call<Void> createToken(@Body RequestBody tokenRequest);
 
 
     //more req

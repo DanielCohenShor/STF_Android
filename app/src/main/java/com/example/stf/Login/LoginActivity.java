@@ -16,22 +16,20 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.stf.ContactsActivity;
+import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
-import com.example.stf.Register.ViewModelRegister;
 
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
-
+    private String username;
     private ViewModelLogin viewModelLogin;
     private EditText etUsername;
     private EditText etPassword;
@@ -122,6 +120,8 @@ public class LoginActivity extends AppCompatActivity {
         viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
         //create listener for the btnRegister
         btnLogin.setOnClickListener(view -> {
+            // save the username
+            this.username = etUsername.getText().toString();
             // Call the registration method in the RegisterViewModel
             viewModelLogin.performLogin(etUsername.getText().toString(),
                     etPassword.getText().toString(),
@@ -150,11 +150,29 @@ public class LoginActivity extends AppCompatActivity {
             LinearLayout parentLayout = findViewById(R.id.test);
             parentLayout.addView(tvError, layoutParams);
         } else {
-
-            // Start the new activity here
-//            Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
-//            startActivity(intent);
+            // save the token
+            viewModelLogin.setToken(token);
+            viewModelLogin.getDetails(username,this::handleDetailsUser);
         }
+
+    }
+
+    private void handleDetailsUser(String [] userDetails) {
+        // Extract the user details from the array
+        String username = userDetails[0];
+        String displayName = userDetails[1];
+        String profilePic = userDetails[2];
+
+        // Get the token from the ViewModel (assuming you have a ViewModel instance named viewModelLogin)
+        String token = viewModelLogin.getToken();
+
+        // Start the new activity and pass the data using Intent extras
+        Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
+        intent.putExtra("username", username);
+        intent.putExtra("displayName", displayName);
+        intent.putExtra("profilePic", profilePic);
+        intent.putExtra("token", token);
+        startActivity(intent);
 
     }
 }
