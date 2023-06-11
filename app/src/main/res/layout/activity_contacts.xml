@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ContactsActivity">
+    tools:context=".Contacts.ContactsActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -63,6 +63,7 @@
     </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,11 +81,11 @@
                     android:id="@+id/tvContactName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Daniel Cohen Shor"
                     android:layout_marginStart="60dp"
+                    android:text="Daniel Cohen Shor"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"/>
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -96,10 +97,10 @@
                         android:id="@+id/tvTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="10:53"
-                        android:textSize="15sp"
+                        android:layout_gravity="center"
                         android:layout_marginEnd="10dp"
-                        android:layout_gravity="center"/>
+                        android:text="10:53"
+                        android:textSize="15sp" />
 
                 </LinearLayout>
             </TableRow>
@@ -117,10 +118,10 @@
             android:id="@+id/tvLastMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hey! What's up?"
+            android:layout_gravity="bottom"
             android:layout_marginStart="80dp"
-            android:textSize="15sp"
-            android:layout_gravity="bottom"/>
+            android:text="Hey! What's up?"
+            android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -131,28 +132,50 @@
 
             <TextView
                 android:id="@+id/tvNotification"
-                android:text="2"
-                android:gravity="center"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:background="@drawable/notification_circle"/>
+                android:layout_gravity="center"
+                android:background="@drawable/notification_circle"
+                android:gravity="center"
+                android:text="2"
+                android:textColor="#FFFFFF" />
 
         </LinearLayout>
     </FrameLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddContact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/light_blue"
         android:clickable="true"
+        android:contentDescription="@string/cd_add_new_contact"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.989"
         app:srcCompat="@drawable/ic_add_contact"
-        android:background="@color/light_blue"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="10dp"
-        android:contentDescription="@string/cd_add_new_contact"
-        app:tint="@android:color/white"/>
+        app:tint="@android:color/white" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+        tools:layout_editor_absoluteX="0dp">
+
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/listViewContacts"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+        app:layout_constraintVertical_bias="0.089"
+        tools:layout_editor_absoluteX="-12dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

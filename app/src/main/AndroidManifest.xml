@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name=".ContactsActivity"
+            android:name=".Contacts.ContactsActivity"
             android:exported="false" />
 
         <activity

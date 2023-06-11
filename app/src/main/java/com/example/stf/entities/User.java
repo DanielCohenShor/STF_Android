@@ -34,7 +34,7 @@ public class User {
         return displayName;
     }
 
-    public String getPropilePic() {
+    public String getProfilePic() {
         return profilePic;
     }
 
@@ -53,4 +53,6 @@ public class User {
     public void setPropilePic(String propilePic) {
         this.profilePic = propilePic;
     }
+
+
 }
