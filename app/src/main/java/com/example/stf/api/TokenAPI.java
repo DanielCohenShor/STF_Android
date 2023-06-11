@@ -2,16 +2,14 @@ package com.example.stf.api;
 
 import com.example.stf.MyApplication;
 import com.example.stf.R;
-import com.example.stf.entities.User;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,16 +29,20 @@ public class TokenAPI {
     }
 
     public void post(String username, String password, Consumer<String> callback) {
-        Map<String, String> tokenRequest = new HashMap<>();
-        tokenRequest.put("username", username);
-        tokenRequest.put("password", password);
+        JsonObject tokenRequest = new JsonObject();
+        tokenRequest.addProperty("username", username);
+        tokenRequest.addProperty("password", password);
 
-        Call<String> call = webServiceAPI.createToken(tokenRequest);
-        call.enqueue(new Callback<String>() {
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(tokenRequest);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
+        Call<Void> call = webServiceAPI.createToken(requestBody);
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    String token = response.body();
+                    String token = removeTokenPrefix(response.headers().get("Set-Cookie"));
                     callback.accept(token);
                     // Handle the token
                 } else {
@@ -57,10 +59,24 @@ public class TokenAPI {
 
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 int x = 5;
             }
         });
+    }
+
+    // remove the token= from the token and everything after ;
+    public String removeTokenPrefix(String input) {
+        if (input != null && input.contains("token=")) {
+            int tokenIndex = input.indexOf("token=");
+            int semicolonIndex = input.indexOf(';', tokenIndex);
+            if (semicolonIndex != -1) {
+                return input.substring(tokenIndex + 6, semicolonIndex);
+            } else {
+                return input.substring(tokenIndex + 6);
+            }
+        }
+        return input;
     }
 
 }

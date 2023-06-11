@@ -23,6 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class UserAPI {
     Retrofit retrofit;
     WebServiceAPI webServiceAPI;
+    String token; // Store the token here
     public UserAPI() {
 
         retrofit = new Retrofit.Builder()
@@ -31,13 +32,41 @@ public class UserAPI {
                 .build();
         webServiceAPI = retrofit.create(WebServiceAPI.class);
     }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-    public void get(String username) {
-        Call<User> call = webServiceAPI.getUser(username);
+    public void get(String username, Consumer<String[]> callback) {
+        Call<User> call = webServiceAPI.getUser("Bearer {\"token\":\"" + token + "\"}", username);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                User user = response.body();
+                if (response.isSuccessful()) {
+                    User res = response.body();
+                    String[] parm = new String[3];
+                    assert res != null;
+                    parm[0] = res.getUsername();
+                    parm[1] = res.getDisplayName();
+                    parm[2] = res.getProfilePic();
+                    callback.accept(parm);
+                } else  {
+                    try {
+                        String errorResponse = response.errorBody().string();
+                        JsonElement jsonElement = JsonParser.parseString(errorResponse);
+                        if (jsonElement.isJsonObject()) {
+                            JsonArray errorsArray = jsonElement.getAsJsonObject().getAsJsonArray("errors");
+                            String[] errors = new String[errorsArray.size()];
+                            for (int i = 0; i < errorsArray.size(); i++) {
+                                errors[i] = errorsArray.get(i).getAsString();
+                            }
+                            callback.accept(errors);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        String[] errors = {"Error parsing response"};
+                        callback.accept(errors);
+                    }
+                }
             }
 
             @Override
@@ -83,4 +112,7 @@ public class UserAPI {
     }
 
 
+    public String getToken() {
+        return token;
+    }
 }
