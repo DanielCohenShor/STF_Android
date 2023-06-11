@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E6E5E5"
+    android:background="@color/background_gray"
     tools:context=".Login.LoginActivity">
 
     <ImageView
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/tv_login_headline"
-            android:textColor="#CADEED"
+            android:textColor="@color/blue_shade_2"
             android:textSize="40sp"
             android:textStyle="bold"
             android:layout_marginTop="30dp" />
@@ -137,7 +137,7 @@
             android:background="@drawable/rounded_button_background"
             android:gravity="center"
             android:text="@string/btn_login"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="20sp" />
 
     </LinearLayout>

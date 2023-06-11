@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ContactsActivity"
-    android:background="#E6E5E5">
+    android:background="@color/background_gray">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -17,12 +17,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageButton
+            android:id="@+id/btnExitChat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="0.1"
+            android:adjustViewBounds="true"
+            android:background="@color/blue_shade_2"
+            app:srcCompat="@drawable/ic_exit" />
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contactImg"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:src="@drawable/picture1"
-            app:civ_border_color="#FF000000"
+            app:civ_border_color="@color/black"
             android:layout_marginStart="10dp"/>
 
         <TextView
@@ -36,18 +48,6 @@
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnExitChat"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="0.1"
-            android:adjustViewBounds="true"
-            android:background="#00FFFFFF"
-            app:srcCompat="@drawable/ic_exit_chat" />
     </LinearLayout>
 
     <LinearLayout
@@ -57,34 +57,79 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <TextView
-            android:id="@+id/tvMyMessage"
+            android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/my_text_bubble_drawable"
+            android:background="@drawable/chat_date_bubble_drawable"
             android:padding="8dp"
-            android:text="Hello, this is a text bubble!"
-            android:textColor="@color/black"
-            android:layout_gravity="end"
+            android:text="08.06.2023"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="10dp"/>
 
-        <TextView
-            android:id="@+id/tvContactMessage"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/contact_text_bubble_drawable"
-            android:padding="8dp"
-            android:text="Hello, this is a text bubble!"
-            android:textColor="@color/black"
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvContactMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello, this is a text bubble!"
+                android:textColor="@color/black"
+                android:layout_gravity="end"
+                android:paddingBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/tvMessageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15:01"
+                android:layout_gravity="end"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/my_text_bubble_drawable"
+            android:padding="10dp"
+            android:orientation="vertical"
             android:layout_gravity="start"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvMyMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello, this is a text bubble!"
+                android:textColor="@color/black"
+                android:layout_gravity="end"
+                android:paddingBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/tvMessageTime1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15:02"
+                android:layout_gravity="end"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E6E5E5"
+        android:background="@color/background_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -98,9 +143,10 @@
             android:layout_weight="1"
             android:background="@drawable/send_message_edit_text"
             android:ems="10"
-            android:hint="New message here..."
+            android:hint="@string/ed_new_message_hint"
             android:inputType="text"
-            android:paddingStart="10dp"/>
+            android:paddingStart="10dp"
+            android:autofillHints="true"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnSendMessage"
@@ -108,7 +154,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:background="@color/light_blue"
+            android:background="@color/blue_shade_2"
             android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

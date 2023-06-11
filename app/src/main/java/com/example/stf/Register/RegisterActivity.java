@@ -58,7 +58,26 @@ public class RegisterActivity extends AppCompatActivity {
         //init the view model
         initViewModel();
 
+        TextView linkToRegister = findViewById(R.id.linkToRegister);
 
+        // Define the text with the portion to be highlighted
+        String fullText = getResources().getString(R.string.tv_link_to_login);
+        String highlightText = "Click here";
+        int highlightStart = fullText.indexOf(highlightText);
+        int highlightEnd = highlightStart + highlightText.length();
+
+        // Create a SpannableString
+        SpannableString spannableString = new SpannableString(fullText);
+
+        // Create a ForegroundColorSpan with the desired hover color
+        int hoverColor = ContextCompat.getColor(this, R.color.blue_shade_4);
+        ForegroundColorSpan hoverSpan = new ForegroundColorSpan(hoverColor);
+
+        // Apply the hover span to the desired portion of the text
+        spannableString.setSpan(hoverSpan, highlightStart, highlightEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Set the SpannableString as the text of the TextView
+        linkToRegister.setText(spannableString);
     }
 
     private void performRegistration() {
