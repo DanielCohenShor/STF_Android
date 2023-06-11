@@ -1,5 +1,7 @@
 package com.example.stf.Register;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -9,13 +11,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -46,6 +50,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     // create map that contains all the text of the errors to show for the user
     private HashMap<String, String> errorsText = new HashMap<>();
+    private ActivityResultLauncher<Intent> filePickerLauncher;
+
+    private Uri fileUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,26 +65,22 @@ public class RegisterActivity extends AppCompatActivity {
         //init the view model
         initViewModel();
 
-        TextView linkToRegister = findViewById(R.id.linkToRegister);
+        filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            fileUri = data.getData();
+                            // Handle the selected file here
+                        }
+                    }
+                });
+    }
 
-        // Define the text with the portion to be highlighted
-        String fullText = getResources().getString(R.string.tv_link_to_login);
-        String highlightText = "Click here";
-        int highlightStart = fullText.indexOf(highlightText);
-        int highlightEnd = highlightStart + highlightText.length();
-
-        // Create a SpannableString
-        SpannableString spannableString = new SpannableString(fullText);
-
-        // Create a ForegroundColorSpan with the desired hover color
-        int hoverColor = ContextCompat.getColor(this, R.color.blue_shade_4);
-        ForegroundColorSpan hoverSpan = new ForegroundColorSpan(hoverColor);
-
-        // Apply the hover span to the desired portion of the text
-        spannableString.setSpan(hoverSpan, highlightStart, highlightEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        // Set the SpannableString as the text of the TextView
-        linkToRegister.setText(spannableString);
+    public void onChooseFileClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        filePickerLauncher.launch(intent);
     }
 
     private void performRegistration() {
@@ -240,10 +243,37 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        linkToRegister.setOnClickListener(v -> {
-            // Start the new activity here
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
+        // Define the text with the portion to be highlighted
+        String fullText = getResources().getString(R.string.tv_link_to_login);
+        String highlightText = "Click here";
+        int highlightStart = fullText.indexOf(highlightText);
+        int highlightEnd = highlightStart + highlightText.length();
+
+        // Create a SpannableString
+        SpannableString spannableString = new SpannableString(fullText);
+
+        // Create a ClickableSpan
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                // Handle the click event here, e.g., change the color
+                int clickedColor = ContextCompat.getColor(RegisterActivity.this, R.color.blue_shade_4);
+                ((TextView) widget).setLinkTextColor(clickedColor);
+
+                // Start the new activity here
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+
+                // Perform any other actions you want when the text is clicked
+                // For example, navigate to a new activity or perform some task.
+            }
+        };
+
+        // Apply the ClickableSpan to the desired portion of the text
+        spannableString.setSpan(clickableSpan, highlightStart, highlightEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Make the text clickable and change the color when clicked
+        linkToRegister.setText(spannableString);
+        linkToRegister.setMovementMethod(LinkMovementMethod.getInstance());
     }
 }

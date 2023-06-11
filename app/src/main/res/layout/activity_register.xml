@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_gray"
-    tools:context=".Login.LoginActivity">
+    tools:context=".Register.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -223,16 +223,17 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/et_profilePic"
+                <Button
+                    android:id="@+id/btnChooseFile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:autofillHints="username"
                     android:background="@drawable/edittext_background"
-                    android:ems="10"
-                    android:hint="@string/et_picture"
-                    android:inputType="text"
-                    android:minHeight="48dp" />
+                    android:drawableStart="@drawable/profile_pic_icon_drawable"
+                    android:drawablePadding="8dp"
+                    android:onClick="onChooseFileClick"
+                    android:minHeight="48dp"
+                    android:text="@string/et_picture"
+                    android:gravity="center_vertical|start" />
             </LinearLayout>
 
             <TextView
