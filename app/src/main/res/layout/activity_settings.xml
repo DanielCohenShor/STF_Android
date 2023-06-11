@@ -113,7 +113,6 @@
                 android:layout_weight="0.1" />
         </LinearLayout>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -146,7 +145,7 @@
                 android:layout_height="18dp"
                 android:layout_marginStart="10dp"
                 android:layout_weight="0.1"
-                app:srcCompat="@drawable/ic_openSetting"
+                app:srcCompat="@drawable/ic_open_setting"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
 
@@ -182,12 +181,8 @@
                 android:layout_height="18dp"
                 android:layout_marginStart="10dp"
                 android:layout_weight="0.1"
-                app:srcCompat="@drawable/ic_openSetting"
+                app:srcCompat="@drawable/ic_open_setting"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
-
-
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
