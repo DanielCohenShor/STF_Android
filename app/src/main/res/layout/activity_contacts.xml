@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Contacts.ContactsActivity">
+    android:background="@color/background_gray">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -35,7 +36,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="#00FFFFFF"
+            android:background="@color/blue_shade_2"
             app:srcCompat="@drawable/ic_settings" />
 
         <ImageButton
@@ -46,7 +47,7 @@
             android:layout_marginStart="15dp"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="#00FFFFFF"
+            android:background="@color/blue_shade_2"
             app:srcCompat="@drawable/ic_search" />
 
         <ImageButton
@@ -58,7 +59,7 @@
             android:layout_marginEnd="10dp"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="#00FFFFFF"
+            android:background="@color/blue_shade_2"
             app:srcCompat="@drawable/ic_logout" />
     </LinearLayout>
 
@@ -111,8 +112,9 @@
             android:id="@+id/contactImg"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/add_new_contact_icon"
-            app:civ_border_color="#FF000000" />
+            android:src="@drawable/picture1"
+            app:civ_border_color="@color/black"
+            android:layout_marginStart="5dp"/>
 
         <TextView
             android:id="@+id/tvLastMessage"
@@ -132,14 +134,14 @@
 
             <TextView
                 android:id="@+id/tvNotification"
+                android:text="2"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:layout_gravity="center"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:layout_gravity="center"
                 android:background="@drawable/notification_circle"
-                android:gravity="center"
-                android:text="2"
-                android:textColor="#FFFFFF" />
-
         </LinearLayout>
     </FrameLayout>
 
@@ -158,7 +160,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.989"
         app:srcCompat="@drawable/ic_add_contact"
-        app:tint="@android:color/white" />
+
+        android:background="@color/blue_shade_2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:contentDescription="@string/cd_add_new_contact"
+        app:tint="@android:color/white"/>
 
     <FrameLayout
         android:layout_width="match_parent"
