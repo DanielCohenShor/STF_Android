@@ -10,7 +10,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -25,6 +30,7 @@ import com.example.stf.R;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -34,6 +40,12 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
+
+    // Declare a HashSet to store the IDs of the created TextViews
+    private HashSet<String> createdTextViews = new HashSet<>();
+
+    // create map that contains all the text of the errors to show for the user
+    private HashMap<String, String> errorsText = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +57,8 @@ public class RegisterActivity extends AppCompatActivity {
         initListeners();
         //init the view model
         initViewModel();
+
+
     }
 
     private void performRegistration() {
@@ -65,16 +79,6 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             // Handle the errors here
-
-            // create map that contains all the text of the errors to show for the user
-            HashMap<String, String> errorsText = new HashMap<>();
-            errorsText.put("username", "must contain at least one letter");
-//            errorsText.put("username2", "username already exist");
-            errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
-            errorsText.put("passwordVerification", "must be the same as the password");
-            errorsText.put("displayName", "must contain at least one letter");
-            errorsText.put("profilePic", "must insert only files of kind: png, jpeg...");
-
             // Inside the errors array are all the errors
             for (int i = 0; i < errors.length; i++) {
                 if (errors[i].equals("password")) {
@@ -86,27 +90,58 @@ public class RegisterActivity extends AppCompatActivity {
 
             for (String error : errors) {
                 String layoutId = "ll_" + error;
-                // Add the error message TextView dynamically
-                TextView tvError = new TextView(RegisterActivity.this);
-                tvError.setText(errorsText.get(error));
-                tvError.setTextColor(Color.RED);
-                tvError.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                tvError.setPadding(16, 8, 16, 8);
+                String tvId = "tv_error_" + error;
 
-                String editTextId = "et_" + error;
-                EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
-                etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
+                // check if the error already shown to the user
+                if (!createdTextViews.contains(tvId)) {
+                    // Add the error message TextView dynamically
+                    TextView tvError = new TextView(RegisterActivity.this);
+                    tvError.setId(tvId.hashCode());
+                    tvError.setText(errorsText.get(error));
+                    tvError.setTextColor(Color.RED);
+                    tvError.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                    tvError.setPadding(16, 8, 16, 8);
 
-                // Set the appropriate layout params for the error message TextView
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+                    // set the edit text border to red
+                    String editTextId = "et_" + error;
+                    EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
+                    etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
 
-                // Add the error message TextView to your desired parent view
-                LinearLayout parentLayout = findViewById(getResources().getIdentifier(layoutId, "id", getPackageName()));
-                parentLayout.addView(tvError, layoutParams);
+                    // Set the appropriate layout params for the error message TextView
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+
+                    // Add the error message TextView to your desired parent view
+                    LinearLayout parentLayout = findViewById(getResources().getIdentifier(layoutId, "id", getPackageName()));
+                    parentLayout.addView(tvError, layoutParams);
+
+                    // add listeners to change of the text in the edit text
+                    etBorder.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                            // This method is called before the text is changed
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // This method is called when the text is being changed
+                        }
+
+                        // This method is called after the text has been changed
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            // change the border of the text view to none
+                            etBorder.setBackgroundResource(R.drawable.edittext_background);
+                            // remove the text view of the error
+                            parentLayout.removeView(tvError);
+                            createdTextViews.remove(tvId);
+                        }
+                    });
+                    createdTextViews.add(tvId);
+                }
             }
         }
     }
@@ -128,6 +163,13 @@ public class RegisterActivity extends AppCompatActivity {
         btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
         btnRegister = findViewById(R.id.btnRegister);
         linkToRegister = findViewById(R.id.linkToRegister);
+
+        errorsText.put("username", "must contain at least one letter");
+//            errorsText.put("username2", "username already exist");
+        errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
+        errorsText.put("passwordVerification", "must be the same as the password");
+        errorsText.put("displayName", "must contain at least one letter");
+        errorsText.put("profilePic", "must insert only files of kind: png, jpeg...");
     }
 
     private void initListeners() {
