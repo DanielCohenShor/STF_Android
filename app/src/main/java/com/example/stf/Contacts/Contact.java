@@ -2,6 +2,7 @@ package com.example.stf.Contacts;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.example.stf.Chat.Message;
 import com.example.stf.entities.User;
 
 @Entity
@@ -11,11 +12,11 @@ public class Contact {
 
     private User user;
 
-    private String lastMessage;
+    private Message lastMessage;
 
     private int notifications;
 
-    public Contact(int id, User user, String lastMessage, int notifications) {
+    public Contact(int id, User user, Message lastMessage, int notifications) {
         this.id = id;
         this.user = user;
         this.lastMessage = lastMessage;
@@ -30,7 +31,7 @@ public class Contact {
         return user;
     }
 
-    public String getLastMessage() {
+    public Message getLastMessage() {
         return lastMessage;
     }
 

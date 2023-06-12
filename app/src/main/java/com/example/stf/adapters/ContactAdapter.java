@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.stf.Contacts.Contact;
 import com.example.stf.R;
 
-import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
@@ -57,7 +55,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             holder.displayName.setText(currentContact.getUser().getDisplayName());
             // Set the profile picture using an image loading library or your preferred method
             // holder.profilePic.setImageURI(Uri.parse(currentContact.getProfilePicUrl()));
-            holder.lastMessage.setText(currentContact.getLastMessage());
+            if (currentContact.getLastMessage() != null) {
+                holder.lastMessage.setText(currentContact.getLastMessage().getContent());
+            }
             holder.notification.setText(String.valueOf(currentContact.getNotifications()));
         }
     }

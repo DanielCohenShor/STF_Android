@@ -47,7 +47,7 @@ public class ContactAPI {
 
             @Override
             public void onFailure(Call<Contact[]> call, Throwable t) {
-
+            return;
             }
         });
     }
