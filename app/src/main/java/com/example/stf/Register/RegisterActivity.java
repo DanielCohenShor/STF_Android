@@ -9,17 +9,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -31,19 +31,29 @@ import android.widget.TextView;
 
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
+import com.makeramen.roundedimageview.RoundedImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etUsername, etPassword,etPasswordVerification, etDisplayName;
-    private TextView tvPicture, linkToRegister;
+    private EditText etUsername, etPassword, etPasswordVerification, etDisplayName;
+
+    private TextView tvProfilePic;
+    private TextView linkToLogin;
     private Button btnRegister;
+
+    private String encodedImg;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
+
+    private RoundedImageView riProfilePic;
 
     // Declare a HashSet to store the IDs of the created TextViews
     private HashSet<String> createdTextViews = new HashSet<>();
@@ -65,23 +75,41 @@ public class RegisterActivity extends AppCompatActivity {
         //init the view model
         initViewModel();
 
-        filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            fileUri = data.getData();
-                            // Handle the selected file here
-                        }
-                    }
-                });
+        riProfilePic.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            profilePic.launch(intent);
+        });
     }
 
-    public void onChooseFileClick(View view) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        filePickerLauncher.launch(intent);
+    private String encodeImage(Bitmap bitmap) {
+        int previewWidth = 150;
+        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
+        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
+
+    private final ActivityResultLauncher<Intent> profilePic = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    if (result.getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            riProfilePic.setImageBitmap(bitmap);
+                            tvProfilePic.setVisibility(View.GONE);
+                            encodedImg = encodeImage(bitmap);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+    );
 
     private void performRegistration() {
         registerViewModel.performRegistration(
@@ -89,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
                 etPassword.getText().toString(),
                 etPasswordVerification.getText().toString(),
                 etDisplayName.getText().toString(),
-                tvPicture.toString(),
+                encodedImg,
                 this::handleRegistrationCallback
         );
     }
@@ -126,6 +154,10 @@ public class RegisterActivity extends AppCompatActivity {
 
                     // set the edit text border to red
                     String editTextId = "et_" + error;
+                    if(error == "username exist") {
+                        layoutId = "ll_username";
+                        editTextId = "et_username";
+                    }
                     EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
                     etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
 
@@ -180,14 +212,15 @@ public class RegisterActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.et_password);
         etPasswordVerification = findViewById(R.id.et_passwordVerification);
         etDisplayName = findViewById(R.id.et_displayName);
-        tvPicture = findViewById(R.id.tvProfilePic);
         btnPasswordVisibility = findViewById(R.id.btnShowPassword);
         btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
         btnRegister = findViewById(R.id.btnRegister);
-        linkToRegister = findViewById(R.id.linkToRegister);
+        linkToLogin = findViewById(R.id.linkToLogin2);
+        riProfilePic = findViewById(R.id.riProfilePic);
+        tvProfilePic = findViewById(R.id.tvProfilePic);
 
         errorsText.put("username", "must contain at least one letter");
-//            errorsText.put("username2", "username already exist");
+        errorsText.put("username exist", "username already exist");
         errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
         errorsText.put("passwordVerification", "must be the same as the password");
         errorsText.put("displayName", "must contain at least one letter");
@@ -243,37 +276,10 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        // Define the text with the portion to be highlighted
-        String fullText = getResources().getString(R.string.tv_link_to_login);
-        String highlightText = "Click here";
-        int highlightStart = fullText.indexOf(highlightText);
-        int highlightEnd = highlightStart + highlightText.length();
-
-        // Create a SpannableString
-        SpannableString spannableString = new SpannableString(fullText);
-
-        // Create a ClickableSpan
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(View widget) {
-                // Handle the click event here, e.g., change the color
-                int clickedColor = ContextCompat.getColor(RegisterActivity.this, R.color.blue_shade_4);
-                ((TextView) widget).setLinkTextColor(clickedColor);
-
-                // Start the new activity here
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-
-                // Perform any other actions you want when the text is clicked
-                // For example, navigate to a new activity or perform some task.
-            }
-        };
-
-        // Apply the ClickableSpan to the desired portion of the text
-        spannableString.setSpan(clickableSpan, highlightStart, highlightEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        // Make the text clickable and change the color when clicked
-        linkToRegister.setText(spannableString);
-        linkToRegister.setMovementMethod(LinkMovementMethod.getInstance());
+        linkToLogin.setOnClickListener(view -> {
+            // Start the new activity here
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
     }
 }

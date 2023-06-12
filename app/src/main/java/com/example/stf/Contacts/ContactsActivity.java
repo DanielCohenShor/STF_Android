@@ -22,17 +22,16 @@ import com.example.stf.Register.ViewModelRegister;
 import com.example.stf.adapters.ContactAdapter;
 
 import java.util.Objects;
+import com.example.stf.SettingsActivity;
 
 public class ContactsActivity extends AppCompatActivity {
-    private TextView usernameTextView;
-    private ImageView profileImageView;
-
-    private TextView displayNameTextView;
     private ImageButton btnLogout;
     private ViewModalContacts viewModalContacts;
     private String token;
     private RecyclerView listViewContacts;
     private ContactAdapter contactAdapter;
+
+    private ImageButton btnSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,21 +53,21 @@ public class ContactsActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        btnSettings.setOnClickListener(v -> {
+            // Start the new activity here
+            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
     }
     private void init() {
         // Initialize the views
-        displayNameTextView = findViewById(R.id.tvContactName);
-        // Retrieve the data from the intent extras
-        String displayName = getIntent().getStringExtra("displayName");
-        // Set the values in the respective views
-        displayNameTextView.setText(displayName);
-        // init the rest of the views
         btnLogout = findViewById(R.id.btnLogout);
         viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
         token = getIntent().getStringExtra("token");
         contactAdapter = new ContactAdapter(this);
         listViewContacts.setAdapter(contactAdapter);
-
+        btnSettings = findViewById(R.id.btnSettings);
     }
 
     private void getContacts() {
