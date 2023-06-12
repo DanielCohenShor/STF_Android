@@ -11,15 +11,14 @@ import android.widget.TextView;
 
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
+import com.example.stf.SettingsActivity;
 
 public class ContactsActivity extends AppCompatActivity {
-    private TextView usernameTextView;
-    private ImageView profileImageView;
-
-    private TextView displayNameTextView;
     private ImageButton btnLogout;
 
     private ListView listViewContacts;
+
+    private ImageButton btnSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +40,18 @@ public class ContactsActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        btnSettings.setOnClickListener(v -> {
+            // Start the new activity here
+            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
     }
     private void init() {
         // Initialize the views
-        displayNameTextView = findViewById(R.id.tvContactName);
-        // Retrieve the data from the intent extras
-        String displayName = getIntent().getStringExtra("displayName");
-        // Set the values in the respective views
-        displayNameTextView.setText(displayName);
-        // init the rest of the views
         btnLogout = findViewById(R.id.btnLogout);
         listViewContacts = findViewById(R.id.listViewContacts);
+        btnSettings = findViewById(R.id.btnSettings);
     }
 
     private void getContacts() {

@@ -6,10 +6,8 @@
     <string name="tv_username">Username</string>
     <string name="tv_password">Password</string>
     <string name="tv_login_headline">Sign in</string>
-    <string name="tv_link_to_register">Not registered? Click here to sign in</string>
     <string name="tv_register_headline">Create Account</string>
     <string name="btn_register">REGISTER</string>
-    <string name="tv_link_to_login">Already registered? Click here to login</string>
     <string name="tv_password_verification">Password Verification</string>
     <string name="et_confirm_password">Confirm Password</string>
     <string name="tv_display_name">Display Name</string>
@@ -20,11 +18,17 @@
     <string name="cd_show_password">showPasswordImg</string>
     <string name="cd_bottom_circle">bottomCircle</string>
     <string name="cd_add_new_contact">addNewContact</string>
-    <string name="BaseUrl">http://192.168.1.37:5000/api/</string>
+    <string name="BaseUrl">http://192.168.139.1:5000/api/</string>
     <string name="ed_new_message_hint">New message here&#8230;</string>
     <string name="tv_add_new_contact_headline">Choose contact</string>
     <string name="tv_settings">Settings</string>
     <string name="tv_dark_mode">Dark Mode</string>
     <string name="tv_change_api">Change API</string>
     <string name="tv_logout">Sign Out</string>
+    <string name="tv_link_to_register_1">Not registered?</string>
+    <string name="tv_link_to_register2">Click here</string>
+    <string name="tv_link_to_register3">to register</string>
+    <string name="tv_link_to_login1">Already registered?</string>
+    <string name="tv_link_to_login2">to login</string>
+    <string name="et_choose_contact">Insert username...</string>
 </resources>

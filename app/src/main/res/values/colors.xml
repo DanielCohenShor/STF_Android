@@ -11,6 +11,8 @@
     <color name="circle_purple">#E74CF8</color>
     <color name="circle_green">#55F2AB</color>
     <color name="edit_text_gray">#D8D6D6</color>
+    <color name="edit_text_dark_gray">#A8A8A8</color>
     <color name="red">#FF0000</color>
     <color name="background_gray">#E6E5E5</color>
+    <color name="background_dark_gray">#383838</color>
 </resources>
