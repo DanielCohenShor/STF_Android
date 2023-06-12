@@ -17,13 +17,11 @@ public interface WebServiceAPI {
     @GET("Users/{username}")
     Call<User> getUser(@Header("Authorization") String token, @Path("username") String username);
 
-
     @POST("Users")
     Call<Void> createUser(@Body User user);
 
     @POST("Tokens")
     Call<Void> createToken(@Body RequestBody tokenRequest);
-
 
     //more req
 }

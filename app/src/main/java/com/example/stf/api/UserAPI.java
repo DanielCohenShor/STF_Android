@@ -6,9 +6,11 @@ import com.example.stf.entities.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.net.CookieManager;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -88,14 +90,21 @@ public class UserAPI {
                         String errorResponse = response.errorBody().string();
                         JsonElement jsonElement = JsonParser.parseString(errorResponse);
                         if (jsonElement.isJsonObject()) {
-                            JsonArray errorsArray = jsonElement.getAsJsonObject().getAsJsonArray("errors");
-                            String[] errors = new String[errorsArray.size()];
-                            for (int i = 0; i < errorsArray.size(); i++) {
-                                errors[i] = errorsArray.get(i).getAsString();
+                            if (response.code() == 409) {
+                                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                                JsonElement valueElement = jsonObject.get("title");
+
+                            } else {
+                                JsonArray errorsArray = jsonElement.getAsJsonObject().getAsJsonArray("errors");
+                                String[] errors = new String[errorsArray.size()];
+                                for (int i = 0; i < errorsArray.size(); i++) {
+                                    errors[i] = errorsArray.get(i).getAsString();
+                                }
+                                callback.accept(errors);
                             }
-                            callback.accept(errors);
                         }
                     } catch (IOException e) {
+                        String test = String.valueOf(response.errorBody());
                         e.printStackTrace();
                         String[] errors = {"Error parsing response"};
                         callback.accept(errors);
@@ -110,7 +119,6 @@ public class UserAPI {
             }
         });
     }
-
 
     public String getToken() {
         return token;
