@@ -21,6 +21,11 @@
         <item name="android:background">@drawable/linearlayout_background</item>
     </style>
 
+    <!-- Block screen with status bar background if light mode on -->
+    <style name="BLOCK_SCREEN_WITH_STATUS_BAR">
+        <item name="android:background">@drawable/rounded_block_screen_drawable</item>
+    </style>
+
     <!-- Headline texts background if light mode on -->
     <style name="HEADLINE_TEXT">
         <item name="android:textColor">@color/blue_shade_2</item>
@@ -44,6 +49,11 @@
     <!-- Send message edit texts background if light mode on -->
     <style name="SEND_MESSAGE_EDIT_TEXT">
         <item name="android:background">@drawable/send_message_edit_text</item>
+    </style>
+
+    <!-- Send message edit texts background if light mode on -->
+    <style name="SEND_MESSAGE_EDIT_TEXT_BACKGROUND">
+        <item name="android:background">@color/white</item>
     </style>
 
     <!-- Button background if light mode on -->

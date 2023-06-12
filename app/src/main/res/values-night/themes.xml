@@ -21,6 +21,11 @@
         <item name="android:background">@drawable/linearlayout_dark_drawable</item>
     </style>
 
+    <!-- Block screen with status bar background if dark mode on -->
+    <style name="BLOCK_SCREEN_WITH_STATUS_BAR">
+        <item name="android:background">@drawable/rounded_block_screen_dark_drawable</item>
+    </style>
+
     <!-- Headline texts background if dark mode on -->
     <style name="HEADLINE_TEXT">
         <item name="android:textColor">@color/blue_shade_4</item>
@@ -41,9 +46,14 @@
         <item name="android:background">@drawable/edittext_dark_background</item>
     </style>
 
-    <!-- Send message edit texts background if light mode on -->
+    <!-- Send message edit texts background if dark mode on -->
     <style name="SEND_MESSAGE_EDIT_TEXT">
         <item name="android:background">@drawable/send_message_edit_text_dark</item>
+    </style>
+
+    <!-- Send message edit texts background if dark mode on -->
+    <style name="SEND_MESSAGE_EDIT_TEXT_BACKGROUND">
+        <item name="android:background">@color/background_dark_gray</item>
     </style>
 
     <!-- Button background if dark mode on -->

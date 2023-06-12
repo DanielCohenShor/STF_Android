@@ -6,10 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatActivity"
-    style="@style/SCREEN">
+    style="@style/STATUS_BAR">
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         style="@style/STATUS_BAR"
@@ -51,111 +51,117 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout2"
+        style="@style/BLOCK_SCREEN_WITH_STATUS_BAR"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout1">
 
         <TextView
             android:id="@+id/tvDate"
+            style="@style/DATE_BUBBLE"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/DATE_BUBBLE"
-            android:padding="8dp"
-            android:text="08.06.2023"
             android:layout_gravity="center"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp"/>
+            android:padding="8dp"
+            android:text="08.06.2023" />
 
         <LinearLayout
+            style="@style/CONTACT_BUBBLE"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/CONTACT_BUBBLE"
-            android:padding="10dp"
-            android:orientation="vertical"
             android:layout_gravity="end"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp">
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <TextView
                 android:id="@+id/tvContactMessage"
+                style="@style/TEXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello, this is a text bubble!"
-                style="@style/TEXT"
                 android:layout_gravity="end"
-                android:paddingBottom="5dp"/>
+                android:paddingBottom="5dp"
+                android:text="Hello, this is a text bubble!" />
 
             <TextView
                 android:id="@+id/tvMessageTime"
+                style="@style/TEXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="15:01"
                 android:layout_gravity="end"
-                android:textSize="12sp"
-                style="@style/TEXT"/>
+                android:text="15:01"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
+            style="@style/MY_BUBBLE"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/MY_BUBBLE"
-            android:padding="10dp"
-            android:orientation="vertical"
             android:layout_gravity="start"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <TextView
                 android:id="@+id/tvMyMessage"
+                style="@style/TEXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello, this is a text bubble!"
-                style="@style/TEXT"
                 android:layout_gravity="end"
-                android:paddingBottom="5dp"/>
+                android:paddingBottom="5dp"
+                android:text="Hello, this is a text bubble!" />
 
             <TextView
                 android:id="@+id/tvMessageTime1"
+                style="@style/TEXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="15:02"
                 android:layout_gravity="end"
-                android:textSize="12sp"
-                style="@style/TEXT"/>
+                android:text="15:02"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/SCREEN"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        style="@style/SEND_MESSAGE_EDIT_TEXT_BACKGROUND">
 
         <EditText
             android:id="@+id/etSendMessage"
+            style="@style/SEND_MESSAGE_EDIT_TEXT"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="1"
-            style="@style/SEND_MESSAGE_EDIT_TEXT"
+            android:autofillHints="true"
             android:ems="10"
             android:hint="@string/ed_new_message_hint"
             android:inputType="text"
-            android:paddingStart="10dp"
-            android:autofillHints="true"/>
+            android:paddingStart="10dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnSendMessage"
+            style="@style/FLOATING_ACTION_BUTTON"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            style="@style/FLOATING_ACTION_BUTTON"
             android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

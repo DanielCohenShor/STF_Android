@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddNewContactActivity"
-    android:background="@color/background_gray">
+    style="@style/STATUS_BAR"
+    android:id="@+id/fullScreen">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/status_bar"
+        style="@style/STATUS_BAR"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -26,7 +27,7 @@
             android:layout_marginEnd="5dp"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="@color/blue_shade_2"
+            android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_exit" />
 
         <TextView
@@ -40,44 +41,52 @@
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnSearch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="15dp"
-            android:layout_weight="0.1"
-            android:adjustViewBounds="true"
-            android:background="@color/blue_shade_2"
-            app:srcCompat="@drawable/ic_search" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout1"
+        style="@style/BLOCK_SCREEN_WITH_STATUS_BAR"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        android:layout_marginTop="5dp">
+        android:gravity="center">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/contactImg"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/picture1"
-            app:civ_border_color="@color/black"
-            android:layout_marginStart="5dp"/>
-
-        <TextView
-            android:id="@+id/tvContactName"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Daniel Cohen Shor"
-            android:layout_marginStart="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_gravity="center_vertical"/>
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/etChooseContact"
+                style="@style/EDIT_TEXT"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:autofillHints="username"
+                android:drawableStart="@drawable/username_icon_drawable"
+                android:drawablePadding="8dp"
+                android:ems="10"
+                android:hint="@string/et_choose_contact"
+                android:inputType="text"
+                android:minHeight="48dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAddContact"
+                style="@style/BUTTON"
+                android:layout_width="185dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:gravity="center"
+                android:text="Add"
+                android:textSize="20sp" />
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
