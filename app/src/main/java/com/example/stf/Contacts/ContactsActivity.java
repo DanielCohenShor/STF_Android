@@ -72,6 +72,7 @@ public class ContactsActivity extends AppCompatActivity {
 
 
     private void handleGetContactsCallback(Contact [] contacts) {
-        //change the ui
+        //change the ui use the adapter
+
     }
 }
