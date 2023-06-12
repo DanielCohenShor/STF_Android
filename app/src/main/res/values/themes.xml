@@ -1,15 +1,82 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.STF" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_shade_2</item>
-        <item name="colorPrimaryVariant">@color/blue_shade_4</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/blue_shade_2</item>
-        <item name="colorSecondaryVariant">@color/blue_shade_4</item>
-        <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/blue_shade_2</item>
+    </style>
+
+    <!-- light mode -->
+    <!-- Screen background if light mode on -->
+    <style name="SCREEN">
+        <item name="android:background">@color/background_gray</item>
+    </style>
+
+    <!-- Status bar background if light mode on -->
+    <style name="STATUS_BAR">
+        <item name="android:background">@drawable/status_bar</item>
+    </style>
+
+    <!-- Block screen background if light mode on -->
+    <style name="BLOCK_SCREEN">
+        <item name="android:background">@drawable/linearlayout_background</item>
+    </style>
+
+    <!-- Headline texts background if light mode on -->
+    <style name="HEADLINE_TEXT">
+        <item name="android:textColor">@color/blue_shade_2</item>
+    </style>
+
+    <!-- Texts background if light mode on -->
+    <style name="TEXT">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!-- Edit texts background if light mode on -->
+    <style name="EDIT_TEXT">
+        <item name="android:background">@drawable/edittext_background</item>
+    </style>
+
+    <!-- Send message edit texts background if light mode on -->
+    <style name="SEND_MESSAGE_EDIT_TEXT">
+        <item name="android:background">@drawable/send_message_edit_text</item>
+    </style>
+
+    <!-- Button background if light mode on -->
+    <style name="BUTTON">
+        <item name="android:background">@drawable/rounded_button_background</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Floating action button background if light mode on -->
+    <style name="FLOATING_ACTION_BUTTON">
+        <item name="android:background">@color/blue_shade_2</item>
+        <item name="android:backgroundTint">@color/blue_shade_2</item>
+    </style>
+
+    <!-- Choose file button background if light mode on -->
+    <style name="CHOOSE_FILE_BUTTON">
+        <item name="android:background">@drawable/edittext_background</item>
+    </style>
+
+    <!-- Notification background if light mode on -->
+    <style name="NOTIFICATION">
+        <item name="android:background">@drawable/notification_circle</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Date bubble background if light mode on -->
+    <style name="DATE_BUBBLE">
+        <item name="android:background">@drawable/chat_date_bubble_drawable</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Contact message bubble background if light mode on -->
+    <style name="CONTACT_BUBBLE">
+        <item name="android:background">@drawable/contact_text_bubble_drawable</item>
+    </style>
+
+    <!-- my message bubble background if light mode on -->
+    <style name="MY_BUBBLE">
+        <item name="android:background">@drawable/my_text_bubble_drawable</item>
     </style>
 </resources>

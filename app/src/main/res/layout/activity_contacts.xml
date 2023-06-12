@@ -6,13 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Contacts.ContactsActivity"
-    android:background="@color/background_gray">
+    style="@style/SCREEN">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/contacts_bar"
+        style="@style/STATUS_BAR"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -36,7 +36,7 @@
             android:layout_gravity="center"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="@color/blue_shade_2"
+            android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_settings" />
 
         <ImageButton
@@ -47,7 +47,7 @@
             android:layout_marginStart="15dp"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="@color/blue_shade_2"
+            android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_search" />
 
         <ImageButton
@@ -59,7 +59,7 @@
             android:layout_marginEnd="10dp"
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
-            android:background="@color/blue_shade_2"
+            android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_logout" />
     </LinearLayout>
 
@@ -84,7 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="60dp"
                     android:text="Daniel Cohen Shor"
-                    android:textColor="@color/black"
+                    style="@style/TEXT"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -101,7 +101,8 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="10dp"
                         android:text="10:53"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        style="@style/TEXT"/>
 
                 </LinearLayout>
             </TableRow>
@@ -123,7 +124,8 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="80dp"
             android:text="Hey! What's up?"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            style="@style/TEXT"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -136,32 +138,27 @@
                 android:id="@+id/tvNotification"
                 android:text="2"
                 android:gravity="center"
-                android:textColor="@color/white"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:layout_gravity="center"
-                android:background="@drawable/notification_circle"/>
+                style="@style/NOTIFICATION"/>
         </LinearLayout>
     </FrameLayout>
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddContact"
+        style="@style/FLOATING_ACTION_BUTTON"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:clickable="true"
+        android:contentDescription="@string/cd_add_new_contact"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.989"
         app:srcCompat="@drawable/ic_add_contact"
-        android:background="@color/blue_shade_2"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="10dp"
-        android:contentDescription="@string/cd_add_new_contact"
-        app:tint="@android:color/white"/>
+        app:tint="@android:color/white" />
 
     <FrameLayout
         android:layout_width="match_parent"

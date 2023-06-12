@@ -5,13 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_gray"
+    style="@style/SCREEN"
     tools:context=".Register.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background_gray">
+        style="@style/SCREEN">
 
         <ImageView
             android:id="@+id/topCircle"
@@ -27,7 +27,7 @@
         <LinearLayout
             android:layout_width="320dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/linearlayout_background"
+            style="@style/BLOCK_SCREEN"
             android:gravity="center_vertical"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/tv_register_headline"
-                android:textColor="@color/blue_shade_2"
+                style="@style/HEADLINE_TEXT"
                 android:textSize="40sp"
                 android:textStyle="bold"
                 android:layout_marginTop="30dp" />
@@ -61,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_username"
-                    android:textColor="@color/black"
+                    style="@style/TEXT"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="username"
-                    android:background="@drawable/edittext_background"
+                    style="@style/EDIT_TEXT"
                     android:drawableStart="@drawable/username_icon_drawable"
                     android:drawablePadding="8dp"
                     android:ems="10"
@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_password"
-                    android:textColor="@color/black"
+                    style="@style/TEXT"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autofillHints="password"
-                        android:background="@drawable/edittext_background"
+                        style="@style/EDIT_TEXT"
                         android:drawableStart="@drawable/password_icon_drawable"
                         android:drawablePadding="8dp"
                         android:ems="10"
@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_password_verification"
-                    android:textColor="@color/black"
+                    style="@style/TEXT"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -152,7 +152,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autofillHints="password"
-                        android:background="@drawable/edittext_background"
+                        style="@style/EDIT_TEXT"
                         android:drawableStart="@drawable/password_icon_drawable"
                         android:drawablePadding="8dp"
                         android:ems="10"
@@ -186,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_display_name"
-                    android:textColor="@color/black"
+                    style="@style/TEXT"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -195,7 +195,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="username"
-                    android:background="@drawable/edittext_background"
+                    style="@style/EDIT_TEXT"
                     android:drawableStart="@drawable/display_name_icon_drawable"
                     android:drawablePadding="8dp"
                     android:ems="10"
@@ -218,21 +218,23 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_picture"
-                    android:textColor="@color/black"
+                    style="@style/TEXT"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnChooseFile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/edittext_background"
+                    style="@style/CHOOSE_FILE_BUTTON"
                     android:drawableStart="@drawable/profile_pic_icon_drawable"
                     android:drawablePadding="8dp"
                     android:onClick="onChooseFileClick"
                     android:minHeight="48dp"
-                    android:text="@string/et_picture"
-                    android:gravity="center_vertical|start" />
+                    android:hint="@string/et_picture"
+                    android:gravity="center_vertical|start"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"/>
             </LinearLayout>
 
             <TextView
@@ -241,19 +243,19 @@
                 android:layout_height="wrap_content"
                 android:text="@string/tv_link_to_login"
                 android:layout_gravity="center"
-                android:textStyle="normal|bold" />
+                android:textStyle="normal|bold"
+                style="@style/TEXT"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnRegister"
                 android:layout_width="185dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:background="@drawable/rounded_button_background"
+                style="@style/BUTTON"
                 android:gravity="center"
                 android:text="@string/btn_register"
-                android:textColor="@color/white"
                 android:textSize="20sp" />
 
         </LinearLayout>

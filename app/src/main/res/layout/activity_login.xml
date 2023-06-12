@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_gray"
+    style="@style/SCREEN"
     tools:context=".Login.LoginActivity"
     android:fillViewport="true">
 
@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_default="wrap"
-        android:background="@color/background_gray">
+        style="@style/SCREEN">
 
         <ImageView
             android:id="@+id/topCircle"
@@ -31,7 +31,7 @@
         <LinearLayout
             android:layout_width="320dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/linearlayout_background"
+            style="@style/BLOCK_SCREEN"
             android:elevation="2dp"
             android:gravity="center_vertical"
             android:orientation="vertical"
@@ -47,7 +47,7 @@
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="@string/tv_login_headline"
-                android:textColor="@color/blue_shade_2"
+                style="@style/HEADLINE_TEXT"
                 android:textSize="40sp"
                 android:textStyle="bold" />
 
@@ -64,16 +64,16 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_username"
-                    android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    style="@style/TEXT"/>
 
                 <EditText
                     android:id="@+id/etUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="username"
-                    android:background="@drawable/edittext_background"
+                    style="@style/EDIT_TEXT"
                     android:drawableStart="@drawable/username_icon_drawable"
                     android:drawablePadding="8dp"
                     android:ems="10"
@@ -96,9 +96,9 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="5dp"
                     android:text="@string/tv_password"
-                    android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    style="@style/TEXT"/>
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -109,7 +109,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autofillHints="password"
-                        android:background="@drawable/edittext_background"
+                        style="@style/EDIT_TEXT"
                         android:drawableStart="@drawable/password_icon_drawable"
                         android:drawablePadding="8dp"
                         android:ems="10"
@@ -135,19 +135,19 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/tv_link_to_register"
-                android:textStyle="normal|bold" />
+                android:textStyle="normal|bold"
+                style="@style/TEXT"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnLogin"
                 android:layout_width="185dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:background="@drawable/rounded_button_background"
+                style="@style/BUTTON"
                 android:gravity="center"
                 android:text="@string/btn_login"
-                android:textColor="@color/white"
                 android:textSize="20sp" />
 
         </LinearLayout>
