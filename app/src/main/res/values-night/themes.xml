@@ -46,6 +46,11 @@
         <item name="android:background">@drawable/edittext_dark_background</item>
     </style>
 
+    <!-- Profile pic circle background if dark mode on -->
+    <style name="PROFILE_PIC_CIRCLE">
+        <item name="android:background">@drawable/profile_pic_dark_circle_drawable</item>
+    </style>
+
     <!-- Send message edit texts background if dark mode on -->
     <style name="SEND_MESSAGE_EDIT_TEXT">
         <item name="android:background">@drawable/send_message_edit_text_dark</item>

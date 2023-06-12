@@ -30,5 +30,6 @@
     <string name="tv_link_to_register3"> to register</string>
     <string name="tv_link_to_login1">Already registered?</string>
     <string name="tv_link_to_login2"> to login</string>
-    <string name="et_choose_contact">Insert username...</string>
+    <string name="et_choose_contact">Insert username&#8230;</string>
+    <string name="tv_add_profile_picture">add profile picture</string>
 </resources>
