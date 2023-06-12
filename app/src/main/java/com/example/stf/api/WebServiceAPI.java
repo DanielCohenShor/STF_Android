@@ -26,7 +26,7 @@ public interface WebServiceAPI {
     Call<Contact[]> getContacts(@Header("Authorization") String token);
 
     @POST("Chats")
-    Call<Contact> addContact(@Header("Authorization") String token, @Body String username);
+    Call<Contact> addContact(@Header("Authorization") String token, @Body RequestBody username);
 
     //more req
 }

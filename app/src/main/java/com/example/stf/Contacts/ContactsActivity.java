@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.Login.LoginActivity;
@@ -57,6 +56,7 @@ public class ContactsActivity extends AppCompatActivity {
         btnAddContact.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
+            intent.putExtra("token", token);
             startActivity(intent);
         });
 
