@@ -47,6 +47,33 @@
                 android:textStyle="bold"
                 android:layout_marginTop="30dp" />
 
+            <FrameLayout
+                android:id="@+id/fl_profilePic"
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:layout_gravity="center">
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/riProfilePic"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    style="@style/PROFILE_PIC_CIRCLE"
+                    android:scaleType="centerCrop"
+                    app:riv_oval="true"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvProfilePic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/tv_add_profile_picture"
+                    style="@style/TEXT" />
+
+            </FrameLayout>
+
             <LinearLayout
                 android:id="@+id/ll_username"
                 android:layout_width="260dp"
@@ -202,39 +229,6 @@
                     android:hint="@string/et_display_name"
                     android:inputType="text"
                     android:minHeight="48dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_profilePic"
-                android:layout_width="260dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingVertical="30dp"
-                android:layout_gravity="center">
-
-                <TextView
-                    android:id="@+id/tvProfilePic"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="5dp"
-                    android:text="@string/tv_picture"
-                    style="@style/TEXT"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnChooseFile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/CHOOSE_FILE_BUTTON"
-                    android:drawableStart="@drawable/profile_pic_icon_drawable"
-                    android:drawablePadding="8dp"
-                    android:onClick="onChooseFileClick"
-                    android:minHeight="48dp"
-                    android:hint="@string/et_picture"
-                    android:gravity="center_vertical|start"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"/>
             </LinearLayout>
 
             <LinearLayout
