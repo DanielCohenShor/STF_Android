@@ -6,10 +6,8 @@
     <string name="tv_username">Username</string>
     <string name="tv_password">Password</string>
     <string name="tv_login_headline">Sign in</string>
-    <string name="tv_link_to_register">Not registered? <u>Click here</u> to register</string>
     <string name="tv_register_headline">Create Account</string>
     <string name="btn_register">REGISTER</string>
-    <string name="tv_link_to_login">Already registered? <u>Click here</u> to login</string>
     <string name="tv_password_verification">Password Verification</string>
     <string name="et_confirm_password">Confirm Password</string>
     <string name="tv_display_name">Display Name</string>
@@ -27,4 +25,9 @@
     <string name="tv_dark_mode">Dark Mode</string>
     <string name="tv_change_api">Change API</string>
     <string name="tv_logout">Sign Out</string>
+    <string name="tv_link_to_register_1">Not registered?</string>
+    <string name="tv_link_to_register2"> Click here</string>
+    <string name="tv_link_to_register3"> to register</string>
+    <string name="tv_link_to_login1">Already registered?</string>
+    <string name="tv_link_to_login2"> to login</string>
 </resources>

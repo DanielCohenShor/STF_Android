@@ -39,7 +39,7 @@ import java.util.HashSet;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword,etPasswordVerification, etDisplayName;
-    private TextView tvPicture, linkToRegister;
+    private TextView tvPicture, linkToLogin;
     private Button btnRegister;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
@@ -184,7 +184,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnPasswordVisibility = findViewById(R.id.btnShowPassword);
         btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
         btnRegister = findViewById(R.id.btnRegister);
-        linkToRegister = findViewById(R.id.linkToRegister);
+        linkToLogin = findViewById(R.id.linkToLogin2);
 
         errorsText.put("username", "must contain at least one letter");
 //            errorsText.put("username2", "username already exist");
@@ -243,37 +243,11 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        // Define the text with the portion to be highlighted
-        String fullText = getResources().getString(R.string.tv_link_to_login);
-        String highlightText = "Click here";
-        int highlightStart = fullText.indexOf(highlightText);
-        int highlightEnd = highlightStart + highlightText.length();
-
-        // Create a SpannableString
-        SpannableString spannableString = new SpannableString(fullText);
-
-        // Create a ClickableSpan
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(View widget) {
-                // Handle the click event here, e.g., change the color
-                int clickedColor = ContextCompat.getColor(RegisterActivity.this, R.color.blue_shade_4);
-                ((TextView) widget).setLinkTextColor(clickedColor);
-
-                // Start the new activity here
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-
-                // Perform any other actions you want when the text is clicked
-                // For example, navigate to a new activity or perform some task.
-            }
-        };
-
-        // Apply the ClickableSpan to the desired portion of the text
-        spannableString.setSpan(clickableSpan, highlightStart, highlightEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        // Make the text clickable and change the color when clicked
-        linkToRegister.setText(spannableString);
-        linkToRegister.setMovementMethod(LinkMovementMethod.getInstance());
+//
+        linkToLogin.setOnClickListener(view -> {
+            // Start the new activity here
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
     }
 }

@@ -31,6 +31,11 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <!-- link to button background if light mode on -->
+    <style name="LINK_TO_TEXT">
+        <item name="android:textColor">@color/blue_shade_4</item>
+    </style>
+
     <!-- Edit texts background if light mode on -->
     <style name="EDIT_TEXT">
         <item name="android:background">@drawable/edittext_background</item>

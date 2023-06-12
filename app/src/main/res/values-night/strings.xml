@@ -27,4 +27,9 @@
     <string name="tv_dark_mode">Dark Mode</string>
     <string name="tv_change_api">Change API</string>
     <string name="tv_logout">Sign Out</string>
+    <string name="tv_link_to_register_1">Not registered?</string>
+    <string name="tv_link_to_register2">Click here</string>
+    <string name="tv_link_to_register3">to register</string>
+    <string name="tv_link_to_login1">Already registered?</string>
+    <string name="tv_link_to_login2">to login</string>
 </resources>

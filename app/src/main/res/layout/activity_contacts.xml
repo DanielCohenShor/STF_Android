@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Contacts.ContactsActivity"
-    style="@style/SCREEN">
+    style="@style/BLOCK_SCREEN">
 
     <LinearLayout
         android:id="@+id/linearLayout"
