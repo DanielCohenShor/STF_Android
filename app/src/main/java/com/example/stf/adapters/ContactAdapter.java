@@ -17,6 +17,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
+
     class ContactViewHolder extends RecyclerView.ViewHolder {
         private final TextView displayName;
         private final CircleImageView propilePic;
@@ -34,10 +35,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
     private final LayoutInflater mInflater;
-    private List<Contact> contacts;
+    private Contact[] contacts;
 
-    public ContactAdapter(Context context) {
+    public ContactAdapter(Context context, Contact[] contacts) {
         this.mInflater = LayoutInflater.from(context);
+        this.contacts = contacts;
     }
 
 
@@ -50,7 +52,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         if (contacts != null) {
-            final Contact currentContact = contacts.get(position);
+            final Contact currentContact = contacts[position];
             // Bind the data to the views in the ContactViewHolder
             holder.displayName.setText(currentContact.getUser().getDisplayName());
             // Set the profile picture using an image loading library or your preferred method
@@ -62,14 +64,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     @Override
     public int getItemCount() {
-        return 0;
+        return contacts.length;
     }
 
-    public void setContacts(List<Contact> contacts) {
+    public void setContacts(Contact[] contacts) {
         this.contacts = contacts;
     }
 
-    public List<Contact> getContacts() {
+    public Contact[] getContacts() {
         return contacts;
     }
 }

@@ -2,6 +2,7 @@ package com.example.stf.Contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -15,6 +16,8 @@ import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
 
 public class ContactsActivity extends AppCompatActivity {
     private ImageButton btnLogout;
@@ -35,7 +38,7 @@ public class ContactsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contacts);
         // init the xml and his stuff.
         init();
-        //get all the contacts
+        //get all the contact
         getContacts();
         //create listeners
         createListeners();
@@ -59,8 +62,8 @@ public class ContactsActivity extends AppCompatActivity {
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
             startActivity(intent);
         });
-
     }
+
     private void init() {
         // Initialize the views
         btnLogout = findViewById(R.id.btnLogout);
@@ -69,16 +72,20 @@ public class ContactsActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
-        contactAdapter = new ContactAdapter(this);
         listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void getContacts() {
         viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(Contact [] contacts) {
+    private void handleGetContactsCallback(Contact[] contacts) {
         //change the ui use the adapter
+        contactAdapter = new ContactAdapter(this, contacts);
+        contactAdapter.setContacts(contacts);
+        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
 
     }
 }
