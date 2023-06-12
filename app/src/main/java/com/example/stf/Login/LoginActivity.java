@@ -9,9 +9,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.TypedValue;
@@ -27,6 +29,7 @@ import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 
+import java.util.HashSet;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
@@ -38,6 +41,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private TextView linkToRegister;
 
+    private HashSet<String> createdTextViews = new HashSet<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         // createListenres
         createListeners();
         //init the view model
-        initViewMOdel();
+        initViewModel();
     }
 
     private void createListeners() {
@@ -89,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister2);
     }
-    private void initViewMOdel() {
+    private void initViewModel() {
         viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
         //create listener for the btnRegister
         btnLogin.setOnClickListener(view -> {
@@ -104,24 +109,79 @@ public class LoginActivity extends AppCompatActivity {
 
     private void handleLogInCallback(String token) {
         if (Objects.equals(token, "Incorrect username and/or password")) {
-            // change the ui
-            // Add the error message TextView dynamically
-            TextView tvError = new TextView(LoginActivity.this);
-            tvError.setText(token);
-            tvError.setTextColor(Color.RED);
-            tvError.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            tvError.setPadding(16, 8, 16, 8);
+            String tvErrorId = "tvError";
 
-            // Set the appropriate layout params for the error message TextView
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+            if (!createdTextViews.contains(tvErrorId)) {
+                // change the ui
+                // Add the error message TextView dynamically
+                TextView tvError = new TextView(LoginActivity.this);
+                tvError.setId(tvErrorId.hashCode());
+                tvError.setText(token);
+                tvError.setTextColor(Color.RED);
+                tvError.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                tvError.setPadding(16, 8, 16, 8);
 
-            // Add the error message TextView to your desired parent view
-            LinearLayout parentLayout = findViewById(R.id.test);
-            parentLayout.addView(tvError, layoutParams);
+                // Set the appropriate layout params for the error message TextView
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+
+                EditText etBorder = findViewById(getResources().getIdentifier("etUsername", "id", getPackageName()));
+                etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
+
+                EditText etBorder1 = findViewById(getResources().getIdentifier("etPassword", "id", getPackageName()));
+                etBorder1.setBackgroundResource(R.drawable.invalid_edit_text);
+
+                // Add the error message TextView to your desired parent view
+                LinearLayout parentLayout = findViewById(R.id.test);
+                parentLayout.addView(tvError, layoutParams);
+
+                etBorder.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        // This method is called before the text is changed
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        // This method is called when the text is being changed
+                    }
+
+                    // This method is called after the text has been changed
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        // change the border of the text view to none
+                        etBorder.setBackgroundResource(R.drawable.edittext_background);
+                        // remove the text view of the error
+                        parentLayout.removeView(tvError);
+                        createdTextViews.remove(tvErrorId);
+                    }
+                });
+                etBorder1.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        // This method is called before the text is changed
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        // This method is called when the text is being changed
+                    }
+
+                    // This method is called after the text has been changed
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        // change the border of the text view to none
+                        etBorder1.setBackgroundResource(R.drawable.edittext_background);
+                        // remove the text view of the error
+                        parentLayout.removeView(tvError);
+                        createdTextViews.remove(tvErrorId);
+                    }
+                });
+                createdTextViews.add(tvErrorId);
+            }
         } else {
             // save the token
             viewModelLogin.setToken(token);

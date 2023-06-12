@@ -126,6 +126,10 @@ public class RegisterActivity extends AppCompatActivity {
 
                     // set the edit text border to red
                     String editTextId = "et_" + error;
+                    if(error == "username exist") {
+                        layoutId = "ll_username";
+                        editTextId = "et_username";
+                    }
                     EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
                     etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
 
@@ -187,7 +191,7 @@ public class RegisterActivity extends AppCompatActivity {
         linkToLogin = findViewById(R.id.linkToLogin2);
 
         errorsText.put("username", "must contain at least one letter");
-//            errorsText.put("username2", "username already exist");
+        errorsText.put("username exist", "username already exist");
         errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
         errorsText.put("passwordVerification", "must be the same as the password");
         errorsText.put("displayName", "must contain at least one letter");
@@ -243,7 +247,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-//
         linkToLogin.setOnClickListener(view -> {
             // Start the new activity here
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);

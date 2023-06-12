@@ -91,9 +91,9 @@ public class UserAPI {
                         JsonElement jsonElement = JsonParser.parseString(errorResponse);
                         if (jsonElement.isJsonObject()) {
                             if (response.code() == 409) {
-                                JsonObject jsonObject = jsonElement.getAsJsonObject();
-                                JsonElement valueElement = jsonObject.get("title");
-
+                                String[] errors = new String[1];
+                                errors[0] = "username exist";
+                                callback.accept(errors);
                             } else {
                                 JsonArray errorsArray = jsonElement.getAsJsonObject().getAsJsonArray("errors");
                                 String[] errors = new String[errorsArray.size()];
