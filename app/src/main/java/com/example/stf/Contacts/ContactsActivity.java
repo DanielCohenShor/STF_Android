@@ -1,6 +1,8 @@
 package com.example.stf.Contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,16 +13,21 @@ import com.example.stf.AddNewContactActivity;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
+import com.example.stf.adapters.ContactAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContactsActivity extends AppCompatActivity {
     private ImageButton btnLogout;
 
-    private ListView listViewContacts;
-
     private ImageButton btnSettings;
 
     private FloatingActionButton btnAddContact;
+
+    private ViewModalContacts viewModalContacts;
+    private String token;
+    private RecyclerView listViewContacts;
+
+    private ContactAdapter contactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +64,21 @@ public class ContactsActivity extends AppCompatActivity {
     private void init() {
         // Initialize the views
         btnLogout = findViewById(R.id.btnLogout);
-        listViewContacts = findViewById(R.id.listViewContacts);
+        viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
+        token = getIntent().getStringExtra("token");
         btnSettings = findViewById(R.id.btnSettings);
+        listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
+        contactAdapter = new ContactAdapter(this);
+        listViewContacts.setAdapter(contactAdapter);
     }
 
     private void getContacts() {
+        viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
+    }
+
+    private void handleGetContactsCallback(Contact [] contacts) {
+        //change the ui use the adapter
 
     }
 }
