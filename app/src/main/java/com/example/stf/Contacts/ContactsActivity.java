@@ -1,16 +1,24 @@
 package com.example.stf.Contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
+import com.example.stf.Register.ViewModelRegister;
+
+import java.util.Objects;
 
 public class ContactsActivity extends AppCompatActivity {
     private TextView usernameTextView;
@@ -20,6 +28,8 @@ public class ContactsActivity extends AppCompatActivity {
     private ImageButton btnLogout;
 
     private ListView listViewContacts;
+    private ViewModalContacts viewModalContacts;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +62,16 @@ public class ContactsActivity extends AppCompatActivity {
         // init the rest of the views
         btnLogout = findViewById(R.id.btnLogout);
         listViewContacts = findViewById(R.id.listViewContacts);
+        viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
+        token = getIntent().getStringExtra("token");
     }
 
     private void getContacts() {
+        viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
+    }
 
+
+    private void handleGetContactsCallback(Contact [] contacts) {
+        //change the ui
     }
 }
