@@ -7,10 +7,11 @@ import androidx.room.InvalidationTracker;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
+import com.example.stf.Contacts.Contact;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.entities.Chat;
 
-@Database(entities = {Chat.class}, version = 1)
+@Database(entities = {Contact.class}, version = 4)
 public abstract class AppDB extends RoomDatabase{
     public abstract ContactsDao ContactsDao();
 }

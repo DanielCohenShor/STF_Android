@@ -7,6 +7,7 @@ import androidx.room.Room;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -28,11 +29,15 @@ import android.widget.TextView;
 
 import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Dao.ContactsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 
 import java.util.HashSet;
 import java.util.Objects;
+
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
 
 public class LoginActivity extends AppCompatActivity {
     private String username;
@@ -46,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     private HashSet<String> createdTextViews = new HashSet<>();
 
     private AppDB db;
+    private ContactsDao contactsDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,8 +67,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void initDB() {
-        db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
-                .build();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                        .build();
+                contactsDao = db.ContactsDao();
+            }
+        });
     }
 
     private void createListeners() {

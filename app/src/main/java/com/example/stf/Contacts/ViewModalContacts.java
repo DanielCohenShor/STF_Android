@@ -15,7 +15,7 @@ public class ViewModalContacts  extends ViewModel {
         this.contactAPI = new ContactAPI();
     }
 
-    public void performGetContacts(String token, Consumer<Chat[]> callback) {
+    public void performGetContacts(String token, Consumer<Contact[]> callback) {
         contactAPI.setToken(token);
         contactAPI.get(callback);
     }

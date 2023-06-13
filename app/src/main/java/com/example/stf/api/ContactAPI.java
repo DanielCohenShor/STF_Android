@@ -11,11 +11,13 @@ import java.util.function.Consumer;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 
 public class ContactAPI {
     Retrofit retrofit;
@@ -34,14 +36,14 @@ public class ContactAPI {
     }
 
 
-    public void get(Consumer<Chat[]> callback) {
-        Call<Chat[]> call = webServiceAPI.getContacts("Bearer {\"token\":\"" + token + "\"}");
+    public void get(Consumer<Contact[]> callback) {
+        Call<Contact[]> call = webServiceAPI.getContacts("Bearer {\"token\":\"" + token + "\"}");
 
-        call.enqueue(new Callback<Chat[]>() {
+        call.enqueue(new Callback<Contact[]>() {
             @Override
-            public void onResponse(Call<Chat[]> call, Response<Chat[]> response) {
+            public void onResponse(Call<Contact[]> call, Response<Contact[]> response) {
                 if (response.isSuccessful()) {
-                    Chat[] contacts = response.body();
+                    Contact[] contacts = response.body();
                     callback.accept(contacts);
                 } else {
                     // error from the get contacts?
@@ -50,10 +52,11 @@ public class ContactAPI {
             }
 
             @Override
-            public void onFailure(Call<Chat[]> call, Throwable t) {
+            public void onFailure(Call<Contact[]> call, Throwable t) {
                 return;
             }
         });
+
     }
     public void post (String contactUsername, Consumer<Contact> callback) {
         String reqToken = "Bearer {\"token\":\"" + token + "\"}";

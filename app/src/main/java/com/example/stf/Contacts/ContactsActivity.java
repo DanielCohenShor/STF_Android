@@ -4,12 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
 import com.example.stf.AddNewContactActivity;
+import com.example.stf.AppDB;
+import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
@@ -30,16 +34,31 @@ public class ContactsActivity extends AppCompatActivity {
 
     private ContactAdapter contactAdapter;
 
+    private AppDB db;
+    private ContactsDao contactsDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
+        // init the data base
+        initDB();
         // init the xml and his stuff.
         init();
         //get all the contacts
         getContacts();
         //create listeners
         createListeners();
+    }
+
+    public void initDB() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                        .build();
+                contactsDao = db.ContactsDao();
+            }
+        });
     }
     private void createListeners() {
         //listener for the logut
@@ -73,11 +92,29 @@ public class ContactsActivity extends AppCompatActivity {
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Contact[] contacts = contactsDao.index();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleGetContactsCallback(contacts);
+                    }
+                });
+            }
+        });
+    }
+
+
     private void getContacts() {
         viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(Chat[] contacts) {
+    private void handleGetContactsCallback(Contact[] contacts) {
         //change the ui use the adapter
         contactAdapter = new ContactAdapter(this, contacts);
         contactAdapter.setContacts(contacts);

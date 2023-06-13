@@ -6,27 +6,28 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.example.stf.Contacts.Contact;
 import com.example.stf.entities.Chat;
 
 @Dao
 public interface ContactsDao {
 
     //bring all the chats
-    @Query("SELECT * FROM Chat")
-    Chat[] index();
+    @Query("SELECT * FROM Contact")
+    Contact[] index();
 
     //bring spesific chat
-    @Query("SELECT * FROM Chat WHERE id =:id")
-    Chat get(int id);
+    @Query("SELECT * FROM Contact WHERE user_id =:id")
+    Contact get(int id);
 
     @Insert
-    void insert(Chat... chats);
+    void insert(Contact... Contacts);
 
     @Update
-    void update(Chat... chats);
+    void update(Contact... Contacts);
 
     @Delete
-    void delete(Chat... chats);
+    void delete(Contact... Contacts);
 
 
 

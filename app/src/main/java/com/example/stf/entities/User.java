@@ -15,6 +15,11 @@ public class User {
     private String profilePic;
 
     private int notfications;
+
+    // Empty constructor
+    public User() {
+        // Required empty constructor for Room
+    }
     public User(String username, String password, String displayName, String propilePic, int notfications) {
         this.username = username;
         this.password = password;
@@ -61,5 +66,9 @@ public class User {
 
     public void setNotfications(int notfications) {
         this.notfications = notfications;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 }
