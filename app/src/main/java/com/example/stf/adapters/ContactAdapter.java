@@ -46,9 +46,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
     private final LayoutInflater mInflater;
-    private Chat[] contacts;
+    private Contact[] contacts;
 
-    public ContactAdapter(Context context, Chat[] contacts) {
+    public ContactAdapter(Context context, Contact[] contacts) {
         this.mInflater = LayoutInflater.from(context);
         this.contacts = contacts;
     }
@@ -73,7 +73,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         if (contacts != null) {
-            final Chat currentContact = contacts[position];
+            final Contact currentContact = contacts[position];
             // Bind the data to the views in the ContactViewHolder
             holder.displayName.setText(currentContact.getUser().getDisplayName());
 
@@ -116,11 +116,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         return contacts.length;
     }
 
-    public void setContacts(Chat[] contacts) {
+    public void setContacts(Contact[] contacts) {
         this.contacts = contacts;
     }
 
-    public Chat[] getContacts() {
+    public Contact[] getContacts() {
         return contacts;
     }
 }

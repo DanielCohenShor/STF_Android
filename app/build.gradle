@@ -33,10 +33,13 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.room:room-runtime:2.5.1' // Replace with the latest version
+    annotationProcessor 'androidx.room:room-compiler:2.5.1' // Replace with the latest version
+    implementation 'androidx.room:room-common:2.5.1'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'

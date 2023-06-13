@@ -1,5 +1,7 @@
 package com.example.stf.entities;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -8,13 +10,19 @@ import com.example.stf.Chat.Message;
 @Entity
 public class Chat {
     @PrimaryKey
+    @ColumnInfo(name = "user_id")
     private int id;
 
+    @Embedded
     private User user;
+
     private User[] users;
 
+    @Embedded
     private Message[] messages;
 
+    @Embedded
+    @ColumnInfo(name = "last_message_id")
     private Message lastMessage;
 
     // create object of type with the two senders and receivers.
