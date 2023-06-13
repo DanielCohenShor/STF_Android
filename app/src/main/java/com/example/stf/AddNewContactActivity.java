@@ -64,6 +64,7 @@ public class AddNewContactActivity extends AppCompatActivity {
             etChooseContact.setBackgroundResource(R.drawable.edittext_background);
             // Start the new activity here
             Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
+            intent.putExtra("token", token);
             startActivity(intent);
         } else {
             etChooseContact.setBackgroundResource(R.drawable.invalid_edit_text);

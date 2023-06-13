@@ -52,6 +52,7 @@ public class ContactsActivity extends AppCompatActivity {
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+            intent.putExtra("token", token);
             startActivity(intent);
         });
 

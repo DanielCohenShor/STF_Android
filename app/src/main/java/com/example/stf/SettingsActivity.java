@@ -22,26 +22,37 @@ public class SettingsActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
+    private String token;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        // init the xml and his stuff.
+        init();
+
         makeDarkMode();
+
         createListeners();
     }
 
-    private void createListeners() {
+    private void init() {
         btnExitSettings = findViewById(R.id.btnExitSettings);
+        switcher = findViewById(R.id.switchDarkMode);
+        token = getIntent().getStringExtra("token");
+    }
+
+    private void createListeners() {
         btnExitSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(SettingsActivity.this, ContactsActivity.class);
+            intent.putExtra("token", token);
             startActivity(intent);
         });
     }
 
     private void makeDarkMode() {
-        switcher = findViewById(R.id.switchDarkMode);
         sharedPreferences = getSharedPreferences("MODE", Context.MODE_PRIVATE);
         nightMODE = sharedPreferences.getBoolean("night", false); // Set default value to true for light mode
 
