@@ -3,6 +3,7 @@ package com.example.stf.Login;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
@@ -43,16 +45,24 @@ public class LoginActivity extends AppCompatActivity {
 
     private HashSet<String> createdTextViews = new HashSet<>();
 
+    private AppDB db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        // init the data base
+        initDB();
         // init the views item of the activity.
         initViewItem();
         // createListenres
         createListeners();
         //init the view model
         initViewModel();
+    }
+
+    public void initDB() {
+        db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                .build();
     }
 
     private void createListeners() {
