@@ -4,14 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
 import androidx.appcompat.widget.SwitchCompat;
-
-import com.example.stf.Contacts.ContactsActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -21,8 +18,6 @@ public class SettingsActivity extends AppCompatActivity {
     boolean nightMODE;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-
-    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +35,11 @@ public class SettingsActivity extends AppCompatActivity {
     private void init() {
         btnExitSettings = findViewById(R.id.btnExitSettings);
         switcher = findViewById(R.id.switchDarkMode);
-        token = getIntent().getStringExtra("token");
     }
 
     private void createListeners() {
         btnExitSettings.setOnClickListener(v -> {
             // Start the new activity here
-//            Intent intent = new Intent(SettingsActivity.this, ContactsActivity.class);
-//            intent.putExtra("token", token);
-//            startActivity(intent);
             finish();
         });
     }

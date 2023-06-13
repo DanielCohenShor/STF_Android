@@ -55,7 +55,7 @@ public class ContactAPI {
             }
         });
     }
-    public void post (String contactUsername, Consumer<Contact> callback) {
+    public void post (String contactUsername, Consumer<Chat> callback) {
         String reqToken = "Bearer {\"token\":\"" + token + "\"}";
 
         JsonObject usernameRequest = new JsonObject();
@@ -66,20 +66,20 @@ public class ContactAPI {
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody);
 
         // Make the API call
-        Call<Contact> call = webServiceAPI.addContact(reqToken, requestBody);
-        call.enqueue(new Callback<Contact>() {
+        Call<Chat> call = webServiceAPI.addContact(reqToken, requestBody);
+        call.enqueue(new Callback<Chat>() {
             @Override
-            public void onResponse(Call<Contact> call, Response<Contact> response) {
+            public void onResponse(Call<Chat> call, Response<Chat> response) {
                 if (response.isSuccessful()) {
-                    Contact contact = response.body();
-                    callback.accept(contact);
+                    Chat chat = response.body();
+                    callback.accept(chat);
                 } else {
                     callback.accept(null);
                 }
             }
 
             @Override
-            public void onFailure(Call<Contact> call, Throwable t) {
+            public void onFailure(Call<Chat> call, Throwable t) {
 
             }
         });

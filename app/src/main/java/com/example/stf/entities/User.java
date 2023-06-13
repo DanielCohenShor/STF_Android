@@ -3,8 +3,10 @@ package com.example.stf.entities;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class User {
+public class User implements Serializable {
     @PrimaryKey
     private String username;
 
@@ -14,13 +16,13 @@ public class User {
 
     private String profilePic;
 
-    private int notfications;
-    public User(String username, String password, String displayName, String propilePic, int notfications) {
+    private int notifications;
+    public User(String username, String password, String displayName, String profilePic, int notifications) {
         this.username = username;
         this.password = password;
         this.displayName = displayName;
-        this.profilePic = propilePic;
-        this.notfications = notfications;
+        this.profilePic = profilePic;
+        this.notifications = notifications;
     }
 
     public String getUsername() {
@@ -51,15 +53,15 @@ public class User {
         this.displayName = displayName;
     }
 
-    public void setPropilePic(String propilePic) {
-        this.profilePic = propilePic;
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 
-    public int getNotfications() {
-        return notfications;
+    public int getNotifications() {
+        return notifications;
     }
 
-    public void setNotfications(int notfications) {
-        this.notfications = notfications;
+    public void setNotifications(int notifications) {
+        this.notifications = notifications;
     }
 }

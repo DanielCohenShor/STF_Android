@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:paddingBottom="10dp">
+        android:paddingBottom="20dp">
 
         <TableLayout
             android:layout_width="match_parent"
@@ -24,7 +24,7 @@
                     android:id="@+id/tvContactName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginStart="70dp"
                     style="@style/TEXT"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -61,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginStart="60dp"
+            android:layout_marginStart="70dp"
             android:text=""
             style="@style/TEXT"
             android:textSize="15sp" />

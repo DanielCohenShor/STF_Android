@@ -102,8 +102,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                     e.printStackTrace();
                 }
             }
-            if (currentContact.getUser().getNotfications() != 0) {
-                holder.notification.setText(String.valueOf(currentContact.getUser().getNotfications()));
+            if (currentContact.getUser().getNotifications() != 0) {
+                holder.notification.setText(String.valueOf(currentContact.getUser().getNotifications()));
             } else {
                 // hide notification
                 holder.notification.setVisibility(View.GONE);
@@ -122,5 +122,12 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     public Chat[] getContacts() {
         return contacts;
+    }
+
+    public void addContact(Chat contact) {
+        Chat[] newContacts = new Chat[contacts.length + 1];
+        System.arraycopy(contacts, 0, newContacts, 0, contacts.length);
+        newContacts[newContacts.length - 1] = contact;
+        contacts = newContacts;
     }
 }

@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
@@ -14,6 +16,8 @@ import android.widget.ImageButton;
 import com.example.stf.Contacts.Contact;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Contacts.ViewModalContacts;
+import com.example.stf.Contacts.ViewModalContactsLive;
+import com.example.stf.entities.Chat;
 
 public class AddNewContactActivity extends AppCompatActivity {
 
@@ -23,9 +27,13 @@ public class AddNewContactActivity extends AppCompatActivity {
 
     private ViewModalContacts contactsViewModel;
 
+    private  ViewModalContactsLive viewModalContactsLive;
+
     private String token;
 
     private EditText etChooseContact;
+
+    private Chat newContact;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,9 @@ public class AddNewContactActivity extends AppCompatActivity {
         btnAddContact = findViewById(R.id.btnAddContact);
         etChooseContact = findViewById(R.id.etChooseContact);
         token = getIntent().getStringExtra("token");
+
+        contactsViewModel = new ViewModelProvider(this).get(ViewModalContacts.class);
+        viewModalContactsLive = new ViewModelProvider(this).get(ViewModalContactsLive.class);
     }
 
     private void performAddContact() {
@@ -57,15 +68,14 @@ public class AddNewContactActivity extends AppCompatActivity {
         );
     }
 
-    private void handleAddContactCallback(Contact contact) {
+    private void handleAddContactCallback(Chat contact) {
+        newContact = contact;
         if (contact != null) {
-            // okay
             // make the edit text to be regular
             etChooseContact.setBackgroundResource(R.drawable.edittext_background);
-            // Start the new activity here
-//            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
-//            intent.putExtra("token", token);
-//            startActivity(intent);
+//            Intent resultIntent = new Intent();
+//            resultIntent.putExtra("newContact", newContact);
+//            setResult(Activity.RESULT_OK, resultIntent);
             finish();
         } else {
             etChooseContact.setBackgroundResource(R.drawable.invalid_edit_text);
@@ -92,17 +102,15 @@ public class AddNewContactActivity extends AppCompatActivity {
     }
 
     private void initViewModel() {
-        contactsViewModel = new ViewModelProvider(this).get(ViewModalContacts.class);
         // create listener for the btnRegister
-        btnAddContact.setOnClickListener(view -> performAddContact());
+        btnAddContact.setOnClickListener(view -> {
+            performAddContact();
+        });
     }
 
 
     private void createListeners() {
         btnExitAddNewContact.setOnClickListener(v -> {
-            // Start the new activity here
-//            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
-//            startActivity(intent);
             finish();
         });
     }
