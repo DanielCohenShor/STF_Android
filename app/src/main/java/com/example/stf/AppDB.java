@@ -11,7 +11,7 @@ import com.example.stf.Contacts.Contact;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.entities.Chat;
 
-@Database(entities = {Contact.class}, version = 4)
+@Database(entities = {Contact.class}, version = 5)
 public abstract class AppDB extends RoomDatabase{
     public abstract ContactsDao ContactsDao();
 }

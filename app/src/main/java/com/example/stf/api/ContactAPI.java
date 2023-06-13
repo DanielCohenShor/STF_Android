@@ -42,12 +42,16 @@ public class ContactAPI {
         call.enqueue(new Callback<Contact[]>() {
             @Override
             public void onResponse(Call<Contact[]> call, Response<Contact[]> response) {
-                if (response.isSuccessful()) {
-                    Contact[] contacts = response.body();
-                    callback.accept(contacts);
-                } else {
-                    // error from the get contacts?
-                    //todo: what we need to return ?
+                try {
+                    if (response.isSuccessful()) {
+                        Contact[] contacts = response.body();
+                        callback.accept(contacts);
+                    } else {
+                        // error from the get contacts?
+                        //todo: what we need to return ?
+                    }
+                } catch (Exception e) {
+                    int x = 5;
                 }
             }
 

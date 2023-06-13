@@ -71,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                        .fallbackToDestructiveMigration()
                         .build();
                 contactsDao = db.ContactsDao();
             }

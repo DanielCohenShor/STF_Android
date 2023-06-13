@@ -55,6 +55,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                        .fallbackToDestructiveMigration()
                         .build();
                 contactsDao = db.ContactsDao();
             }
@@ -102,7 +103,7 @@ public class ContactsActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        handleGetContactsCallback(contacts);
+                        updateUIWithContacts(contacts);
                     }
                 });
             }
@@ -115,10 +116,22 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     private void handleGetContactsCallback(Contact[] contacts) {
-        //change the ui use the adapter
+        // Save the contacts in the local memory
+        for (Contact contact : contacts) {
+            Contact existingContact = contactsDao.get(contact.getId());
+            if (existingContact == null) {
+                contactsDao.insert(contact);
+            }
+        }
+        updateUIWithContacts(contacts);
+    }
+
+    private void updateUIWithContacts(Contact[] contacts) {
+        // Change the UI using the adapter
         contactAdapter = new ContactAdapter(this, contacts);
         contactAdapter.setContacts(contacts);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
+
 }

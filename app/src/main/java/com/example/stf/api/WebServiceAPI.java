@@ -23,10 +23,10 @@ public interface WebServiceAPI {
     @POST("Tokens")
     Call<Void> createToken(@Body RequestBody tokenRequest);
 
-    @GET("Contact")
+    @GET("Chats")
     Call<Contact[]> getContacts(@Header("Authorization") String token);
 
-    @POST("Contact")
+    @POST("Chats")
     Call<Contact> addContact(@Header("Authorization") String token, @Body RequestBody username);
 
     //more req
