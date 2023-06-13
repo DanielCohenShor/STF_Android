@@ -6,8 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.stf.Contacts.Contact;
-import com.example.stf.entities.Chat;
+import com.example.stf.entities.Contact;
 
 @Dao
 public interface ContactsDao {
@@ -20,6 +19,9 @@ public interface ContactsDao {
     @Query("SELECT * FROM Contact WHERE user_id =:id")
     Contact get(int id);
 
+    @Query("DELETE FROM Contact")
+    void deleteAllContacts();
+
     @Insert
     void insert(Contact... Contacts);
 
@@ -28,7 +30,4 @@ public interface ContactsDao {
 
     @Delete
     void delete(Contact... Contacts);
-
-
-
 }

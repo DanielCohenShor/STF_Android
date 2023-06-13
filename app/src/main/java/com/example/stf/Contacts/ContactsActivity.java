@@ -14,11 +14,10 @@ import android.widget.ImageButton;
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
 import com.example.stf.Dao.ContactsDao;
-import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
-import com.example.stf.entities.Chat;
+import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContactsActivity extends AppCompatActivity {
@@ -44,10 +43,10 @@ public class ContactsActivity extends AppCompatActivity {
         initDB();
         // init the xml and his stuff.
         init();
-        //get all the contacts
-        getContacts();
         //create listeners
         createListeners();
+        //get all the contacts
+        getContacts();
     }
 
     public void initDB() {
@@ -61,27 +60,6 @@ public class ContactsActivity extends AppCompatActivity {
             }
         });
     }
-    private void createListeners() {
-        //listener for the logut
-        btnLogout.setOnClickListener(v -> {
-            finish();
-        });
-
-        btnSettings.setOnClickListener(v -> {
-            // Start the new activity here
-            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
-            intent.putExtra("token", token);
-            startActivity(intent);
-        });
-
-        btnAddContact.setOnClickListener(v -> {
-            // Start the new activity here
-            Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
-            intent.putExtra("token", token);
-            startActivity(intent);
-        });
-    }
-
     private void init() {
         // Initialize the views
         btnLogout = findViewById(R.id.btnLogout);
@@ -92,27 +70,53 @@ public class ContactsActivity extends AppCompatActivity {
         btnAddContact = findViewById(R.id.btnAddContact);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
+    private void createListeners() {
+        //listener for the logut
+        btnLogout.setOnClickListener(v -> {logOut();});
+
+        btnSettings.setOnClickListener(v -> {openSettings();});
+
+        btnAddContact.setOnClickListener(v -> {openAddNewContact();});
+    }
+
+    private void logOut() {
+        // Delete the local database
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                contactsDao.deleteAllContacts();
+                db.close();
+            }
+        });
+        finish();
+    }
+
+    private void openAddNewContact() {
+        // Start the new activity here
+        Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
+        intent.putExtra("token", token);
+        startActivity(intent);
+    }
+
+    private void openSettings() {
+        // Start the new activity here
+        Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+        intent.putExtra("token", token);
+        startActivity(intent);
+    }
+    private void getContacts() {
+        viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Contact[] contacts = contactsDao.index();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUIWithContacts(contacts);
-                    }
-                });
-            }
+        AsyncTask.execute(() -> {
+            Contact[] contacts = contactsDao.index();
+            runOnUiThread(() -> {
+                updateUIWithContacts(contacts);
+            });
         });
-    }
-
-
-    private void getContacts() {
-        viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
     }
 
     private void handleGetContactsCallback(Contact[] contacts) {
@@ -125,12 +129,16 @@ public class ContactsActivity extends AppCompatActivity {
                         contactsDao.insert(contact);
                     }
                 }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUIWithContacts(contacts);
+                    }
+                });
             }
         });
-
-        updateUIWithContacts(contacts);
     }
-
 
     private void updateUIWithContacts(Contact[] contacts) {
         // Change the UI using the adapter
@@ -139,5 +147,6 @@ public class ContactsActivity extends AppCompatActivity {
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
+
 
 }

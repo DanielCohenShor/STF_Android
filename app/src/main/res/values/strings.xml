@@ -18,8 +18,8 @@
     <string name="cd_show_password">showPasswordImg</string>
     <string name="cd_bottom_circle">bottomCircle</string>
     <string name="cd_add_new_contact">addNewContact</string>
-    <string name="BaseUrl">http://10.100.102.91:5000/api/</string>
-<!--    <string name="BaseUrl">http://10.0.2.2:5000/api/</string>-->
+<!--    <string name="BaseUrl">http://10.100.102.91:5000/api/</string>-->
+    <string name="BaseUrl">http://10.0.2.2:5000/api/</string>
     <string name="ed_new_message_hint">New message here&#8230;</string>
     <string name="tv_add_new_contact_headline">Choose contact</string>
     <string name="tv_settings">Settings</string>

@@ -1,8 +1,9 @@
 package com.example.stf.Contacts;
+
 import androidx.lifecycle.ViewModel;
 
 import com.example.stf.api.ContactAPI;
-import com.example.stf.entities.Chat;
+import com.example.stf.entities.Contact;
 
 import java.util.function.Consumer;
 

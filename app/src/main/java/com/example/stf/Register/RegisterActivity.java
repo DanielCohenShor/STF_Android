@@ -45,12 +45,8 @@ import java.util.HashSet;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword, etPasswordVerification, etDisplayName;
-
-    private TextView tvProfilePic;
     private TextView linkToLogin;
     private Button btnRegister;
-
-    private String encodedImg;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
@@ -62,10 +58,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     // create map that contains all the text of the errors to show for the user
     private HashMap<String, String> errorsText = new HashMap<>();
-    private ActivityResultLauncher<Intent> filePickerLauncher;
-
     private Uri profilePictureUri;
     private String profilePictureBase64;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +69,27 @@ public class RegisterActivity extends AppCompatActivity {
         initView();
         //init the listener for the show password.
         initListeners();
-        //init the view model
-        initViewModel();
+    }
+
+    private void initView() {
+        // Initialize the RegisterViewModel
+        etUsername = findViewById(R.id.et_username);
+        etPassword = findViewById(R.id.et_password);
+        etPasswordVerification = findViewById(R.id.et_passwordVerification);
+        etDisplayName = findViewById(R.id.et_displayName);
+        btnPasswordVisibility = findViewById(R.id.btnShowPassword);
+        btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
+        registerViewModel = new ViewModelProvider(this).get(ViewModelRegister.class);
+        btnRegister = findViewById(R.id.btnRegister);
+        linkToLogin = findViewById(R.id.linkToLogin2);
+        riProfilePic = findViewById(R.id.riProfilePic);
+
+        errorsText.put("username", "must contain at least one letter");
+        errorsText.put("username exist", "username already exist");
+        errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
+        errorsText.put("passwordVerification", "must be the same as the password");
+        errorsText.put("displayName", "must contain at least one letter");
+        errorsText.put("profilePic", "must insert only files of kind: png, jpeg...");
     }
 
     @Override
@@ -108,6 +122,73 @@ public class RegisterActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void pickProfilePicture() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, 1);
+    }
+
+    private void initListeners() {
+        Context context = this; // 'this' refers to the current Activity instance
+
+        // create listener for the btnRegister
+        btnRegister.setOnClickListener(view -> performRegistration());
+
+        riProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickProfilePicture();
+            }
+        });
+
+        btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
+            boolean isPasswordVisible = false;
+            final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
+            final Drawable hidePassword = ContextCompat.getDrawable(context, R.drawable.hide_password_icon_drawable);
+
+            @Override
+            public void onClick(View v) {
+                if (isPasswordVisible) {
+                    btnPasswordVisibility.setImageDrawable(showPassword);
+                    // Set the input type to hide the password
+                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                } else {
+                    btnPasswordVisibility.setImageDrawable(hidePassword);
+                    // Set the input type to show the password
+                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                }
+                isPasswordVisible = !isPasswordVisible;
+
+                // Move the cursor to the end of the text
+                etPassword.setSelection(etPassword.getText().length());
+            }
+        });
+
+        btnConfirmationPasswordVisibility.setOnClickListener(new View.OnClickListener() {
+            boolean isPasswordVisible = false;
+            final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
+            final Drawable hidePassword = ContextCompat.getDrawable(context, R.drawable.hide_password_icon_drawable);
+
+            @Override
+            public void onClick(View v) {
+                if (isPasswordVisible) {
+                    btnConfirmationPasswordVisibility.setImageDrawable(showPassword);
+                    // Set the input type to hide the password
+                    etPasswordVerification.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                } else {
+                    btnConfirmationPasswordVisibility.setImageDrawable(hidePassword);
+                    // Set the input type to show the password
+                    etPasswordVerification.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                }
+                isPasswordVisible = !isPasswordVisible;
+
+                // Move the cursor to the end of the text
+                etPasswordVerification.setSelection(etPasswordVerification.getText().length());
+            }
+        });
+
+        linkToLogin.setOnClickListener(view -> navigateToLoginActivity());
     }
 
     private void performRegistration() {
@@ -198,101 +279,9 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private void initViewModel() {
-        registerViewModel = new ViewModelProvider(this).get(ViewModelRegister.class);
-        // create listener for the btnRegister
-        btnRegister.setOnClickListener(view -> performRegistration());
-    }
-    //only findview.by.id
-    private void initView() {
-        // Initialize the RegisterViewModel
-        etUsername = findViewById(R.id.et_username);
-        etPassword = findViewById(R.id.et_password);
-        etPasswordVerification = findViewById(R.id.et_passwordVerification);
-        etDisplayName = findViewById(R.id.et_displayName);
-        btnPasswordVisibility = findViewById(R.id.btnShowPassword);
-        btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
-        btnRegister = findViewById(R.id.btnRegister);
-        linkToLogin = findViewById(R.id.linkToLogin2);
-        riProfilePic = findViewById(R.id.riProfilePic);
-        tvProfilePic = findViewById(R.id.tvProfilePic);
 
-        errorsText.put("username", "must contain at least one letter");
-        errorsText.put("username exist", "username already exist");
-        errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
-        errorsText.put("passwordVerification", "must be the same as the password");
-        errorsText.put("displayName", "must contain at least one letter");
-        errorsText.put("profilePic", "must insert only files of kind: png, jpeg...");
-    }
-
-
-    private void pickProfilePicture() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, 1);
-    }
-
-
-
-    private void initListeners() {
-        Context context = this; // 'this' refers to the current Activity instance
-
-        riProfilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickProfilePicture();
-            }
-        });
-
-        btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
-            boolean isPasswordVisible = false;
-            final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
-            final Drawable hidePassword = ContextCompat.getDrawable(context, R.drawable.hide_password_icon_drawable);
-
-            @Override
-            public void onClick(View v) {
-                if (isPasswordVisible) {
-                    btnPasswordVisibility.setImageDrawable(showPassword);
-                    // Set the input type to hide the password
-                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                } else {
-                    btnPasswordVisibility.setImageDrawable(hidePassword);
-                    // Set the input type to show the password
-                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                }
-                isPasswordVisible = !isPasswordVisible;
-
-                // Move the cursor to the end of the text
-                etPassword.setSelection(etPassword.getText().length());
-            }
-        });
-
-        btnConfirmationPasswordVisibility.setOnClickListener(new View.OnClickListener() {
-            boolean isPasswordVisible = false;
-            final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
-            final Drawable hidePassword = ContextCompat.getDrawable(context, R.drawable.hide_password_icon_drawable);
-
-            @Override
-            public void onClick(View v) {
-                if (isPasswordVisible) {
-                    btnConfirmationPasswordVisibility.setImageDrawable(showPassword);
-                    // Set the input type to hide the password
-                    etPasswordVerification.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                } else {
-                    btnConfirmationPasswordVisibility.setImageDrawable(hidePassword);
-                    // Set the input type to show the password
-                    etPasswordVerification.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                }
-                isPasswordVisible = !isPasswordVisible;
-
-                // Move the cursor to the end of the text
-                etPasswordVerification.setSelection(etPasswordVerification.getText().length());
-            }
-        });
-
-        linkToLogin.setOnClickListener(view -> {
-            // Start the new activity here
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
+    private void navigateToLoginActivity() {
+        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 }

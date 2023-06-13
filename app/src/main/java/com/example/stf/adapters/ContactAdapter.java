@@ -7,15 +7,13 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.stf.Contacts.Contact;
+import com.example.stf.entities.Contact;
 import com.example.stf.R;
-import com.example.stf.entities.Chat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

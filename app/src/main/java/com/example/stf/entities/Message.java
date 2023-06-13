@@ -1,4 +1,4 @@
-package com.example.stf.Chat;
+package com.example.stf.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;

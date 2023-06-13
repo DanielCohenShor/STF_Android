@@ -1,5 +1,8 @@
 package com.example.stf.Register;
 
+import android.net.Uri;
+import android.util.Base64;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -7,6 +10,9 @@ import androidx.lifecycle.ViewModel;
 import com.example.stf.api.UserAPI;
 import com.example.stf.entities.User;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -16,7 +22,6 @@ public class ViewModelRegister extends ViewModel {
     public ViewModelRegister() {
         this.userAPI = new UserAPI();
     }
-
 
     public void performRegistration(String usernameValue, String passwordValue,
                                     String passwordVerificationValue,
@@ -32,4 +37,5 @@ public class ViewModelRegister extends ViewModel {
         String[] errors = {"password"}; // Password verification failed
         callback.accept(errors);
     }
+
 }

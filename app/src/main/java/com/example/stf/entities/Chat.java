@@ -5,8 +5,6 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.stf.Chat.Message;
-
 @Entity
 public class Chat {
     @PrimaryKey

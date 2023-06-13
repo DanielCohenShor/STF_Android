@@ -1,7 +1,6 @@
 package com.example.stf.api;
 
-import com.example.stf.Contacts.Contact;
-import com.example.stf.entities.Chat;
+import com.example.stf.entities.Contact;
 import com.example.stf.entities.User;
 
 import okhttp3.RequestBody;
