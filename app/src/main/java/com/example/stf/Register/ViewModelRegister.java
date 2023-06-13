@@ -19,12 +19,12 @@ public class ViewModelRegister extends ViewModel {
 
 
     public void performRegistration(String usernameValue, String passwordValue,
-                                        String passwordVerificationValue,
-                                        String displayNameValue, String pictureValue,
-                                        Consumer<String[]> callback) {
+                                    String passwordVerificationValue,
+                                    String displayNameValue,
+                                    Consumer<String[]> callback, String photo) {
         // Add your logic to perform the registration process check valdiation
         if (Objects.equals(passwordValue, passwordVerificationValue)) {
-            User user = new User(usernameValue, passwordValue, displayNameValue, pictureValue);
+            User user = new User(usernameValue, passwordValue, displayNameValue, photo, 0);
             userAPI.post(user, callback);
             return;
         }

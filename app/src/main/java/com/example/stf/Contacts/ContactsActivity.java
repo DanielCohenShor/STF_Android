@@ -2,6 +2,7 @@ package com.example.stf.Contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -13,6 +14,7 @@ import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
+import com.example.stf.entities.Chat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContactsActivity extends AppCompatActivity {
@@ -69,16 +71,18 @@ public class ContactsActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
-        contactAdapter = new ContactAdapter(this);
-        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void getContacts() {
         viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(Contact [] contacts) {
+    private void handleGetContactsCallback(Chat[] contacts) {
         //change the ui use the adapter
-
+        contactAdapter = new ContactAdapter(this, contacts);
+        contactAdapter.setContacts(contacts);
+        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 }

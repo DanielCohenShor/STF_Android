@@ -1,8 +1,10 @@
-package com.example.stf;
+package com.example.stf.Chat;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.stf.R;
 
 public class ChatActivity extends AppCompatActivity {
 
