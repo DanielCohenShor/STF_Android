@@ -5,7 +5,6 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,11 +12,9 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.example.stf.Contacts.Contact;
-import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.entities.Contact;
 import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
-import com.example.stf.entities.Chat;
 
 public class AddNewContactActivity extends AppCompatActivity {
 

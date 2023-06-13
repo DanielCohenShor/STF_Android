@@ -14,11 +14,10 @@ import android.widget.ImageButton;
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
 import com.example.stf.Dao.ContactsDao;
-import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
-import com.example.stf.entities.Chat;
+import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContactsActivity extends AppCompatActivity {

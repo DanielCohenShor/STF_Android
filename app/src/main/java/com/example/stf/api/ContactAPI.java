@@ -1,9 +1,8 @@
 package com.example.stf.api;
 
-import com.example.stf.Contacts.Contact;
+import com.example.stf.entities.Contact;
 import com.example.stf.MyApplication;
 import com.example.stf.R;
-import com.example.stf.entities.Chat;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -11,7 +10,6 @@ import java.util.function.Consumer;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
