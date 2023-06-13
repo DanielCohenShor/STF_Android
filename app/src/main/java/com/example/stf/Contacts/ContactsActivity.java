@@ -45,8 +45,9 @@ public class ContactsActivity extends AppCompatActivity {
         //listener for the logut
         btnLogout.setOnClickListener(v -> {
             // Start the new activity here
-            Intent intent = new Intent(ContactsActivity.this, LoginActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(ContactsActivity.this, LoginActivity.class);
+//            startActivity(intent);
+            finish();
         });
 
         btnSettings.setOnClickListener(v -> {

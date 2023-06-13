@@ -63,9 +63,10 @@ public class AddNewContactActivity extends AppCompatActivity {
             // make the edit text to be regular
             etChooseContact.setBackgroundResource(R.drawable.edittext_background);
             // Start the new activity here
-            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
-            intent.putExtra("token", token);
-            startActivity(intent);
+//            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
+//            intent.putExtra("token", token);
+//            startActivity(intent);
+            finish();
         } else {
             etChooseContact.setBackgroundResource(R.drawable.invalid_edit_text);
 
@@ -100,8 +101,9 @@ public class AddNewContactActivity extends AppCompatActivity {
     private void createListeners() {
         btnExitAddNewContact.setOnClickListener(v -> {
             // Start the new activity here
-            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
+//            startActivity(intent);
+            finish();
         });
     }
 }

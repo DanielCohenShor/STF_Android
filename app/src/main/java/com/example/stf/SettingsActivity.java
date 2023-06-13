@@ -46,9 +46,10 @@ public class SettingsActivity extends AppCompatActivity {
     private void createListeners() {
         btnExitSettings.setOnClickListener(v -> {
             // Start the new activity here
-            Intent intent = new Intent(SettingsActivity.this, ContactsActivity.class);
-            intent.putExtra("token", token);
-            startActivity(intent);
+//            Intent intent = new Intent(SettingsActivity.this, ContactsActivity.class);
+//            intent.putExtra("token", token);
+//            startActivity(intent);
+            finish();
         });
     }
 
