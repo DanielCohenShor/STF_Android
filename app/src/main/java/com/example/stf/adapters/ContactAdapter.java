@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stf.Contacts.Contact;
 import com.example.stf.R;
+import com.example.stf.entities.Chat;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -33,9 +34,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
     private final LayoutInflater mInflater;
-    private Contact[] contacts;
+    private Chat[] contacts;
 
-    public ContactAdapter(Context context, Contact[] contacts) {
+    public ContactAdapter(Context context, Chat[] contacts) {
         this.mInflater = LayoutInflater.from(context);
         this.contacts = contacts;
     }
@@ -50,7 +51,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         if (contacts != null) {
-            final Contact currentContact = contacts[position];
+            final Chat currentContact = contacts[position];
             // Bind the data to the views in the ContactViewHolder
             holder.displayName.setText(currentContact.getUser().getDisplayName());
             // Set the profile picture using an image loading library or your preferred method
@@ -58,7 +59,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             if (currentContact.getLastMessage() != null) {
                 holder.lastMessage.setText(currentContact.getLastMessage().getContent());
             }
-            holder.notification.setText(String.valueOf(currentContact.getNotifications()));
+            holder.notification.setText(String.valueOf(currentContact.getUser().getNotfications()));
         }
     }
 
@@ -67,11 +68,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         return contacts.length;
     }
 
-    public void setContacts(Contact[] contacts) {
+    public void setContacts(Chat[] contacts) {
         this.contacts = contacts;
     }
 
-    public Contact[] getContacts() {
+    public Chat[] getContacts() {
         return contacts;
     }
 }

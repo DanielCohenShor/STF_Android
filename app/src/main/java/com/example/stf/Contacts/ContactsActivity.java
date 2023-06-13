@@ -15,6 +15,7 @@ import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
+import com.example.stf.entities.Chat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -72,7 +73,7 @@ public class ContactsActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
-        listViewContacts.setAdapter(contactAdapter);
+//        listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -80,12 +81,11 @@ public class ContactsActivity extends AppCompatActivity {
         viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(Contact[] contacts) {
+    private void handleGetContactsCallback(Chat[] contacts) {
         //change the ui use the adapter
         contactAdapter = new ContactAdapter(this, contacts);
         contactAdapter.setContacts(contacts);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-
     }
 }

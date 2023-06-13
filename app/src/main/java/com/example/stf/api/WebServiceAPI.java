@@ -1,6 +1,7 @@
 package com.example.stf.api;
 
 import com.example.stf.Contacts.Contact;
+import com.example.stf.entities.Chat;
 import com.example.stf.entities.User;
 
 import okhttp3.RequestBody;
@@ -23,7 +24,7 @@ public interface WebServiceAPI {
     Call<Void> createToken(@Body RequestBody tokenRequest);
 
     @GET("Chats")
-    Call<Contact[]> getContacts(@Header("Authorization") String token);
+    Call<Chat[]> getContacts(@Header("Authorization") String token);
 
     @POST("Chats")
     Call<Contact> addContact(@Header("Authorization") String token, @Body String username);
