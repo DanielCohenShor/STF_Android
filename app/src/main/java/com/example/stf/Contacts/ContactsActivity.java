@@ -73,7 +73,6 @@ public class ContactsActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
-//        listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
