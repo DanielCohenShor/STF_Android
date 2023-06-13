@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,6 +36,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,7 +55,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
 
-    private RoundedImageView riProfilePic;
+    private ImageView riProfilePic;
 
     // Declare a HashSet to store the IDs of the created TextViews
     private HashSet<String> createdTextViews = new HashSet<>();
@@ -62,8 +64,8 @@ public class RegisterActivity extends AppCompatActivity {
     private HashMap<String, String> errorsText = new HashMap<>();
     private ActivityResultLauncher<Intent> filePickerLauncher;
 
-    private Uri fileUri;
-
+    private Uri profilePictureUri;
+    private String profilePictureBase64;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,42 +76,39 @@ public class RegisterActivity extends AppCompatActivity {
         initListeners();
         //init the view model
         initViewModel();
-
-        riProfilePic.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            profilePic.launch(intent);
-        });
     }
 
-    private String encodeImage(Bitmap bitmap) {
-        int previewWidth = 150;
-        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
-        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            profilePictureUri = data.getData();
+            riProfilePic.setImageURI(profilePictureUri);
+
+            // Convert profile picture to Base64
+            profilePictureBase64 = convertProfilePictureToBase64();
+        }
     }
 
-    private final ActivityResultLauncher<Intent> profilePic = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    if (result.getData() != null) {
-                        Uri imageUri = result.getData().getData();
-                        try {
-                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            riProfilePic.setImageBitmap(bitmap);
-                            tvProfilePic.setVisibility(View.GONE);
-                            encodedImg = encodeImage(bitmap);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+    private String convertProfilePictureToBase64() {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(profilePictureUri);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
             }
-    );
+
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+            return base64Image;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private void performRegistration() {
         registerViewModel.performRegistration(
@@ -117,8 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
                 etPassword.getText().toString(),
                 etPasswordVerification.getText().toString(),
                 etDisplayName.getText().toString(),
-                encodedImg,
-                this::handleRegistrationCallback
+                this::handleRegistrationCallback, "data:image/png;base64," + profilePictureBase64
         );
     }
 
@@ -227,8 +225,23 @@ public class RegisterActivity extends AppCompatActivity {
         errorsText.put("profilePic", "must insert only files of kind: png, jpeg...");
     }
 
+
+    private void pickProfilePicture() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, 1);
+    }
+
+
+
     private void initListeners() {
         Context context = this; // 'this' refers to the current Activity instance
+
+        riProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickProfilePicture();
+            }
+        });
 
         btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
             boolean isPasswordVisible = false;

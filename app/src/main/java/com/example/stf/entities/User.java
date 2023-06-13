@@ -3,7 +3,6 @@ package com.example.stf.entities;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-
 @Entity
 public class User {
     @PrimaryKey
@@ -15,11 +14,13 @@ public class User {
 
     private String profilePic;
 
-    public User(String username, String password, String displayName, String propilePic) {
+    private int notfications;
+    public User(String username, String password, String displayName, String propilePic, int notfications) {
         this.username = username;
         this.password = password;
         this.displayName = displayName;
         this.profilePic = propilePic;
+        this.notfications = notfications;
     }
 
     public String getUsername() {
@@ -54,5 +55,11 @@ public class User {
         this.profilePic = propilePic;
     }
 
+    public int getNotfications() {
+        return notfications;
+    }
 
+    public void setNotfications(int notfications) {
+        this.notfications = notfications;
+    }
 }
