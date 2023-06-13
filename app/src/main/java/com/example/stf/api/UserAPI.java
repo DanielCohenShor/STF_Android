@@ -27,7 +27,6 @@ public class UserAPI {
     WebServiceAPI webServiceAPI;
     String token; // Store the token here
     public UserAPI() {
-
         retrofit = new Retrofit.Builder()
                 .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
                 .addConverterFactory(GsonConverterFactory.create())
@@ -37,7 +36,7 @@ public class UserAPI {
     public void setToken(String token) {
         this.token = token;
     }
-
+  
     public void get(String username, Consumer<User> callback) {
         Call<User> call = webServiceAPI.getUser("Bearer {\"token\":\"" + token + "\"}", username);
         call.enqueue(new Callback<User>() {
@@ -58,7 +57,6 @@ public class UserAPI {
             }
         });
     }
-
     public void post(User user, Consumer<String[]> callback) {
         Call<Void> call = webServiceAPI.createUser(user);
         call.enqueue(new Callback<Void>() {

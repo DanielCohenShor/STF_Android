@@ -35,8 +35,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
         private final TextView time;
 
-
-
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
             displayName = itemView.findViewById(R.id.tvContactName);
@@ -54,7 +52,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         this.mInflater = LayoutInflater.from(context);
         this.contacts = contacts;
     }
-
     @Override
     public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = mInflater.inflate(R.layout.contact, parent, false);

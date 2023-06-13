@@ -6,13 +6,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
+import com.example.stf.Register.ViewModelRegister;
+import com.example.stf.adapters.ContactAdapter;
+
+import java.util.Objects;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
 import com.example.stf.entities.Chat;
@@ -22,7 +32,6 @@ import java.util.List;
 
 public class ContactsActivity extends AppCompatActivity {
     private ImageButton btnLogout;
-
     private ImageButton btnSettings;
 
     private FloatingActionButton btnAddContact;
