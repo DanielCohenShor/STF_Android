@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.stf.api.TokenAPI;
 import com.example.stf.api.UserAPI;
+import com.example.stf.entities.User;
 
 import java.util.function.Consumer;
 
@@ -32,7 +33,7 @@ public class ViewModelLogin extends ViewModel {
         tokenAPI.post(usernameValue, passwordValue, callback);
     }
 
-    public void getDetails(String username, Consumer<String[]> callback) {
+    public void getDetails(String username, Consumer<User> callback) {
         userAPI.get(username, callback);
     }
 }

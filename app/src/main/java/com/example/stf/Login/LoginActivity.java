@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
+import com.example.stf.entities.User;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -190,20 +191,15 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void handleDetailsUser(String [] userDetails) {
-        // Extract the user details from the array
-        String username = userDetails[0];
-        String displayName = userDetails[1];
-        String profilePic = userDetails[2];
-
+    private void handleDetailsUser(User user) {
         // Get the token from the ViewModel (assuming you have a ViewModel instance named viewModelLogin)
         String token = viewModelLogin.getToken();
 
         // Start the new activity and pass the data using Intent extras
         Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
-        intent.putExtra("username", username);
-        intent.putExtra("displayName", displayName);
-        intent.putExtra("profilePic", profilePic);
+        intent.putExtra("username", user.getUsername());
+        intent.putExtra("displayName", user.getDisplayName());
+        intent.putExtra("profilePic", user.getProfilePic());
         intent.putExtra("token", token);
         startActivity(intent);
 
