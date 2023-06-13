@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -35,6 +36,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -82,34 +84,67 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private String encodeImage(Bitmap bitmap) {
-        int previewWidth = 150;
-        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
-        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    // Convert the image file to a Base64-encoded string
+    private String convertImageToBase64(Uri imageUri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            byte[] imageBytes = new byte[inputStream.available()];
+            inputStream.read(imageBytes);
+            inputStream.close();
+
+            return Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    private final ActivityResultLauncher<Intent> profilePic = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    if (result.getData() != null) {
-                        Uri imageUri = result.getData().getData();
-                        try {
-                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            riProfilePic.setImageBitmap(bitmap);
-                            tvProfilePic.setVisibility(View.GONE);
-                            encodedImg = encodeImage(bitmap);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
+//    private String convertProfilePictureToBase64() {
+//        try {
+//            InputStream inputStream = getContentResolver().openInputStream(profilePictureUri);
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//
+//            byte[] buffer = new byte[1024];
+//            int bytesRead;
+//            while ((bytesRead = inputStream.read(buffer)) != -1) {
+//                byteArrayOutputStream.write(buffer, 0, bytesRead);
+//            }
+//
+//            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+//            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+//            return base64Image;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
+    // In your activity or fragment
+    private ActivityResultLauncher<Intent> profilePic = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null && data.getData() != null) {
+                        Uri selectedImageUri = data.getData();
+
+                        // Convert the image file to a Base64-encoded string
+                        String base64Image = convertImageToBase64(selectedImageUri);
+
+                        // Combine with the appropriate prefix
+                        encodedImg = "data:image/png;base64," + base64Image;
                     }
                 }
             }
     );
+
+    private String encodeImage(Bitmap bitmap) {
+        // Encode the bitmap image to Base64
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
 
     private void performRegistration() {
         registerViewModel.performRegistration(

@@ -83,5 +83,5 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        style="@style/BLOCK_SCREEN_WITH_STATUS_BAR"/>
+        style="@style/BLOCK_SCREEN_WITH_STATUS_BAR" />
 </androidx.constraintlayout.widget.ConstraintLayout>
