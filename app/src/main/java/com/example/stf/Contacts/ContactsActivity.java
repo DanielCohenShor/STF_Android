@@ -80,8 +80,8 @@ public class ContactsActivity extends AppCompatActivity {
             intent.putExtra("token", token);
             startActivity(intent);
         });
-
     }
+
     private void init() {
         // Initialize the views
         btnLogout = findViewById(R.id.btnLogout);
@@ -116,15 +116,21 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     private void handleGetContactsCallback(Contact[] contacts) {
-        // Save the contacts in the local memory
-        for (Contact contact : contacts) {
-            Contact existingContact = contactsDao.get(contact.getId());
-            if (existingContact == null) {
-                contactsDao.insert(contact);
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (Contact contact : contacts) {
+                    Contact existingContact = contactsDao.get(contact.getId());
+                    if (existingContact == null) {
+                        contactsDao.insert(contact);
+                    }
+                }
             }
-        }
+        });
+
         updateUIWithContacts(contacts);
     }
+
 
     private void updateUIWithContacts(Contact[] contacts) {
         // Change the UI using the adapter
