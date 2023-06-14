@@ -103,6 +103,7 @@ public class AddNewContactActivity extends AppCompatActivity {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     // This method is called when the text is being changed
+
                 }
 
                 // This method is called after the text has been changed

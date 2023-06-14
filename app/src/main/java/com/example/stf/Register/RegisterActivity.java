@@ -245,7 +245,11 @@ public class RegisterActivity extends AppCompatActivity {
 
                     if (!editTextId.equals("et_ProfilePic")) {
                         EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
-                        etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
+                        int styleResId = R.style.INVALID_EDIT_TEXT;
+                        TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                        int drawableResId = styledAttributes.getResourceId(0, 0);
+                        styledAttributes.recycle();
+                        etBorder.setBackgroundResource(drawableResId);
 
                         // Set the appropriate layout params for the error message TextView
                         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -274,7 +278,12 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void afterTextChanged(Editable s) {
                                 // change the border of the text view to none
-                                etBorder.setBackgroundResource(R.drawable.edittext_background);
+                                int styleResId = R.style.EDIT_TEXT;
+                                TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                                int drawableResId = styledAttributes.getResourceId(0, 0);
+                                styledAttributes.recycle();
+
+                                etBorder.setBackgroundResource(drawableResId);
                                 // remove the text view of the error
                                 parentLayout.removeView(tvError);
                                 createdTextViews.remove(tvId);

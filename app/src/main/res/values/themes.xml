@@ -104,4 +104,8 @@
     <style name="PROFILE_PIC_BORDER">
         <item name="android:background">@drawable/circle_border</item>
     </style>
+
+    <style name="INVALID_EDIT_TEXT">
+        <item name="android:background">@drawable/invalid_edit_text</item>
+    </style>
 </resources>
