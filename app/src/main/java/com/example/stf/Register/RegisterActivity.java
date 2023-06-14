@@ -1,7 +1,6 @@
 package com.example.stf.Register;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -9,8 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -26,7 +24,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,7 +32,6 @@ import com.example.stf.R;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -43,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -63,8 +58,6 @@ public class RegisterActivity extends AppCompatActivity {
     private HashMap<String, String> errorsText = new HashMap<>();
     private Uri profilePictureUri;
     private String profilePictureBase64;
-
-    private LinearLayout ll_ProfilePic;
     private TextView etProfilePic;
 
     @Override
@@ -89,7 +82,6 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         linkToLogin = findViewById(R.id.linkToLogin2);
         riProfilePic = findViewById(R.id.riProfilePic);
-        ll_ProfilePic = findViewById(R.id.ll_ProfilePic);
         etProfilePic = findViewById(R.id.et_ProfilePic);
 
 
@@ -130,8 +122,7 @@ public class RegisterActivity extends AppCompatActivity {
             //clean it
             etProfilePic.setText("");
 
-            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-            return base64Image;
+            return Base64.encodeToString(imageBytes, Base64.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,12 +140,7 @@ public class RegisterActivity extends AppCompatActivity {
         // create listener for the btnRegister
         btnRegister.setOnClickListener(view -> performRegistration());
 
-        riProfilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickProfilePicture();
-            }
-        });
+        riProfilePic.setOnClickListener(v -> pickProfilePicture());
 
         btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
             boolean isPasswordVisible = false;
@@ -296,9 +282,13 @@ public class RegisterActivity extends AppCompatActivity {
                         });
                         createdTextViews.add(tvId);
                     } else {
-                        RoundedImageView etBorder = findViewById(R.id.riProfilePic);
-                        etBorder.setBackground(ContextCompat.getDrawable(this, R.drawable.circle_border));
-                        createdTextViews.add(tvId);
+                        int styleResId = R.style.PROFILE_PIC_BORDER;
+                        TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                        int drawableResId = styledAttributes.getResourceId(0, 0);
+                        styledAttributes.recycle();
+
+                        riProfilePic.setImageResource(drawableResId);
+
                     }
                 }
             }
