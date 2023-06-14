@@ -215,8 +215,13 @@ public class RegisterActivity extends AppCompatActivity {
                     newErrors[errors.length] = "passwordVerification";
                     errors = newErrors;
                 }
+                if (errors[i].equals("photo")) {
+                    String[] newErrors = Arrays.copyOf(errors, errors.length + 1);
+                    newErrors[errors.length] = "photoVerification";
+                    errors = newErrors;
+                }
             }
-
+            //todo: add error for photo show the ui of photo
             for (String error : errors) {
                 String layoutId = "ll_" + error;
                 String tvId = "tv_error_" + error;

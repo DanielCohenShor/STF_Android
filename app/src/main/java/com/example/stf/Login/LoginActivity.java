@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private TextView linkToRegister;
 
-    private HashSet<String> createdTextViews = new HashSet<>();
+    private final HashSet<String> createdTextViews = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
