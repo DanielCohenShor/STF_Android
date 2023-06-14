@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.stf.ContactClickListener;
 import com.example.stf.entities.Contact;
 import com.example.stf.R;
 
@@ -33,27 +34,40 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
         private final TextView time;
 
-        public ContactViewHolder(@NonNull View itemView) {
+        public ContactViewHolder(@NonNull View itemView, ContactClickListener contactClickListener) {
             super(itemView);
             displayName = itemView.findViewById(R.id.tvContactName);
             profilePic = itemView.findViewById(R.id.contactImg);
             lastMessage = itemView.findViewById(R.id.tvLastMessage);
             notification = itemView.findViewById(R.id.tvNotification);
             time = itemView.findViewById(R.id.tvTime);
+
+            itemView.setOnClickListener(v -> {
+                if (contactClickListener != null) {
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        contactClickListener.onItemClick(pos);
+                    }
+                }
+            });
         }
     }
 
     private final LayoutInflater mInflater;
     private Contact[] contacts;
 
-    public ContactAdapter(Context context, Contact[] contacts) {
+    private final ContactClickListener contactClickListener;
+
+    public ContactAdapter(Context context, Contact[] contacts, ContactClickListener contactClickListener) {
         this.mInflater = LayoutInflater.from(context);
         this.contacts = contacts;
+        this.contactClickListener = contactClickListener;
     }
+    @NonNull
     @Override
-    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = mInflater.inflate(R.layout.contact, parent, false);
-        return new ContactViewHolder(itemView);
+        return new ContactViewHolder(itemView, contactClickListener);
     }
 
     private Bitmap decodeBase64Image(String base64Image) {

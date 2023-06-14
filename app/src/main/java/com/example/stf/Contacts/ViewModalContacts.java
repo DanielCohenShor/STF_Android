@@ -8,8 +8,7 @@ import java.util.function.Consumer;
 
 public class ViewModalContacts  extends ViewModel {
 
-
-    private ContactAPI contactAPI;
+    private final ContactAPI contactAPI;
 
     public ViewModalContacts() {
         this.contactAPI = new ContactAPI();

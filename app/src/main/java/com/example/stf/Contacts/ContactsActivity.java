@@ -13,6 +13,8 @@ import android.widget.ImageButton;
 
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
+import com.example.stf.Chat.ChatActivity;
+import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
@@ -20,7 +22,7 @@ import com.example.stf.adapters.ContactAdapter;
 import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class ContactsActivity extends AppCompatActivity {
+public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
     private ImageButton btnLogout;
 
     private ImageButton btnSettings;
@@ -50,18 +52,15 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     public void initDB() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
-                        .fallbackToDestructiveMigration()
-                        .build();
-                contactsDao = db.ContactsDao();
-            }
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            contactsDao = db.ContactsDao();
         });
     }
     private void createListeners() {
-        //listener for the logut
+        //listener for the logout
         btnLogout.setOnClickListener(v -> {
             finish();
         });
@@ -95,17 +94,9 @@ public class ContactsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Contact[] contacts = contactsDao.index();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUIWithContacts(contacts);
-                    }
-                });
-            }
+        AsyncTask.execute(() -> {
+            Contact[] contacts = contactsDao.index();
+            runOnUiThread(() -> updateUIWithContacts(contacts));
         });
     }
 
@@ -115,14 +106,11 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     private void handleGetContactsCallback(Contact[] contacts) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (Contact contact : contacts) {
-                    Contact existingContact = contactsDao.get(contact.getId());
-                    if (existingContact == null) {
-                        contactsDao.insert(contact);
-                    }
+        AsyncTask.execute(() -> {
+            for (Contact contact : contacts) {
+                Contact existingContact = contactsDao.get(contact.getId());
+                if (existingContact == null) {
+                    contactsDao.insert(contact);
                 }
             }
         });
@@ -133,10 +121,17 @@ public class ContactsActivity extends AppCompatActivity {
 
     private void updateUIWithContacts(Contact[] contacts) {
         // Change the UI using the adapter
-        contactAdapter = new ContactAdapter(this, contacts);
+        contactAdapter = new ContactAdapter(this, contacts, this);
         contactAdapter.setContacts(contacts);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    @Override
+    public void onItemClick(int position) {
+        // Start the new activity here
+        Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
+        intent.putExtra("token", token);
+        startActivity(intent);
+    }
 }
