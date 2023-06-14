@@ -81,7 +81,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         }
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         if (contacts != null) {
@@ -134,5 +133,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     public Contact[] getContacts() {
         return contacts;
+    }
+
+    public Contact getContact(int index) {
+        return contacts[index];
     }
 }

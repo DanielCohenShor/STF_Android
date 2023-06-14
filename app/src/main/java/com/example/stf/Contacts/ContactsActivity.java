@@ -41,12 +41,16 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
+
         // init the data base
         initDB();
+
         // init the xml and his stuff.
         init();
+
         //get all the contacts
         getContacts();
+
         //create listeners
         createListeners();
     }
@@ -59,11 +63,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             contactsDao = db.ContactsDao();
         });
     }
+
     private void createListeners() {
         //listener for the logout
-        btnLogout.setOnClickListener(v -> {
-            finish();
-        });
+        btnLogout.setOnClickListener(v -> finish());
 
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
@@ -129,9 +132,16 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     @Override
     public void onItemClick(int position) {
+        // Retrieve the clicked contact from the adapter
+        Contact clickedContact = contactAdapter.getContact(position);
+
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
+
         intent.putExtra("token", token);
+        intent.putExtra("contactProfilePic", clickedContact.getUser().getProfilePic());
+        intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());
+
         startActivity(intent);
     }
 }

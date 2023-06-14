@@ -1,5 +1,6 @@
 package com.example.stf.api;
 
+import com.example.stf.entities.Chat;
 import com.example.stf.entities.Contact;
 import com.example.stf.entities.User;
 
@@ -27,6 +28,9 @@ public interface WebServiceAPI {
 
     @POST("Chats")
     Call<Contact> addContact(@Header("Authorization") String token, @Body RequestBody username);
+
+    @GET("Chats/:id")
+    Call<Chat> getChat(@Header("Authorization") String token);
 
     //more req
 }
