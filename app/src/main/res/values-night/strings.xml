@@ -12,7 +12,7 @@
     <string name="et_confirm_password">Confirm Password</string>
     <string name="tv_display_name">Display Name</string>
     <string name="et_display_name">Display Name</string>
-    <string name="tv_picture">Picture</string>
+    <string name="et_ProfilePic">et_ProfilePic</string>
     <string name="et_picture">Picture</string>
     <string name="cd_top_circle">topCircle</string>
     <string name="cd_show_password">showPasswordImg</string>

@@ -34,7 +34,7 @@ public class ViewModelRegister extends ViewModel {
                 userAPI.post(user, callback);
                 return;
             } else {
-                String[] errors = {"photo"}; // Password verification failed
+                String[] errors = {"ProfilePic"}; // Password verification failed
                 callback.accept(errors);
                 return;
             }

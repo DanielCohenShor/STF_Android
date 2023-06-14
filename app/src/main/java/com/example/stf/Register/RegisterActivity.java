@@ -41,6 +41,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -51,7 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
 
-    private ImageView riProfilePic;
+    private RoundedImageView riProfilePic;
 
     // Declare a HashSet to store the IDs of the created TextViews
     private HashSet<String> createdTextViews = new HashSet<>();
@@ -60,6 +63,9 @@ public class RegisterActivity extends AppCompatActivity {
     private HashMap<String, String> errorsText = new HashMap<>();
     private Uri profilePictureUri;
     private String profilePictureBase64;
+
+    private LinearLayout ll_ProfilePic;
+    private TextView etProfilePic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +89,9 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         linkToLogin = findViewById(R.id.linkToLogin2);
         riProfilePic = findViewById(R.id.riProfilePic);
+        ll_ProfilePic = findViewById(R.id.ll_ProfilePic);
+        etProfilePic = findViewById(R.id.et_ProfilePic);
+
 
         errorsText.put("username", "must contain at least one letter");
         errorsText.put("username exist", "username already exist");
@@ -116,6 +125,11 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
+            riProfilePic.setBackground(ContextCompat.getDrawable(this, R.drawable.circle_border));
+            //clean it
+            etProfilePic.setText("");
+
             String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
             return base64Image;
         } catch (IOException e) {
@@ -217,7 +231,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
                 if (errors[i].equals("photo")) {
                     String[] newErrors = Arrays.copyOf(errors, errors.length + 1);
-                    newErrors[errors.length] = "photoVerification";
+                    newErrors[errors.length] = "ProfilePic";
                     errors = newErrors;
                 }
             }
@@ -225,11 +239,11 @@ public class RegisterActivity extends AppCompatActivity {
             for (String error : errors) {
                 String layoutId = "ll_" + error;
                 String tvId = "tv_error_" + error;
-
+                TextView tvError;
                 // check if the error already shown to the user
                 if (!createdTextViews.contains(tvId)) {
                     // Add the error message TextView dynamically
-                    TextView tvError = new TextView(RegisterActivity.this);
+                    tvError = new TextView(RegisterActivity.this);
                     tvError.setId(tvId.hashCode());
                     tvError.setText(errorsText.get(error));
                     tvError.setTextColor(Color.RED);
@@ -238,52 +252,58 @@ public class RegisterActivity extends AppCompatActivity {
 
                     // set the edit text border to red
                     String editTextId = "et_" + error;
-                    if(error == "username exist") {
+                    if(Objects.equals(error, "username exist")) {
                         layoutId = "ll_username";
                         editTextId = "et_username";
                     }
-                    EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
-                    etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
 
-                    // Set the appropriate layout params for the error message TextView
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+                    if (!editTextId.equals("et_ProfilePic")) {
+                        EditText etBorder = findViewById(getResources().getIdentifier(editTextId, "id", getPackageName()));
+                        etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
 
-                    // Add the error message TextView to your desired parent view
-                    LinearLayout parentLayout = findViewById(getResources().getIdentifier(layoutId, "id", getPackageName()));
-                    parentLayout.addView(tvError, layoutParams);
+                        // Set the appropriate layout params for the error message TextView
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
 
-                    // add listeners to change of the text in the edit text
-                    etBorder.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                            // This method is called before the text is changed
-                        }
+                        // Add the error message TextView to your desired parent view
+                        LinearLayout parentLayout = findViewById(getResources().getIdentifier(layoutId, "id", getPackageName()));
+                        parentLayout.addView(tvError, layoutParams);
 
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            // This method is called when the text is being changed
-                        }
+                        // add listeners to change of the text in the edit text
+                        etBorder.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                                // This method is called before the text is changed
+                            }
 
-                        // This method is called after the text has been changed
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            // change the border of the text view to none
-                            etBorder.setBackgroundResource(R.drawable.edittext_background);
-                            // remove the text view of the error
-                            parentLayout.removeView(tvError);
-                            createdTextViews.remove(tvId);
-                        }
-                    });
-                    createdTextViews.add(tvId);
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                // This method is called when the text is being changed
+                            }
+
+                            // This method is called after the text has been changed
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                // change the border of the text view to none
+                                etBorder.setBackgroundResource(R.drawable.edittext_background);
+                                // remove the text view of the error
+                                parentLayout.removeView(tvError);
+                                createdTextViews.remove(tvId);
+                            }
+                        });
+                        createdTextViews.add(tvId);
+                    } else {
+                        RoundedImageView etBorder = findViewById(R.id.riProfilePic);
+                        etBorder.setBackground(ContextCompat.getDrawable(this, R.drawable.circle_border));
+                        createdTextViews.add(tvId);
+                    }
                 }
             }
         }
     }
-
 
     private void navigateToLoginActivity() {
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);

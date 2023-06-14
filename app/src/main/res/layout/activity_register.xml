@@ -47,32 +47,41 @@
                 android:textStyle="bold"
                 android:layout_marginTop="30dp" />
 
-            <FrameLayout
-                android:id="@+id/fl_profilePic"
-                android:layout_width="260dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingVertical="30dp"
-                android:layout_gravity="center">
+            <LinearLayout
+                android:id="@+id/ll_ProfilePic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <com.makeramen.roundedimageview.RoundedImageView
-                    android:id="@+id/riProfilePic"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    style="@style/PROFILE_PIC_CIRCLE"
-                    android:scaleType="centerCrop"
-                    app:riv_oval="true"
-                    android:layout_gravity="center"/>
-
-                <TextView
-                    android:id="@+id/tvProfilePic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <FrameLayout
+                    android:id="@+id/fl_profilePic"
+                    android:layout_width="260dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:text="@string/tv_add_profile_picture"
-                    style="@style/TEXT" />
+                    android:orientation="vertical"
+                    android:paddingVertical="30dp">
 
-            </FrameLayout>
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/riProfilePic"
+                        style="@style/PROFILE_PIC_CIRCLE"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:scaleType="centerCrop"
+                        app:riv_oval="true" />
+
+                    <TextView
+                        android:id="@+id/et_ProfilePic"
+                        style="@style/TEXT"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/tv_add_profile_picture" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/ll_username"
