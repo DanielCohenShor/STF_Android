@@ -43,8 +43,12 @@ import java.util.Objects;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword, etPasswordVerification, etDisplayName;
+
+    private TextView tvProfilePic;
     private TextView linkToLogin;
     private Button btnRegister;
+
+    private String encodedImg;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
@@ -56,6 +60,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     // create map that contains all the text of the errors to show for the user
     private HashMap<String, String> errorsText = new HashMap<>();
+    private ActivityResultLauncher<Intent> filePickerLauncher;
+
     private Uri profilePictureUri;
     private String profilePictureBase64;
     private TextView etProfilePic;
@@ -221,7 +227,7 @@ public class RegisterActivity extends AppCompatActivity {
                     errors = newErrors;
                 }
             }
-            //todo: add error for photo show the ui of photo
+
             for (String error : errors) {
                 String layoutId = "ll_" + error;
                 String tvId = "tv_error_" + error;
