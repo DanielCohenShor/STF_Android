@@ -21,6 +21,7 @@ public class ViewModalContacts  extends ViewModel {
 
     public void performAddContact(String token, String contactUsername, Consumer<Contact> callback) {
         contactAPI.setToken(token);
+        //add new thread
         contactAPI.post(contactUsername, callback);
     }
 }

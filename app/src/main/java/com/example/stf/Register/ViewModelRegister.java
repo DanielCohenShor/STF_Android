@@ -24,9 +24,15 @@ public class ViewModelRegister extends ViewModel {
                                     Consumer<String[]> callback, String photo) {
         // Add your logic to perform the registration process check valdiation
         if (Objects.equals(passwordValue, passwordVerificationValue)) {
-            User user = new User(usernameValue, passwordValue, displayNameValue, photo, 0);
-            userAPI.post(user, callback);
-            return;
+            if (!Objects.equals(photo, "data:image/png;base64,null")) {
+                User user = new User(usernameValue, passwordValue, displayNameValue, photo, 0);
+                userAPI.post(user, callback);
+                return;
+            } else {
+                String[] errors = {"ProfilePic"}; // Password verification failed
+                callback.accept(errors);
+                return;
+            }
         }
         // meaning the password not match.
         String[] errors = {"password"}; // Password verification failed

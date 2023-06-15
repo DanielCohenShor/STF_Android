@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -152,10 +153,14 @@ public class LoginActivity extends AppCompatActivity {
                 layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
 
                 EditText etBorder = findViewById(getResources().getIdentifier("etUsername", "id", getPackageName()));
-                etBorder.setBackgroundResource(R.drawable.invalid_edit_text);
+                int styleResId = R.style.INVALID_EDIT_TEXT;
+                TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                int drawableResId = styledAttributes.getResourceId(0, 0);
+                styledAttributes.recycle();
+                etBorder.setBackgroundResource(drawableResId);
 
                 EditText etBorder1 = findViewById(getResources().getIdentifier("etPassword", "id", getPackageName()));
-                etBorder1.setBackgroundResource(R.drawable.invalid_edit_text);
+                etBorder1.setBackgroundResource(drawableResId);
 
                 // Add the error message TextView to your desired parent view
                 LinearLayout parentLayout = findViewById(R.id.test);
@@ -176,7 +181,13 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void afterTextChanged(Editable s) {
                         // change the border of the text view to none
-                        etBorder.setBackgroundResource(R.drawable.edittext_background);
+                        int styleResId = R.style.EDIT_TEXT;
+                        TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                        int drawableResId = styledAttributes.getResourceId(0, 0);
+                        styledAttributes.recycle();
+
+                        etBorder.setBackgroundResource(drawableResId);
+
                         // remove the text view of the error
                         parentLayout.removeView(tvError);
                         createdTextViews.remove(tvErrorId);
@@ -197,7 +208,11 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void afterTextChanged(Editable s) {
                         // change the border of the text view to none
-                        etBorder1.setBackgroundResource(R.drawable.edittext_background);
+                        int styleResId = R.style.EDIT_TEXT;
+                        TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                        int drawableResId = styledAttributes.getResourceId(0, 0);
+                        styledAttributes.recycle();
+                        etBorder1.setBackgroundResource(drawableResId);
                         // remove the text view of the error
                         parentLayout.removeView(tvError);
                         createdTextViews.remove(tvErrorId);

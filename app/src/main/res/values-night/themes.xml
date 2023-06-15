@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.STF" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Status bar color. -->
@@ -98,4 +98,14 @@
     <style name="MY_BUBBLE">
         <item name="android:background">@drawable/my_text_bubble_dark_drawable</item>
     </style>
+
+    <!-- Profile pic circle border if light mode on -->
+    <style name="PROFILE_PIC_BORDER">
+        <item name="android:background">@drawable/circle_border_dark</item>
+    </style>
+
+    <style name="INVALID_EDIT_TEXT">
+        <item name="android:background">@drawable/invalid_edit_text_dark</item>
+    </style>
+
 </resources>
