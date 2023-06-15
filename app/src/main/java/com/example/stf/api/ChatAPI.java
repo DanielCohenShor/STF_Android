@@ -2,6 +2,7 @@ package com.example.stf.api;
 
 import com.example.stf.MyApplication;
 import com.example.stf.R;
+import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -93,4 +94,26 @@ public class ChatAPI {
         });
     }
 
+    public void getUpdate(String chatId) {
+        Call<Contact[]> call = webServiceAPI.getUpdateContacts("Bearer {\"token\":\"" + token + "\"}", chatId);
+
+        call.enqueue(new Callback<Contact[]>() {
+            @Override
+            public void onResponse(Call<Contact[]> call, Response<Contact[]> response) {
+                try {
+                    if (response.isSuccessful()) {
+                        // okay
+                    } else {
+                        // error from the get contacts?
+                        //todo: what we need to return ?
+                    }
+                } catch (Exception e) {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Contact[]> call, Throwable t) {
+            }
+        });
+    }
 }
