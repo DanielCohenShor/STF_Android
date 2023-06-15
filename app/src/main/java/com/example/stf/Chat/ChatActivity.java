@@ -143,9 +143,8 @@ public class ChatActivity extends AppCompatActivity {
                     messagesDao.insert(message);
                 }
             }
+            runOnUiThread(() -> updateUIWithMessages(messages));
         });
-
-        updateUIWithMessages(messages);
     }
 
     private void updateUIWithMessages(Message[] messages) {
@@ -180,9 +179,8 @@ public class ChatActivity extends AppCompatActivity {
         AsyncTask.execute(() -> {
             newMessage.setChatId(chatId);
             messagesDao.insert(newMessage);
+            runOnUiThread(() -> updateUIWithNewMessage(newMessage));
         });
-
-        updateUIWithNewMessage(newMessage);
     }
 
     private void updateUIWithNewMessage(Message newMessage) {
