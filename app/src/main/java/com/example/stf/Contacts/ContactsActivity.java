@@ -25,6 +25,8 @@ import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
+    private boolean isFirstTime = true;
+
     private ImageButton btnLogout;
 
     private ImageButton btnSettings;
@@ -122,10 +124,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     @Override
     protected void onResume() {
         super.onResume();
-        AsyncTask.execute(() -> {
-            Contact[] contacts = contactsDao.indexSortedByDate();
-            runOnUiThread(() -> updateUIWithContacts(contacts));
-        });
+        if (isFirstTime) {
+            // This code will run only the first time
+            isFirstTime = false;
+        } else {
+            AsyncTask.execute(() -> {
+                Contact[] contacts = contactsDao.indexSortedByDate();
+                runOnUiThread(() -> updateUIWithContacts(contacts));
+            });
+        }
     }
 
 
@@ -143,7 +150,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     contactsDao.insert(contact);
                 }
             }
-            runOnUiThread(() -> updateUIWithContacts(contacts));
+            Contact[] sortredContacts = contactsDao.indexSortedByDate();
+
+            runOnUiThread(() -> updateUIWithContacts(sortredContacts));
         });
     }
 
