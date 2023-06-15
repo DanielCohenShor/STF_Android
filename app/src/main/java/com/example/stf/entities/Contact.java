@@ -29,6 +29,22 @@ public class Contact {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setLastMessage(Message lastMessage) {
+        this.lastMessage = lastMessage;
+    }
+
+    public void setNotifications(int notifications) {
+        this.notifications = notifications;
+    }
+
     public User getUser() {
         return user;
     }

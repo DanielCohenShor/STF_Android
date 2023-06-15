@@ -32,5 +32,8 @@ public interface WebServiceAPI {
     @GET("Chats/{id}/Messages")
     Call<Message[]> getMessages(@Header("Authorization") String token, @Path("id") String id);
 
+    @POST("Chats/{id}/Messages")
+    Call<Message> addMessage(@Header("Authorization") String token, @Path("id") String id, @Body RequestBody message);
+
     //more req
 }

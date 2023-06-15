@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -27,6 +28,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatActivity extends AppCompatActivity {
 
     private ImageButton btnExitChat;
+
+    private EditText etSendMessage;
 
     private FloatingActionButton btnSendMessage;
 
@@ -87,6 +90,7 @@ public class ChatActivity extends AppCompatActivity {
         contactImg = findViewById(R.id.contactImg);
         tvContactName = findViewById(R.id.tvContactName);
         listViewMessages = findViewById(R.id.RecyclerViewMessages);
+        etSendMessage = findViewById(R.id.etSendMessage);
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
         token = getIntent().getStringExtra("token");
         contactProfilePic = getIntent().getStringExtra("contactProfilePic");
@@ -150,9 +154,44 @@ public class ChatActivity extends AppCompatActivity {
         messageAdapter.setMessages(messages);
         listViewMessages.setAdapter(messageAdapter);
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
+        int lastPosition = messageAdapter.getItemCount() - 1;
+        if (lastPosition >= 0) {
+            listViewMessages.scrollToPosition(lastPosition);
+        }
     }
 
     private void createListeners() {
         btnExitChat.setOnClickListener(v -> finish());
+
+        btnSendMessage.setOnClickListener(v -> {
+            if (!etSendMessage.toString().equals("")) {
+                sendNewMessage(etSendMessage.getText().toString());
+                etSendMessage.setText("");
+            }
+        });
+    }
+
+    private void sendNewMessage(String content) {
+        // request to the server - running on new thread
+        viewModalChats.performAddMessage(token, Integer.toString(chatId), content, this::handleAddNewMessageCallback);
+    }
+
+    private void handleAddNewMessageCallback(Message newMessage) {
+        AsyncTask.execute(() -> {
+            newMessage.setChatId(chatId);
+            messagesDao.insert(newMessage);
+        });
+
+        updateUIWithNewMessage(newMessage);
+    }
+
+    private void updateUIWithNewMessage(Message newMessage) {
+        messageAdapter.addMessage(newMessage);
+        listViewMessages.setAdapter(messageAdapter);
+        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
+        int lastPosition = messageAdapter.getItemCount() - 1;
+        if (lastPosition >= 0) {
+            listViewMessages.scrollToPosition(lastPosition);
+        }
     }
 }

@@ -211,4 +211,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public Message[] getMessages() {
         return messages;
     }
+
+    public void addMessage(Message newMessage) {
+        // Create a new array with increased size
+        Message[] newMessages = new Message[getItemCount() + 1];
+
+        // Copy elements from the original array to the new array
+        System.arraycopy(messages, 0, newMessages, 0, getItemCount());
+
+        // Add the new message to the new array
+        newMessages[getItemCount()] = newMessage;
+
+        // Assign the new array back to the original reference
+        messages = newMessages;
+    }
 }
