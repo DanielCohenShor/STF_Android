@@ -14,7 +14,7 @@ public class ViewModalChats extends ViewModel {
         this.chatAPI = new ChatAPI();
     }
 
-    public void performGetChat(String token, String chatId, Consumer<Message[]> callback) {
+    public void performGetMessages(String token, String chatId, Consumer<Message[]> callback) {
         chatAPI.setToken(token);
         chatAPI.get(chatId, callback);
     }

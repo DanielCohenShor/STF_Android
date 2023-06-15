@@ -120,7 +120,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void getMessages() {
-        viewModalChats.performGetChat(token, Integer.toString(chatId), this::handleGetMessagesCallback);
+        // request to the server - running on new thread
+        viewModalChats.performGetMessages(token, Integer.toString(chatId), this::handleGetMessagesCallback);
+
+        // request to the local database - running on new thread
+        AsyncTask.execute(() -> {
+            Message[] messages = messagesDao.getAllMessages(chatId);
+            runOnUiThread(() -> updateUIWithMessages(messages));
+        });
     }
 
     private void handleGetMessagesCallback(@NonNull Message[] messages) {
@@ -128,6 +135,7 @@ public class ChatActivity extends AppCompatActivity {
             for (Message message : messages) {
                 Message existingMessage = messagesDao.get(message.getId());
                 if (existingMessage == null) {
+                    message.setChatId(chatId);
                     messagesDao.insert(message);
                 }
             }
