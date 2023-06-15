@@ -60,7 +60,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     // create map that contains all the text of the errors to show for the user
     private HashMap<String, String> errorsText = new HashMap<>();
-    private ActivityResultLauncher<Intent> filePickerLauncher;
 
     private Uri profilePictureUri;
     private String profilePictureBase64;
