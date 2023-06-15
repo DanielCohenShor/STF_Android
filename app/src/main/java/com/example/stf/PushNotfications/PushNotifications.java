@@ -1,8 +1,10 @@
 package com.example.stf.PushNotfications;
 
 public class PushNotifications {
-    private Notifications data;
+    // to shoud be aUniqueKey = notification_key
     private String to;
+    private Notifications data;
+
 
     public PushNotifications(Notifications data, String to) {
         this.data = data;
