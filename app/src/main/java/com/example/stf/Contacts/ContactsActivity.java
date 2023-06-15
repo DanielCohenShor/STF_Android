@@ -37,6 +37,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private AppDB db;
     private ContactsDao contactsDao;
+
+    private String currentUserUsername;
+    private String currentUserDisplayName;
+    private String currentUserProfilePic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +93,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         btnLogout = findViewById(R.id.btnLogout);
         viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
         token = getIntent().getStringExtra("token");
+        currentUserUsername = getIntent().getStringExtra("username");
+        currentUserDisplayName = getIntent().getStringExtra("displayName");
+        currentUserProfilePic = getIntent().getStringExtra("profilePic");
         btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
@@ -141,6 +149,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         intent.putExtra("token", token);
         intent.putExtra("contactProfilePic", clickedContact.getUser().getProfilePic());
         intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());
+        intent.putExtra("chatId", clickedContact.getId());
+        intent.putExtra("currentUserUsername", currentUserUsername);
 
         startActivity(intent);
     }

@@ -1,7 +1,11 @@
 package com.example.stf.Chat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,8 +15,10 @@ import android.util.Base64;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.stf.AppDB;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.R;
-import com.example.stf.entities.Chat;
+import com.example.stf.adapters.MessageAdapter;
 import com.example.stf.entities.Message;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -30,24 +36,49 @@ public class ChatActivity extends AppCompatActivity {
 
     private String token;
 
-    private ViewModalChats viewModalChats;
+    private int chatId;
 
     private String contactProfilePic;
 
     private String contactDisplayName;
+
+    private ViewModalChats viewModalChats;
+
+    private RecyclerView listViewMessages;
+
+    private AppDB db;
+    private MessagesDao messagesDao;
+
+    private MessageAdapter messageAdapter;
+
+    private String currentUserUsername;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        initDB();
+
         // init the xml and his stuff.
         init();
 
         showContactDetails();
 
+        getMessages();
+
         //create listeners
         createListeners();
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "MessagesDB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            messagesDao = db.messagesDao();
+        });
     }
 
     private void init() {
@@ -55,9 +86,13 @@ public class ChatActivity extends AppCompatActivity {
         btnSendMessage = findViewById(R.id.btnSendMessage);
         contactImg = findViewById(R.id.contactImg);
         tvContactName = findViewById(R.id.tvContactName);
+        listViewMessages = findViewById(R.id.RecyclerViewMessages);
+        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
         token = getIntent().getStringExtra("token");
         contactProfilePic = getIntent().getStringExtra("contactProfilePic");
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
+        currentUserUsername = getIntent().getStringExtra("currentUserUsername");
+        chatId = getIntent().getIntExtra("chatId", 0);
         viewModalChats = new ViewModelProvider(this).get(ViewModalChats.class);
     }
 
@@ -85,18 +120,28 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void getMessages() {
-        viewModalChats.performGetChat(token, this::handleGetChatCallback);
+        viewModalChats.performGetChat(token, Integer.toString(chatId), this::handleGetMessagesCallback);
     }
 
-    private void handleGetChatCallback(Chat chat) {
+    private void handleGetMessagesCallback(@NonNull Message[] messages) {
         AsyncTask.execute(() -> {
-            for (Message message : chat.getMessages()) {
-//                Contact existingContact = contactsDao.get(contact.getId());
-//                if (existingContact == null) {
-//                    contactsDao.insert(contact);
-//                }
+            for (Message message : messages) {
+                Message existingMessage = messagesDao.get(message.getId());
+                if (existingMessage == null) {
+                    messagesDao.insert(message);
+                }
             }
         });
+
+        updateUIWithMessages(messages);
+    }
+
+    private void updateUIWithMessages(Message[] messages) {
+        // Change the UI using the adapter
+        messageAdapter = new MessageAdapter(this, messages, currentUserUsername);
+        messageAdapter.setMessages(messages);
+        listViewMessages.setAdapter(messageAdapter);
+        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void createListeners() {
