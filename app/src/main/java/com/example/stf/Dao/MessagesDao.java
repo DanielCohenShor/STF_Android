@@ -22,6 +22,9 @@ public interface MessagesDao {
     @Query("SELECT * FROM Message WHERE chatId =:id")
     Message[] getAllMessages(int id);
 
+    @Query("DELETE FROM Message")
+    void deleteAllMessages();
+
     @Insert
     void insert(Message... messages);
 

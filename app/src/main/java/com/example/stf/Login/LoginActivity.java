@@ -51,32 +51,17 @@ public class LoginActivity extends AppCompatActivity {
 
     private HashSet<String> createdTextViews = new HashSet<>();
 
-    private AppDB db;
-    private ContactsDao contactsDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // init the data base
-        initDB();
         // init the views item of the activity.
         initViewItem();
         // createListenres
         createListeners();
         //init the view model
         initViewModel();
-    }
-
-    public void initDB() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
-                        .fallbackToDestructiveMigration()
-                        .build();
-                contactsDao = db.ContactsDao();
-            }
-        });
     }
 
     private void createListeners() {

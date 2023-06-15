@@ -9,6 +9,7 @@ import androidx.room.Room;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 
 import com.example.stf.AddNewContactActivity;
@@ -16,6 +17,7 @@ import com.example.stf.AppDB;
 import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
@@ -37,6 +39,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private AppDB db;
     private ContactsDao contactsDao;
+    private MessagesDao messagesDao;
+
 
     private String currentUserUsername;
     private String currentUserDisplayName;
@@ -62,16 +66,17 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     public void initDB() {
         AsyncTask.execute(() -> {
-            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
+            messagesDao = db.messagesDao();
         });
     }
 
     private void createListeners() {
         //listener for the logout
-        btnLogout.setOnClickListener(v -> finish());
+        btnLogout.setOnClickListener(v -> {logOut();});
 
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
@@ -102,11 +107,23 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    private void logOut() {
+        // Delete the local database
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                contactsDao.deleteAllContacts();
+                messagesDao.deleteAllMessages();
+            }
+        });
+        finish();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         AsyncTask.execute(() -> {
-            Contact[] contacts = contactsDao.index();
+            Contact[] contacts = contactsDao.indexSortedByDate();
             runOnUiThread(() -> updateUIWithContacts(contacts));
         });
     }
@@ -119,14 +136,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private void handleGetContactsCallback(Contact[] contacts) {
         AsyncTask.execute(() -> {
             for (Contact contact : contacts) {
+                String contactId = String.valueOf(contact.getId()); // Convert to string
+                Log.d("MyApp", contactId); // Print "Hello" for each iteration
                 Contact existingContact = contactsDao.get(contact.getId());
                 if (existingContact == null) {
                     contactsDao.insert(contact);
                 }
             }
+            runOnUiThread(() -> updateUIWithContacts(contacts));
         });
-
-        updateUIWithContacts(contacts);
     }
 
 
