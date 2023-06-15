@@ -19,6 +19,9 @@ public interface ContactsDao {
     @Query("SELECT * FROM Contact WHERE user_id =:id")
     Contact get(int id);
 
+    @Query("DELETE FROM Contact")
+    void deleteAllContacts();
+
     @Insert
     void insert(Contact... Contacts);
 
