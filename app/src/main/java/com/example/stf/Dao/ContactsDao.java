@@ -11,11 +11,11 @@ import com.example.stf.entities.Contact;
 @Dao
 public interface ContactsDao {
 
-    //bring all the chats
+    //bring all the contacts
     @Query("SELECT * FROM Contact")
     Contact[] index();
 
-    //bring spesific chat
+    //bring specific contact
     @Query("SELECT * FROM Contact WHERE user_id =:id")
     Contact get(int id);
 

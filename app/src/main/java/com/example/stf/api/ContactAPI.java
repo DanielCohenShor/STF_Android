@@ -21,6 +21,7 @@ public class ContactAPI {
     Retrofit retrofit;
     WebServiceAPI webServiceAPI;
     private String token;
+
     public ContactAPI() {
         retrofit = new Retrofit.Builder()
                 .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
@@ -32,7 +33,6 @@ public class ContactAPI {
     public void setToken(String token) {
         this.token = token;
     }
-
 
     public void get(Consumer<Contact[]> callback) {
         Call<Contact[]> call = webServiceAPI.getContacts("Bearer {\"token\":\"" + token + "\"}");
@@ -49,13 +49,13 @@ public class ContactAPI {
                         //todo: what we need to return ?
                     }
                 } catch (Exception e) {
-                    int x = 5;
+
                 }
             }
 
             @Override
             public void onFailure(Call<Contact[]> call, Throwable t) {
-                return;
+
             }
         });
 

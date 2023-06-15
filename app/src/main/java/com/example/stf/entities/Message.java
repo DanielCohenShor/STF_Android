@@ -5,8 +5,6 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.stf.entities.User;
-
 @Entity
 public class Message {
     @PrimaryKey
@@ -20,11 +18,22 @@ public class Message {
 
     private String content;
 
-    public Message(int id, String created, User sender, String content) {
+    private int chatId;
+
+    public int getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
+    }
+
+    public Message(int id, String created, User sender, String content, int chatId) {
         this.id = id;
         this.created = created;
         this.sender = sender;
         this.content = content;
+        this.chatId = chatId;
     }
 
     public int getId() {

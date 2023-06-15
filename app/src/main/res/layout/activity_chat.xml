@@ -33,104 +33,33 @@
             android:id="@+id/contactImg"
             android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:src="@drawable/picture1"
             app:civ_border_color="@color/black"
             android:layout_marginStart="10dp"/>
 
         <TextView
-            android:id="@+id/tvHeadline"
+            android:id="@+id/tvContactName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:text="Daniel Cohen Shor"
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RecyclerViewMessages"
         style="@style/BLOCK_SCREEN_WITH_STATUS_BAR"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout1">
-
-        <TextView
-            android:id="@+id/tvDate"
-            style="@style/DATE_BUBBLE"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:padding="8dp"
-            android:text="08.06.2023" />
-
-        <LinearLayout
-            style="@style/CONTACT_BUBBLE"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/tvContactMessage"
-                style="@style/TEXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:paddingBottom="5dp"
-                android:text="Hello, this is a text bubble!" />
-
-            <TextView
-                android:id="@+id/tvMessageTime"
-                style="@style/TEXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="15:01"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            style="@style/MY_BUBBLE"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/tvMyMessage"
-                style="@style/TEXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:paddingBottom="5dp"
-                android:text="Hello, this is a text bubble!" />
-
-            <TextView
-                android:id="@+id/tvMessageTime1"
-                style="@style/TEXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="15:02"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout1" />
 
     <LinearLayout
         android:id="@+id/linearLayout3"
@@ -138,7 +67,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        style="@style/SEND_MESSAGE_EDIT_TEXT_BACKGROUND">
+        style="@style/SEND_MESSAGE_EDIT_TEXT_BACKGROUND"
+        android:paddingTop="10dp">
 
         <EditText
             android:id="@+id/etSendMessage"

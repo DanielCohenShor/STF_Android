@@ -3,14 +3,21 @@ package com.example.stf.Login;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
+
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -19,12 +26,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Dao.ContactsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
+
 import java.util.HashSet;
 import java.util.Objects;
 
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
 
 public class LoginActivity extends AppCompatActivity {
     private String username;
@@ -35,40 +48,39 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private TextView linkToRegister;
 
-    private final HashSet<String> createdTextViews = new HashSet<>();
+    private HashSet<String> createdTextViews = new HashSet<>();
 
+    private AppDB db;
+    private ContactsDao contactsDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        // init the data base
+        initDB();
         // init the views item of the activity.
-        initializeLoginViews();
+        initViewItem();
         // createListenres
         createListeners();
+        //init the view model
+        initViewModel();
     }
 
-    private void initializeLoginViews() {
-        btnPasswordVisibility = findViewById(R.id.btnShowPassword);
-        etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        linkToRegister = findViewById(R.id.linkToRegister2);
-        viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+    public void initDB() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                        .fallbackToDestructiveMigration()
+                        .build();
+                contactsDao = db.ContactsDao();
+            }
+        });
     }
 
     private void createListeners() {
         // i dont know for what ?
         Context context = this; // 'this' refers to the current Activity instance
-
-        //create listener for the btnRegister
-        btnLogin.setOnClickListener(view -> {
-            // save the username
-            this.username = etUsername.getText().toString();
-            // Call the registration method in the RegisterViewModel
-            viewModelLogin.performLogin(etUsername.getText().toString(),
-                    etPassword.getText().toString(),
-                    this::handleLogInCallback);
-        });
         btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
             boolean isPasswordVisible = false;
             final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
@@ -92,13 +104,30 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        linkToRegister.setOnClickListener(view -> {openRegister();});
+        linkToRegister.setOnClickListener(view -> {
+            // Start the new activity here
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
     }
-
-    private void openRegister() {
-        // Start the new activity here
-        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-        startActivity(intent);
+    private void initViewItem() {
+        btnPasswordVisibility = findViewById(R.id.btnShowPassword);
+        etUsername = findViewById(R.id.etUsername);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        linkToRegister = findViewById(R.id.linkToRegister2);
+    }
+    private void initViewModel() {
+        viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+        //create listener for the btnRegister
+        btnLogin.setOnClickListener(view -> {
+            // save the username
+            this.username = etUsername.getText().toString();
+            // Call the registration method in the RegisterViewModel
+            viewModelLogin.performLogin(etUsername.getText().toString(),
+                    etPassword.getText().toString(),
+                    this::handleLogInCallback);
+        });
     }
 
     private void handleLogInCallback(String token) {
