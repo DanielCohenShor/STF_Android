@@ -73,12 +73,12 @@ public class ChatActivity extends AppCompatActivity {
         // init the xml and his stuff.
         init();
 
+        //create listeners
+        createListeners();
+
         showContactDetails();
 
         getMessages();
-
-        //create listeners
-        createListeners();
     }
 
     public void initDB() {
@@ -190,7 +190,7 @@ public class ChatActivity extends AppCompatActivity {
             viewModalChats.performUpdateContacts(token, Integer.toString(chatId));
         }
         catch (Exception e) {
-            e.printStackTrace();
+            // error
         }
     }
 
