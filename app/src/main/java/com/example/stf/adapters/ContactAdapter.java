@@ -103,7 +103,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         String createdDateString = currentContact.getLastMessage().getCreated();
         SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.US);
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
 
 
         // Get the current date

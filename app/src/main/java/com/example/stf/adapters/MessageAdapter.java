@@ -14,6 +14,7 @@ import com.example.stf.entities.Message;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -24,10 +25,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         private final TextView tvMessageTime;
 
+        private final TextView tvDate;
+
         public MyMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.tvContent);
             tvMessageTime = itemView.findViewById(R.id.tvMessageTime);
+            tvDate = itemView.findViewById(R.id.tvDate);
         }
     }
 
@@ -36,26 +40,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         private final TextView tvMessageTime;
 
+        private final TextView tvDate;
+
         public ContactMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.tvContent);
             tvMessageTime = itemView.findViewById(R.id.tvMessageTime);
-        }
-    }
-
-    static class DateBubbleViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvDate;
-
-        public DateBubbleViewHolder(@NonNull View itemView) {
-            super(itemView);
             tvDate = itemView.findViewById(R.id.tvDate);
         }
     }
 
     private static final int VIEW_TYPE_1 = 1;
     private static final int VIEW_TYPE_2 = 2;
-    private static final int VIEW_TYPE_3 = 3;
-
 
     private final LayoutInflater mInflater;
 
@@ -71,9 +67,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        // Return the view type based on the position or data at that position
-        // You can implement your logic here to determine the view type for each item
-        // For example:
         if (!Objects.equals(messages[position].getSender().getUsername(), currentUserUsername)) {
             return VIEW_TYPE_2;
         } else {
@@ -84,22 +77,34 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the appropriate layout based on the view type
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view;
         switch (viewType) {
             case VIEW_TYPE_1:
-                view = inflater.inflate(R.layout.my_message, parent, false);
+                view = mInflater.inflate(R.layout.my_message, parent, false);
                 return new MyMessageViewHolder(view);
             case VIEW_TYPE_2:
-                view = inflater.inflate(R.layout.contact_message, parent, false);
+                view = mInflater.inflate(R.layout.contact_message, parent, false);
                 return new ContactMessageViewHolder(view);
-            case VIEW_TYPE_3:
-                view = inflater.inflate(R.layout.date_bubble, parent, false);
-                return new DateBubbleViewHolder(view);
             default:
                 throw new IllegalArgumentException("Invalid view type: " + viewType);
         }
+    }
+
+    // Method to check if two dates are the same day
+    private boolean isSameDate(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        int year1 = cal1.get(Calendar.YEAR);
+        int month1 = cal1.get(Calendar.MONTH);
+        int day1 = cal1.get(Calendar.DAY_OF_MONTH);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        int year2 = cal2.get(Calendar.YEAR);
+        int month2 = cal2.get(Calendar.MONTH);
+        int day2 = cal2.get(Calendar.DAY_OF_MONTH);
+
+        return (year1 == year2 && month1 == month2 && day1 == day2);
     }
 
     @Override
@@ -110,38 +115,85 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             String createdDateString = currentMessage.getCreated();
             SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.US);
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
+
             switch (holder.getItemViewType()) {
                 case VIEW_TYPE_1:
                     MyMessageViewHolder myMessageViewHolder = (MyMessageViewHolder) holder;
                     // Bind data for ViewHolder1
                     myMessageViewHolder.tvContent.setText(currentMessage.getContent());
 
-                    try {
-                        Date createdTime = inputFormat.parse(createdDateString);
-                        String time = timeFormat.format(createdTime);
-                        myMessageViewHolder.tvMessageTime.setText(time);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                    if (position != 0) {
+                        final Message prevMessage = messages[position - 1];
+                        String prevDateString = prevMessage.getCreated();
+                        try {
+                            Date myCreatedDate = inputFormat.parse(createdDateString);
+                            Date prevCreatedDate = inputFormat.parse(prevDateString);
+                            if (myCreatedDate != null && prevCreatedDate != null) {
+                                // Check if the created date is the current date
+                                if (isSameDate(myCreatedDate, prevCreatedDate)) {
+                                    myMessageViewHolder.tvDate.setVisibility(View.GONE);
+                                } else {
+                                    String date = dateFormat.format(myCreatedDate);
+                                    myMessageViewHolder.tvDate.setText(date);
+                                }
+                            }
+
+                            String time = timeFormat.format(myCreatedDate);
+                            myMessageViewHolder.tvMessageTime.setText(time);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            Date myCreatedDate = inputFormat.parse(createdDateString);
+                            String date = dateFormat.format(myCreatedDate);
+                            myMessageViewHolder.tvDate.setText(date);
+                            String time = timeFormat.format(myCreatedDate);
+                            myMessageViewHolder.tvMessageTime.setText(time);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     break;
                 case VIEW_TYPE_2:
                     ContactMessageViewHolder contactMessageViewHolder = (ContactMessageViewHolder) holder;
-                    // Bind data for ViewHolder2
+                    // Bind data for ViewHolder1
                     contactMessageViewHolder.tvContent.setText(currentMessage.getContent());
 
-                    try {
-                        Date createdTime = inputFormat.parse(createdDateString);
-                        String time = timeFormat.format(createdTime);
-                        contactMessageViewHolder.tvMessageTime.setText(time);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                    if (position != 0) {
+                        final Message prevMessage = messages[position - 1];
+                        String prevDateString = prevMessage.getCreated();
+                        try {
+                            Date myCreatedDate = inputFormat.parse(createdDateString);
+                            Date prevCreatedDate = inputFormat.parse(prevDateString);
+                            if (myCreatedDate != null && prevCreatedDate != null) {
+                                // Check if the created date is the current date
+                                if (isSameDate(myCreatedDate, prevCreatedDate)) {
+                                    contactMessageViewHolder.tvDate.setVisibility(View.GONE);
+                                } else {
+                                    String date = dateFormat.format(myCreatedDate);
+                                    contactMessageViewHolder.tvDate.setText(date);
+                                }
+                            }
+
+                            String time = timeFormat.format(myCreatedDate);
+                            contactMessageViewHolder.tvMessageTime.setText(time);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            Date myCreatedDate = inputFormat.parse(createdDateString);
+                            String date = dateFormat.format(myCreatedDate);
+                            contactMessageViewHolder.tvDate.setText(date);
+                            String time = timeFormat.format(myCreatedDate);
+                            contactMessageViewHolder.tvMessageTime.setText(time);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    break;
-                case VIEW_TYPE_3:
-                    DateBubbleViewHolder dateBubbleViewHolder = (DateBubbleViewHolder) holder;
-                    // Bind data for ViewHolder3
-                    dateBubbleViewHolder.tvDate.setText("");
                     break;
             }
         }
