@@ -2,18 +2,29 @@ package com.example.stf.Services;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.Map;
+import java.util.logging.LogRecord;
 
 public class ReceiveMessages extends FirebaseMessagingService {
     int notificationId;
+
     public ReceiveMessages() {
         notificationId = 0;
     }
@@ -21,34 +32,37 @@ public class ReceiveMessages extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
+        sendNotification(message.getNotification().getBody());
+    }
 
+    private void sendNotification(String messageBody) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_IMMUTABLE);
 
-        String channelId = "my_channel_id";
-        CharSequence channelName = "My Channel";
-        String channelDescription = "My Channel Description";
-        int importance = NotificationManager.IMPORTANCE_HIGH;
+        String channelId = "any_value";
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("my new notification")
+                        .setContentText(messageBody)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
 
-        NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
-        channel.setDescription(channelDescription);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
 
-
-        // Extract the notification data
-        Map<String, String> data = message.getData();
-        String title = data.get("title");
-        String content = data.get("message");
-
-        // Create the notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.logout_icon)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
-
-        // Show the notification
-        notificationManager.notify(notificationId, builder.build());
-        notificationId += 1;
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 }

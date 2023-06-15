@@ -19,7 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ChatAPI {
+
     Retrofit retrofit;
+    Retrofit retrofitForFireBAse;
     WebServiceAPI webServiceAPI;
 
     private String token;
@@ -30,7 +32,16 @@ public class ChatAPI {
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl("https://fcm.googkeapis.com")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
         webServiceAPI = retrofit.create(WebServiceAPI.class);
+
+
     }
 
     public void setToken(String token) {
@@ -94,6 +105,21 @@ public class ChatAPI {
         });
     }
 
+    public void PostNotifaction() {
+        Call<Void> call = webServiceAPI.PostNotifaction("test");
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+
+            }
+        });
+
+    }
     public void getUpdate(String chatId) {
         Call<Contact[]> call = webServiceAPI.getUpdateContacts("Bearer {\"token\":\"" + token + "\"}", chatId);
 

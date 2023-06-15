@@ -30,7 +30,7 @@
             android:resource="@color/blue_shade_1" />
 
         <service
-            android:name=".Services.ReciveMessages"
+            android:name=".Services.ReceiveMessages"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
