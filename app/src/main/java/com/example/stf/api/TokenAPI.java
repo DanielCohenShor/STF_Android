@@ -60,7 +60,7 @@ public class TokenAPI {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                int x = 5;
+                //todo: what to return ?
             }
         });
     }
