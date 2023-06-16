@@ -54,34 +54,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-        <LinearLayout
-            android:id="@+id/linearLayout3"
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+            android:layout_marginTop="10dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/contactImg"
+                android:id="@+id/currentUserImg"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginBottom="10dp"
-                android:src="@drawable/picture1"
                 app:civ_border_color="@color/black" />
 
             <TextView
-                android:id="@+id/tvUserDisplayName"
+                android:id="@+id/tvCurrentUserDisplayName"
                 style="@style/TEXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/currentUserImg"
+                android:layout_toRightOf="@id/currentUserImg"
+                android:layout_alignTop="@id/currentUserImg"
+                android:layout_alignBottom="@id/currentUserImg"
                 android:layout_marginStart="10dp"
-                android:text="Daniel"
                 android:textSize="24sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:textStyle="bold"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -94,7 +96,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="30dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/llDarkMode">
 
                 <ImageView
                     android:id="@+id/ivDarkMode"
@@ -128,7 +131,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="30dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/llChangeApi">
 
                 <ImageView
                     android:id="@+id/ivChangeApi"
@@ -164,7 +168,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="30dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/llLogout">
 
                 <ImageView
                     android:id="@+id/ivLogout"

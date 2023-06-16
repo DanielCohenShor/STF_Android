@@ -78,12 +78,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void createListeners() {
         //listener for the logout
-        btnLogout.setOnClickListener(v -> {logOut();});
+        btnLogout.setOnClickListener(v -> logOut());
 
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
             intent.putExtra("token", token);
+            intent.putExtra("currentUserDisplayName", currentUserDisplayName);
+            intent.putExtra("currentUserProfilePic", currentUserProfilePic);
             startActivity(intent);
         });
 
@@ -111,12 +113,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void logOut() {
         // Delete the local database
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                contactsDao.deleteAllContacts();
-                messagesDao.deleteAllMessages();
-            }
+        AsyncTask.execute(() -> {
+            contactsDao.deleteAllContacts();
+            messagesDao.deleteAllMessages();
         });
         finish();
     }
