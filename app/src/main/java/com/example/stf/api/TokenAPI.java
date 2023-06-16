@@ -19,10 +19,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TokenAPI {
     Retrofit retrofit;
     WebServiceAPI webServiceAPI;
-    public TokenAPI() {
+    public TokenAPI(String baseUrl) {
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         webServiceAPI = retrofit.create(WebServiceAPI.class);

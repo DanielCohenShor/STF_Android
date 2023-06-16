@@ -26,10 +26,10 @@ public class UserAPI {
     Retrofit retrofit;
     WebServiceAPI webServiceAPI;
     String token; // Store the token here
-    public UserAPI() {
+    public UserAPI(String baseUrl) {
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         webServiceAPI = retrofit.create(WebServiceAPI.class);

@@ -90,5 +90,12 @@ public class ChangeApiActivity extends AppCompatActivity {
         });
 
         btnCancel.setOnClickListener(v -> popupWindow.dismiss());
+        btnContinue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // The value of `BaseUrl` will be the value that the user entered
+                String.format(getString(R.string.BaseUrl), etChangeApi.getText().toString());
+            }
+        });
     }
 }

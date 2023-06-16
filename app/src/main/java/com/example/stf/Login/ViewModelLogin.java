@@ -14,9 +14,9 @@ public class ViewModelLogin extends ViewModel {
     private TokenAPI tokenAPI;
     private UserAPI userAPI;
 
-    public ViewModelLogin() {
-        this.tokenAPI = new TokenAPI();
-        this.userAPI = new UserAPI();
+    public ViewModelLogin(String baseUrl) {
+        this.tokenAPI = new TokenAPI(baseUrl);
+        this.userAPI = new UserAPI(baseUrl);
     }
 
     public void setToken(String token) {

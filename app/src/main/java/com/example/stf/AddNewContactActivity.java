@@ -30,6 +30,8 @@ public class AddNewContactActivity extends AppCompatActivity {
     private AppDB db;
     private ContactsDao contactsDao;
 
+    private String baseUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,13 +61,12 @@ public class AddNewContactActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void init() {
         btnExitAddNewContact = findViewById(R.id.btnExitAddNewContact);
         btnAddContact = findViewById(R.id.btnAddContact);
         etChooseContact = findViewById(R.id.etChooseContact);
         token = getIntent().getStringExtra("token");
+        baseUrl = getIntent().getStringExtra("baseUrl");
     }
 
     private void performAddContact() {
@@ -117,7 +118,7 @@ public class AddNewContactActivity extends AppCompatActivity {
     }
 
     private void initViewModel() {
-        contactsViewModel = new ViewModelProvider(this).get(ViewModalContacts.class);
+        contactsViewModel = new ViewModalContacts(baseUrl);
         // create listener for the btnRegister
         btnAddContact.setOnClickListener(view -> performAddContact());
     }

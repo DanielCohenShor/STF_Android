@@ -17,12 +17,15 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.stf.Login.LoginActivity;
+
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -49,6 +52,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private String currentUserProfilePic;
 
+    private RelativeLayout llCurrentUserInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +69,46 @@ public class SettingsActivity extends AppCompatActivity {
         createListeners();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Update the UI based on the value of nightMODE
+        updateDarkModeUI();
+
+        showDetails();
+    }
+
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//        super.onNewIntent(intent);
+//
+//        // Retrieve the extras data from the new intent
+//        Bundle extras = intent.getExtras();
+//        if (extras != null) {
+//            token = extras.getString("token", "");
+//            currentUserDisplayName = extras.getString("currentUserDisplayName", "");
+//            currentUserProfilePic = extras.getString("currentUserProfilePic", "");
+//        }
+//
+//        // Update the UI based on the value of nightMODE
+//        updateDarkModeUI();
+//
+//        showDetails();
+//    }
+
+
+    private void updateDarkModeUI() {
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            switcher.setChecked(true);
+            nightMODE = true;
+        } else {
+            switcher.setChecked(false);
+            nightMODE = false;
+        }
+    }
+
     private void init() {
         btnExitSettings = findViewById(R.id.btnExitSettings);
         switcher = findViewById(R.id.switchDarkMode);
@@ -71,6 +116,7 @@ public class SettingsActivity extends AppCompatActivity {
         tvCurrentUserDisplayName = findViewById(R.id.tvCurrentUserDisplayName);
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
+        llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
         token = getIntent().getStringExtra("token");
         currentUserDisplayName = getIntent().getStringExtra("currentUserDisplayName");
         currentUserProfilePic = getIntent().getStringExtra("currentUserProfilePic");
@@ -88,27 +134,35 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void showDetails() {
-        // Convert the Base64-encoded string to a Bitmap
-        Bitmap bitmap = decodeBase64Image(currentUserProfilePic);
+        if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
+            // Convert the Base64-encoded string to a Bitmap
+            Bitmap bitmap = decodeBase64Image(currentUserProfilePic);
 
-        if (bitmap != null) {
-            // Set the Bitmap as the image source for the ImageView
-            currentUserImg.setImageBitmap(bitmap);
+            if (bitmap != null) {
+                // Set the Bitmap as the image source for the ImageView
+                currentUserImg.setImageBitmap(bitmap);
+            }
+
+            tvCurrentUserDisplayName.setText(currentUserDisplayName);
+        } else {
+            llCurrentUserInfo.setVisibility(View.GONE);
+            llLogout.setVisibility(View.GONE);
         }
-
-        tvCurrentUserDisplayName.setText(currentUserDisplayName);
-
     }
 
     private void createListeners() {
-        btnExitSettings.setOnClickListener(v -> finish());
+        btnExitSettings.setOnClickListener(v -> {
+            onBackPressed();
+        });
 
         llChangeApi.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ChangeApiActivity.class);
             startActivity(intent);
         });
 
-        llLogout.setOnClickListener(this::onButtonShowPopupWindowClick);
+        if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
+            llLogout.setOnClickListener(this::onButtonShowPopupWindowClick);
+        }
     }
 
     public void onButtonShowPopupWindowClick(View view) {
@@ -153,16 +207,29 @@ public class SettingsActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> popupWindow.dismiss());
 
         btnContinue.setOnClickListener(v -> {
+            popupWindow.dismiss();
+            token = "";
+            currentUserProfilePic = "";
+            currentUserDisplayName = "";
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
-            finish();
         });
     }
 
     private void makeDarkMode() {
         sharedPreferences = getSharedPreferences("MODE", Context.MODE_PRIVATE);
-        nightMODE = sharedPreferences.getBoolean("night", false); // Set default value to true for light mode
+        boolean shouldResetMode = sharedPreferences.getBoolean("should_reset_mode", false);
+        nightMODE = sharedPreferences.getBoolean("night", false);
+
+        // Reset the mode if the flag is set
+        if (shouldResetMode) {
+            nightMODE = false;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("night", false);
+            editor.putBoolean("should_reset_mode", false);
+            editor.apply();
+        }
 
         // Update the UI based on the initial value of nightMODE
         if (nightMODE) {
@@ -170,19 +237,23 @@ public class SettingsActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
 
-
         switcher.setOnClickListener(v -> {
             // Update the UI based on the new value of nightMODE
             if (nightMODE) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                editor = sharedPreferences.edit();
-                editor.putBoolean("night", false);
+                nightMODE = false;
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                editor = sharedPreferences.edit();
-                editor.putBoolean("night", true);
+                nightMODE = true;
             }
+
+            // Set the flag to reset the mode on next launch
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("should_reset_mode", true);
+            editor.putBoolean("night", nightMODE);
             editor.apply();
+
+            recreate();
         });
     }
 }

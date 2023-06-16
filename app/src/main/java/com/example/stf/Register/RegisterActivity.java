@@ -44,11 +44,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword, etPasswordVerification, etDisplayName;
 
-    private TextView tvProfilePic;
     private TextView linkToLogin;
     private Button btnRegister;
 
-    private String encodedImg;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
@@ -65,12 +63,16 @@ public class RegisterActivity extends AppCompatActivity {
     private String profilePictureBase64;
     private TextView etProfilePic;
 
+    private String baseUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        //init the fileds of the xml activity.
+
+        //init the fields of the xml activity.
         initView();
+
         //init the listener for the show password.
         initListeners();
     }
@@ -83,12 +85,13 @@ public class RegisterActivity extends AppCompatActivity {
         etDisplayName = findViewById(R.id.et_displayName);
         btnPasswordVisibility = findViewById(R.id.btnShowPassword);
         btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
-        registerViewModel = new ViewModelProvider(this).get(ViewModelRegister.class);
         btnRegister = findViewById(R.id.btnRegister);
         linkToLogin = findViewById(R.id.linkToLogin2);
         riProfilePic = findViewById(R.id.riProfilePic);
         etProfilePic = findViewById(R.id.et_ProfilePic);
+        baseUrl = getIntent().getStringExtra("baseUrl");
 
+        registerViewModel = new ViewModelRegister(baseUrl);
 
         errorsText.put("username", "must contain at least one letter");
         errorsText.put("username exist", "username already exist");
@@ -193,7 +196,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        linkToLogin.setOnClickListener(view -> navigateToLoginActivity());
+        linkToLogin.setOnClickListener(view -> finish());
     }
 
     private void performRegistration() {
@@ -307,10 +310,5 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    private void navigateToLoginActivity() {
-        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-        startActivity(intent);
     }
 }

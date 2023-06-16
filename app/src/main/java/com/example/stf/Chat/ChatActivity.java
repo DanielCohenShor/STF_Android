@@ -62,6 +62,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private String currentUserUsername;
 
+    private String baseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +100,16 @@ public class ChatActivity extends AppCompatActivity {
         tvContactName = findViewById(R.id.tvContactName);
         listViewMessages = findViewById(R.id.RecyclerViewMessages);
         etSendMessage = findViewById(R.id.etSendMessage);
-        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
+
         token = getIntent().getStringExtra("token");
         contactProfilePic = getIntent().getStringExtra("contactProfilePic");
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
         currentUserUsername = getIntent().getStringExtra("currentUserUsername");
         chatId = getIntent().getIntExtra("chatId", 0);
-        viewModalChats = new ViewModelProvider(this).get(ViewModalChats.class);
+        baseUrl = getIntent().getStringExtra("baseUrl");
+
+        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
+        viewModalChats = new ViewModalChats(baseUrl);
     }
 
     private Bitmap decodeBase64Image(String base64Image) {

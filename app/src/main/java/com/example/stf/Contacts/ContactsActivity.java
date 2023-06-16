@@ -18,6 +18,7 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
@@ -47,6 +48,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private String currentUserUsername;
     private String currentUserDisplayName;
     private String currentUserProfilePic;
+
+    private String baseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             intent.putExtra("token", token);
             intent.putExtra("currentUserDisplayName", currentUserDisplayName);
             intent.putExtra("currentUserProfilePic", currentUserProfilePic);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
 
@@ -93,6 +97,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
             intent.putExtra("token", token);
+            intent.putExtra("baseUrl", baseUrl);
             startActivity(intent);
         });
     }
@@ -100,14 +105,16 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private void init() {
         // Initialize the views
         btnLogout = findViewById(R.id.btnLogout);
-        viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
+        btnSettings = findViewById(R.id.btnSettings);
+        listViewContacts = findViewById(R.id.RecyclerViewContacts);
+        btnAddContact = findViewById(R.id.btnAddContact);
+
         token = getIntent().getStringExtra("token");
         currentUserUsername = getIntent().getStringExtra("username");
         currentUserDisplayName = getIntent().getStringExtra("displayName");
         currentUserProfilePic = getIntent().getStringExtra("profilePic");
-        btnSettings = findViewById(R.id.btnSettings);
-        listViewContacts = findViewById(R.id.RecyclerViewContacts);
-        btnAddContact = findViewById(R.id.btnAddContact);
+        baseUrl = getIntent().getStringExtra("baseUrl");
+        viewModalContacts = new ViewModalContacts(baseUrl);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -177,6 +184,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());
         intent.putExtra("chatId", clickedContact.getId());
         intent.putExtra("currentUserUsername", currentUserUsername);
+        intent.putExtra("baseUrl", baseUrl);
 
         startActivity(intent);
     }

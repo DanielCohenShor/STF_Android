@@ -10,8 +10,8 @@ public class ViewModalContacts  extends ViewModel {
 
     private final ContactAPI contactAPI;
 
-    public ViewModalContacts() {
-        this.contactAPI = new ContactAPI();
+    public ViewModalContacts(String baseUrl) {
+        this.contactAPI = new ContactAPI(baseUrl);
     }
 
     public void performGetContacts(String token, Consumer<Contact[]> callback) {

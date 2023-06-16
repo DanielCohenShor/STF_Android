@@ -33,6 +33,7 @@ import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
+import com.example.stf.SettingsActivity;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -46,26 +47,32 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername;
     private EditText etPassword;
     private ImageButton btnPasswordVisibility;
+
+    private ImageButton btnSettings;
+
     private Button btnLogin;
     private TextView linkToRegister;
 
     private HashSet<String> createdTextViews = new HashSet<>();
 
+    private String baseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         // init the views item of the activity.
         initViewItem();
-        // createListenres
+
+        // createListeners
         createListeners();
+
         //init the view model
         initViewModel();
     }
 
     private void createListeners() {
-        // i dont know for what ?
         Context context = this; // 'this' refers to the current Activity instance
         btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
             boolean isPasswordVisible = false;
@@ -93,6 +100,17 @@ public class LoginActivity extends AppCompatActivity {
         linkToRegister.setOnClickListener(view -> {
             // Start the new activity here
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            intent.putExtra("baseUrl", baseUrl);
+            startActivity(intent);
+        });
+
+        btnSettings.setOnClickListener(v -> {
+            // Start the new activity here
+            Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+            intent.putExtra("token", "");
+            intent.putExtra("currentUserDisplayName", "");
+            intent.putExtra("currentUserProfilePic", "");
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
     }
@@ -102,9 +120,15 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister2);
+        btnSettings = findViewById(R.id.btnSettings);
+
+        String url = "192.168.5.1:5000";
+        // The value of `BaseUrl` will be "http://192.168.5.1:5000/api/"
+        baseUrl = String.format(getString(R.string.BaseUrl), url);
     }
+
     private void initViewModel() {
-        viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+        viewModelLogin = new ViewModelLogin(baseUrl);
         //create listener for the btnRegister
         btnLogin.setOnClickListener(view -> {
             // save the username
@@ -210,7 +234,6 @@ public class LoginActivity extends AppCompatActivity {
             viewModelLogin.setToken(token);
             viewModelLogin.getDetails(username,this::handleDetailsUser);
         }
-
     }
 
     private void handleDetailsUser(String [] userDetails) {
@@ -228,6 +251,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("displayName", displayName);
         intent.putExtra("profilePic", profilePic);
         intent.putExtra("token", token);
+        intent.putExtra("baseUrl", baseUrl);
         startActivity(intent);
 
     }

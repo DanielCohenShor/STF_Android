@@ -24,9 +24,9 @@ public class ChatAPI {
 
     private String token;
 
-    public ChatAPI() {
+    public ChatAPI(String baseUrl) {
         retrofit = new Retrofit.Builder()
-                .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
+                .baseUrl(baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
