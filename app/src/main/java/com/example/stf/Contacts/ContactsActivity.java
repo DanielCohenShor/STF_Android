@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -181,4 +183,27 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         startActivity(intent);
     }
+
+    @Override
+    public void onItemLongClick(int position) {
+        // Inside your item click listener or where you want to show the dialog
+        new AlertDialog.Builder(ContactsActivity.this)
+                .setTitle("Delete Chat")
+                .setMessage("You will delete this chat. Are you sure?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Delete chat logic here
+                        Log.d("Tag", "Message");
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // No action needed, dialog will be automatically dismissed
+                    }
+                })
+                .show();
+    }
+
 }

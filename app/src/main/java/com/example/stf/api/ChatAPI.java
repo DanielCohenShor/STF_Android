@@ -1,5 +1,12 @@
 package com.example.stf.api;
 
+import android.os.AsyncTask;
+
+import androidx.room.Room;
+
+import com.example.stf.AppDB;
+import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.MyApplication;
 import com.example.stf.PushNotfications.PushNotifications;
 import com.example.stf.R;
@@ -47,7 +54,9 @@ public class ChatAPI {
                 .build();
 
         webServiceAPI = retrofit.create(WebServiceAPI.class);
+
     }
+
 
     public void setToken(String token) {
         this.token = token;
@@ -129,6 +138,27 @@ public class ChatAPI {
 
             @Override
             public void onFailure(Call<Contact[]> call, Throwable t) {
+            }
+        });
+    }
+
+    public void deleteChat(String chatId, Consumer<String> callback) {
+        Call<Void> call = webServiceAPI.deleteChat("Bearer {\"token\":\"" + token + "\"}", chatId);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                // delete
+                if (response.isSuccessful()) {
+                    callback.accept(chatId);
+                } else {
+                    //todo: what to return ?
+                    callback.accept("fail to delete");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+
             }
         });
     }

@@ -51,6 +51,16 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                     }
                 }
             });
+
+            itemView.setOnLongClickListener(v -> {
+                if (contactClickListener != null) {
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        contactClickListener.onItemLongClick(pos);
+                    }
+                }
+                return false;
+            });
         }
     }
 
