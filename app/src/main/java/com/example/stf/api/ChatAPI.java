@@ -1,12 +1,7 @@
 package com.example.stf.api;
 
-import android.os.AsyncTask;
+import android.util.Log;
 
-import androidx.room.Room;
-
-import com.example.stf.AppDB;
-import com.example.stf.Dao.ContactsDao;
-import com.example.stf.Dao.MessagesDao;
 import com.example.stf.MyApplication;
 import com.example.stf.PushNotfications.PushNotifications;
 import com.example.stf.R;
@@ -19,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import okhttp3.MediaType;
@@ -47,7 +41,7 @@ public class ChatAPI {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        retrofit = new Retrofit.Builder()
+        retrofitForFireBAse = new Retrofit.Builder()
                 .baseUrl("https://fcm.googleapis.com")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
@@ -142,23 +136,26 @@ public class ChatAPI {
         });
     }
 
-    public void deleteChat(String chatId, Consumer<String> callback) {
-        Call<Void> call = webServiceAPI.deleteChat("Bearer {\"token\":\"" + token + "\"}", chatId);
+    public void deleteChat(int chatId, Consumer<Integer> callback) {
+        Call<Void> call = webServiceAPI.deleteChat("Bearer {\"token\":\"" + token + "\"}", String.valueOf(chatId));
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 // delete
                 if (response.isSuccessful()) {
+                    Log.d("Tag", "inside on success on resposnse");
                     callback.accept(chatId);
                 } else {
                     //todo: what to return ?
-                    callback.accept("fail to delete");
+                    Log.d("Tag", "inside on fail on resposnse");
+                    Log.d("Tag", String.valueOf(response.code()));
+                    callback.accept(-1);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-
+                Log.d("Tag", "inside on fail");
             }
         });
     }

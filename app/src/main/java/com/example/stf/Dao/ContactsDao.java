@@ -15,6 +15,9 @@ public interface ContactsDao {
     @Query("SELECT * FROM Contact")
     Contact[] index();
 
+    @Query("DELETE FROM Contact WHERE user_id = :id")
+    void deleteByChatId(int id);
+
     //bring specific contact
     @Query("SELECT * FROM Contact WHERE user_id =:id")
     Contact get(int id);

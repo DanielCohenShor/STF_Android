@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -52,7 +53,7 @@ public class AddNewContactActivity extends AppCompatActivity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
+                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                         .build();
                 contactsDao = db.ContactsDao();
             }
@@ -85,6 +86,7 @@ public class AddNewContactActivity extends AppCompatActivity {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d("Tag", "inside on add to local db");
                     // Perform insert operation on a background thread
                     contactsDao.insert(contact);
                 }

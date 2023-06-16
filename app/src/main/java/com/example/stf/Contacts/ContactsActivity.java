@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
@@ -20,11 +21,14 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
 import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Objects;
 
 public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
     private boolean isFirstTime = true;
@@ -130,13 +134,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             // This code will run only the first time
             isFirstTime = false;
         } else {
+            Log.d("Tag", "inside on resume");
             AsyncTask.execute(() -> {
                 Contact[] contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
         }
     }
-
 
     private void getContacts() {
         viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
@@ -194,7 +198,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Delete chat logic here
-                        Log.d("Tag", "Message");
+                        Contact clickedContact = contactAdapter.getContact(position);
+                        viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -204,6 +209,19 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     }
                 })
                 .show();
+    }
+
+    private void deleteChatById(int chatID) {
+        if (chatID != -1) {
+            AsyncTask.execute(() -> {
+                messagesDao.deleteMessagesByChatId(String.valueOf(chatID));
+                contactsDao.deleteByChatId(chatID);
+                Contact[] contacts = contactsDao.indexSortedByDate();
+                runOnUiThread(() -> updateUIWithContacts(contacts));
+            });
+        } else {
+            //dont know what to do?
+        }
     }
 
 }

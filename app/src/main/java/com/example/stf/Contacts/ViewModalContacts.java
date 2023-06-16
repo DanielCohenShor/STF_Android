@@ -1,4 +1,6 @@
 package com.example.stf.Contacts;
+import android.util.Log;
+
 import androidx.lifecycle.ViewModel;
 
 import com.example.stf.api.ChatAPI;
@@ -28,8 +30,9 @@ public class ViewModalContacts  extends ViewModel {
         contactAPI.post(contactUsername, callback);
     }
 
-    public void performDeleteChat(String token, String chatId, Consumer<String> callback) {
+    public void performDeleteChat(String token, int chatId, Consumer<Integer> callback) {
         chatAPI.setToken(token);
+        Log.d("Tag", "inside on performDeleteChat inside view model");
         chatAPI.deleteChat(chatId, callback);
     }
 }
