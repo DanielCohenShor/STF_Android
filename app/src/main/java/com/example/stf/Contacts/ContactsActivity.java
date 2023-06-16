@@ -190,10 +190,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     @Override
     public void onItemLongClick(int position) {
+        String displayNameOfChatDelete = contactAdapter.getContact(position).getUser().getDisplayName();
         // Inside your item click listener or where you want to show the dialog
         new AlertDialog.Builder(ContactsActivity.this)
                 .setTitle("Delete Chat")
-                .setMessage("You will delete this chat. Are you sure?")
+                .setMessage("You will delete " + displayNameOfChatDelete + " chat. Are you sure?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -223,5 +224,34 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             //dont know what to do?
         }
     }
+
+    /*
+    @Override
+public void onItemLongClick(int position) {
+    // Inflate the custom layout for the popover UI
+    View popoverView = getLayoutInflater().inflate(R.layout.popover_layout, null);
+
+    // Inside your item click listener or where you want to show the dialog
+    new AlertDialog.Builder(ContactsActivity.this)
+            .setTitle("Delete Chat")
+            .setView(popoverView) // Set the custom layout as the view
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Delete chat logic here
+                    Contact clickedContact = contactAdapter.getContact(position);
+                    viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
+                }
+            })
+            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // No action needed, dialog will be automatically dismissed
+                }
+            })
+            .show();
+}
+
+     */
 
 }
