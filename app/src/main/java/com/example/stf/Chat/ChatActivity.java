@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -170,7 +171,7 @@ public class ChatActivity extends AppCompatActivity {
         btnExitChat.setOnClickListener(v -> finish());
 
         btnSendMessage.setOnClickListener(v -> {
-            if (!etSendMessage.toString().equals("")) {
+            if (!TextUtils.isEmpty(etSendMessage.getText().toString().trim())) {
                 sendNewMessage(etSendMessage.getText().toString());
                 etSendMessage.setText("");
             }
