@@ -8,8 +8,16 @@
     tools:context=".Contacts.ContactsActivity"
     style="@style/STATUS_BAR">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        style="@style/STATUS_BAR"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/LinearLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         style="@style/STATUS_BAR"
@@ -26,42 +34,11 @@
             android:layout_weight="1"
             android:text="@string/app_name"
             android:textColor="@color/white"
-            android:textSize="25sp"
+            android:textSize="23sp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.1"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_settings" />
-
-        <ImageButton
-            android:id="@+id/btnSearch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="15dp"
-            android:layout_weight="0.1"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_search" />
-
-        <ImageButton
-            android:id="@+id/btnLogout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="0.1"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_logout" />
     </LinearLayout>
+
+    </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddContact"
@@ -79,12 +56,12 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecyclerViewContacts"
+        style="@style/BLOCK_SCREEN_WITH_STATUS_BAR"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        style="@style/BLOCK_SCREEN_WITH_STATUS_BAR"
-        android:paddingTop="10dp"
         android:paddingStart="10dp"
-        android:paddingEnd="10dp"/>
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

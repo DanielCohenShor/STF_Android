@@ -12,14 +12,17 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.stf.AppDB;
+import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.R;
 import com.example.stf.adapters.MessageAdapter;
+import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -52,6 +55,8 @@ public class ChatActivity extends AppCompatActivity {
     private AppDB db;
     private MessagesDao messagesDao;
 
+    private ContactsDao contactDao;
+
     private MessageAdapter messageAdapter;
 
     private String currentUserUsername;
@@ -60,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContentView(R.layout.activity_chat);
 
         initDB();
@@ -67,12 +73,12 @@ public class ChatActivity extends AppCompatActivity {
         // init the xml and his stuff.
         init();
 
+        //create listeners
+        createListeners();
+
         showContactDetails();
 
         getMessages();
-
-        //create listeners
-        createListeners();
     }
 
     public void initDB() {
@@ -81,6 +87,7 @@ public class ChatActivity extends AppCompatActivity {
                     .fallbackToDestructiveMigration()
                     .build();
             messagesDao = db.messagesDao();
+            contactDao = db.ContactsDao();
         });
     }
 
@@ -168,17 +175,38 @@ public class ChatActivity extends AppCompatActivity {
                 etSendMessage.setText("");
             }
         });
+
+        etSendMessage.setOnClickListener(v -> {
+            int lastPosition = messageAdapter.getItemCount() - 1;
+            if (lastPosition >= 0) {
+                listViewMessages.scrollToPosition(lastPosition);
+            }
+        });
+    }
+
+    private void updateContacts() {
+        try {
+            // request to the server - running on new thread
+            viewModalChats.performUpdateContacts(token, Integer.toString(chatId));
+        }
+        catch (Exception e) {
+            // error
+        }
     }
 
     private void sendNewMessage(String content) {
         // request to the server - running on new thread
         viewModalChats.performAddMessage(token, Integer.toString(chatId), content, this::handleAddNewMessageCallback);
+        updateContacts();
     }
 
     private void handleAddNewMessageCallback(Message newMessage) {
         AsyncTask.execute(() -> {
             newMessage.setChatId(chatId);
             messagesDao.insert(newMessage);
+            Contact currentContact = contactDao.get(newMessage.getChatId());
+            currentContact.setLastMessage(newMessage);
+            contactDao.update(currentContact);
             runOnUiThread(() -> updateUIWithNewMessage(newMessage));
         });
     }
