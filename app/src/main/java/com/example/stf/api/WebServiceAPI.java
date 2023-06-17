@@ -55,8 +55,8 @@ public interface WebServiceAPI {
     @POST("Chats/Notifications")
     Call<UserNotification> getNotifications(@Header("Authorization") String token);
 
-    @GET("Chats/Notifications/:id")
-    Call<Integer> resetNotifications(@Header("Authorization") String token, @Path("id") String id);
+    @GET("Chats/Notifications/{id}")
+    Call<Void> resetNotifications(@Header("Authorization") String token, @Path("id") String id);
 
 
     //request to create a "room"

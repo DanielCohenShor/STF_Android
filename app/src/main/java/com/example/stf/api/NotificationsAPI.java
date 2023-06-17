@@ -57,17 +57,14 @@ public class NotificationsAPI {
     }
 
     public void resetNotifications(String chatId, Consumer<String> callback) {
-        Call<Integer> call = webServiceAPI.resetNotifications("Bearer {\"token\":\"" + token + "\"}", chatId);
+        Call<Void> call = webServiceAPI.resetNotifications("Bearer {\"token\":\"" + token + "\"}", chatId);
 
-        call.enqueue(new Callback<Integer>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 try {
                     if (response.isSuccessful()) {
-                        Integer isReset = response.body();
-                        if (isReset == 1) {
-                            callback.accept(chatId);
-                        }
+                        callback.accept(chatId);
                     } else {
                         // error from the get contacts?
                         //todo: what we need to return ?
@@ -77,7 +74,7 @@ public class NotificationsAPI {
             }
 
             @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
             }
         });
     }
