@@ -18,9 +18,9 @@ public class NotificationsAPI {
     WebServiceAPI webServiceAPI;
     private String token;
 
-    public NotificationsAPI() {
+    public NotificationsAPI(String baseUrl) {
         retrofit = new Retrofit.Builder()
-                .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
+                .baseUrl(baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

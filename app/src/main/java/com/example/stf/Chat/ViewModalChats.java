@@ -13,9 +13,11 @@ public class ViewModalChats extends ViewModel {
 
     private final NotificationsAPI notificationsAPI;
 
-    public ViewModalChats() {
-        this.chatAPI = new ChatAPI();
-        this.notificationsAPI = new NotificationsAPI();
+    private String baseUrl;
+    public ViewModalChats(String baseUrl) {
+        this.baseUrl = baseUrl;
+        this.chatAPI = new ChatAPI(baseUrl);
+        this.notificationsAPI = new NotificationsAPI(baseUrl);
     }
 
     public void performGetMessages(String token, String chatId, Consumer<Message[]> callback) {

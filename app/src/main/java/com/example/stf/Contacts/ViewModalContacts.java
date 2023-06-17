@@ -14,15 +14,15 @@ import java.util.function.Consumer;
 public class ViewModalContacts  extends ViewModel {
 
     private ContactAPI contactAPI;
-    private final ChatAPI chatAPI;
-    private final NotificationsAPI notificationsAPI;
+    private ChatAPI chatAPI;
+    private NotificationsAPI notificationsAPI;
     private String baseUrl;
 
     public ViewModalContacts(String baseUrl) {
         this.baseUrl = baseUrl;
         this.contactAPI = new ContactAPI(baseUrl);
         this.chatAPI = new ChatAPI(baseUrl);
-        this.notificationsAPI = new NotificationsAPI();
+        this.notificationsAPI = new NotificationsAPI(baseUrl);
     }
 
     public void performGetContacts(String token, Consumer<Contact[]> callback) {
@@ -38,6 +38,8 @@ public class ViewModalContacts  extends ViewModel {
     public void setBaseUrl(String baseUrl) {
         if (!Objects.equals(baseUrl, this.baseUrl)) {
             this.contactAPI = new ContactAPI(baseUrl);
+            this.chatAPI = new ChatAPI(baseUrl);
+            this.notificationsAPI = new NotificationsAPI(baseUrl);
         }
     }
     public void performDeleteChat(String token, int chatId, Consumer<Integer> callback) {
