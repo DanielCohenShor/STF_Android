@@ -268,6 +268,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         int contactIndex = getWantedContact(chatId);
         Contact contact = filteredContacts.get(contactIndex);
         contact.setNotifications(0);
-        filteredContacts.set(chatId, contact);
+        filteredContacts.set(contactIndex, contact);
     }
 }
