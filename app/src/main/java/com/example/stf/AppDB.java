@@ -8,7 +8,7 @@ import com.example.stf.entities.Contact;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.entities.Message;
 
-@Database(entities = {Contact.class, Message.class}, version = 13)
+@Database(entities = {Contact.class, Message.class}, version = 15)
 public abstract class AppDB extends RoomDatabase{
     public abstract ContactsDao ContactsDao();
     public abstract MessagesDao messagesDao();

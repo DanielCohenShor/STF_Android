@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +25,8 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Notifications.ChatsNotification;
+import com.example.stf.Notifications.UserNotification;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
@@ -33,6 +34,7 @@ import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
     private boolean isFirstTime = true;
@@ -52,7 +54,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private AppDB db;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
-
 
     private String currentUserUsername;
     private String currentUserDisplayName;
@@ -217,9 +218,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     contactsDao.insert(contact);
                 }
             }
-            List<Contact> sortredContacts = contactsDao.indexSortedByDate();
+            List<Contact> sortedContacts = contactsDao.indexSortedByDate();
 
-            runOnUiThread(() -> updateUIWithContacts(sortredContacts));
+            runOnUiThread(() -> updateUIWithContacts(sortedContacts));
         });
     }
 
@@ -228,6 +229,33 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Change the UI using the adapter
         contactAdapter = new ContactAdapter(this, contacts, this);
         contactAdapter.setContacts(contacts);
+        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+
+        viewModalContacts.performGetNotifications(token, this::handleGetNotificationsCallback);
+    }
+
+    private void handleGetNotificationsCallback(UserNotification notifications) {
+        AsyncTask.execute(() -> {
+            int notification;
+            for (ChatsNotification chat : notifications.getChats()) {
+                if (!Objects.equals(chat.getUsers().get(0).get("username"), currentUserUsername)) {
+                    notification = Integer.parseInt(Objects.requireNonNull(chat.getUsers().get(0).get("notifications")));
+                } else {
+                    notification = Integer.parseInt(Objects.requireNonNull(chat.getUsers().get(1).get("notifications")));
+                }
+                Contact updateContact = contactsDao.get(chat.getId());
+                updateContact.setNotifications(notification);
+                contactsDao.update(updateContact);
+            }
+
+            runOnUiThread(() -> updateUIWithNotifications(notifications));
+        });
+    }
+
+    private void updateUIWithNotifications(UserNotification notifications) {
+        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
+        contactAdapter.setNotifications(notifications);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }

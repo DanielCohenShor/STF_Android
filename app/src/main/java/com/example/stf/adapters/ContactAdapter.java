@@ -16,17 +16,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stf.ContactClickListener;
+import com.example.stf.Notifications.ChatsNotification;
+import com.example.stf.Notifications.UserNotification;
 import com.example.stf.entities.Contact;
 import com.example.stf.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -173,8 +175,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                 holder.time.setText(getTime(currentContact));
             }
 
-            if (currentContact.getUser().getNotfications() != 0) {
-                holder.notification.setText(String.valueOf(currentContact.getUser().getNotfications()));
+            if (currentContact.getNotifications() != 0) {
+                holder.notification.setText(String.valueOf(currentContact.getNotifications()));
+                holder.notification.setVisibility(View.VISIBLE);
             } else {
                 // hide notification
                 holder.notification.setVisibility(View.GONE);
@@ -230,5 +233,34 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     public Contact getContact(int index) {
         return filteredContacts.get(index);
+    }
+
+    public List<Contact> getContacts() {
+        return filteredContacts;
+    }
+
+    public int getWantedContact(int id) {
+        for (int i = 0; i < filteredContacts.size(); i++) {
+            if (filteredContacts.get(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void setNotifications(UserNotification notifications) {
+        for (int i = 0; i < notifications.getChats().length; i++) {
+            ChatsNotification chat = notifications.getChats()[i];
+            int contactIndex = getWantedContact(chat.getId());
+            int notification;
+            Contact contact = filteredContacts.get(contactIndex);
+            if (Objects.equals(chat.getUsers().get(0).get("username"), contact.getUser().getUsername())) {
+                notification = Integer.parseInt(Objects.requireNonNull(chat.getUsers().get(0).get("notifications")));
+            } else {
+                notification = Integer.parseInt(Objects.requireNonNull(chat.getUsers().get(1).get("notifications")));
+            }
+            contact.setNotifications(notification);
+            filteredContacts.set(contactIndex, contact);
+        }
     }
 }
