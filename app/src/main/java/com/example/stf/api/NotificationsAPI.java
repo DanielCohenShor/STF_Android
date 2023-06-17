@@ -79,4 +79,28 @@ public class NotificationsAPI {
         });
     }
 
+    public void addNotifications(String chatId) {
+        Call<Void> call = webServiceAPI.addNotifications("Bearer {\"token\":\"" + token + "\"}", chatId);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                try {
+                    if (response.isSuccessful()) {
+                        // okay
+                    } else {
+                        // error from the get contacts?
+                        //todo: what we need to return ?
+                    }
+                } catch (Exception e) {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+            }
+        });
+    }
+
+
 }
