@@ -3,6 +3,7 @@ package com.example.stf;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +14,6 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -27,7 +27,6 @@ import androidx.room.Room;
 
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
-import com.example.stf.entities.Settings;
 
 import java.util.Objects;
 
@@ -48,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity {
     SwitchCompat switcher;
     boolean nightMODE;
     SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
 
 
     private String currentUserDisplayName;
@@ -71,22 +69,11 @@ public class SettingsActivity extends AppCompatActivity {
         // i init the db
         initDB();
 
-        showDetails();
+        updateDarkModeUI();
 
         makeDarkMode();
 
         createListeners();
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Update the UI based on the value of nightMODE
-        updateDarkModeUI();
-
-        showDetails();
     }
 
     private void updateDarkModeUI() {
@@ -117,6 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
             settingsDao = db.settingsDao();
             currentUserDisplayName = settingsDao.getFirst().getDisplayname();
             currentUserProfilePic = settingsDao.getFirst().getPhoto();
+            runOnUiThread(this::showDetails);
         });
     }
 
@@ -149,9 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void createListeners() {
-        btnExitSettings.setOnClickListener(v -> {
-            finish();
-        });
+        btnExitSettings.setOnClickListener(v -> finish());
 
         llChangeApi.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ChangeApiActivity.class);
@@ -163,12 +149,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void onButtonShowPopupWindowClick(View view) {
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
                 getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.popup_window, null);
+        @SuppressLint("InflateParams") View popupView = inflater.inflate(R.layout.popup_window, null);
 
         // Retrieve the TextView from the popup layout
         TextView tvPopupHeadline = popupView.findViewById(R.id.tvPopupHeadline);
@@ -194,12 +181,9 @@ public class SettingsActivity extends AppCompatActivity {
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
         // dismiss the popup window when touched
-        popupView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                popupWindow.dismiss();
-                return true;
-            }
+        popupView.setOnTouchListener((v, event) -> {
+            popupWindow.dismiss();
+            return true;
         });
 
         btnCancel.setOnClickListener(v -> popupWindow.dismiss());

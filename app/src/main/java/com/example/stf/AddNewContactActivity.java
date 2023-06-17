@@ -2,13 +2,13 @@ package com.example.stf;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -42,26 +42,24 @@ public class AddNewContactActivity extends AppCompatActivity {
 
         // init the data base
         initDB();
-
-        // init the xml and his stuff.
-        init();
-
-        //create listeners
-        createListeners();
-
-        //init the view model
-        initViewModel();
     }
 
     public void initDB() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
-                        .build();
-                contactsDao = db.ContactsDao();
-                settingsDao = db.settingsDao();
-            }
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            contactsDao = db.ContactsDao();
+            settingsDao = db.settingsDao();
+            Log.d("TAG", "hello1");
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            Log.d("TAG", baseUrl);
+            contactsViewModel = new ViewModalContacts(baseUrl);
+            // init the xml and his stuff.
+            init();
+
+            //create listeners
+            createListeners();
         });
     }
 
@@ -70,7 +68,6 @@ public class AddNewContactActivity extends AppCompatActivity {
         btnAddContact = findViewById(R.id.btnAddContact);
         etChooseContact = findViewById(R.id.etChooseContact);
         token = getIntent().getStringExtra("token");
-        baseUrl = getIntent().getStringExtra("baseUrl");
     }
 
     private void performAddContact() {
@@ -87,12 +84,9 @@ public class AddNewContactActivity extends AppCompatActivity {
             // make the edit text to be regular
             etChooseContact.setBackgroundResource(R.drawable.edittext_background);
             //push to the data base local
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    // Perform insert operation on a background thread
-                    contactsDao.insert(contact);
-                }
+            AsyncTask.execute(() -> {
+                // Perform insert operation on a background thread
+                contactsDao.insert(contact);
             });
             // Start the new activity here
             finish();
@@ -121,17 +115,14 @@ public class AddNewContactActivity extends AppCompatActivity {
         }
     }
 
-    private void initViewModel() {
-        contactsViewModel = new ViewModalContacts(settingsDao.getFirst().getServerUrl());
-        // create listener for the btnRegister
-        btnAddContact.setOnClickListener(view -> performAddContact());
-    }
-
 
     private void createListeners() {
         btnExitAddNewContact.setOnClickListener(v -> {
             // back to the activity here
             finish();
         });
+
+        btnAddContact.setOnClickListener(view -> performAddContact());
+
     }
 }

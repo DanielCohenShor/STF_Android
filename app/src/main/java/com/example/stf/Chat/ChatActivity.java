@@ -2,7 +2,6 @@ package com.example.stf.Chat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -77,13 +76,6 @@ public class ChatActivity extends AppCompatActivity {
 
         // init the xml and his stuff.
         init();
-
-        //create listeners
-        createListeners();
-
-        showContactDetails();
-
-        getMessages();
     }
 
     public void initDB() {
@@ -94,6 +86,14 @@ public class ChatActivity extends AppCompatActivity {
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
             settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            viewModalChats = new ViewModalChats(baseUrl);
+            //create listeners
+            createListeners();
+
+            showContactDetails();
+
+            getMessages();
         });
     }
 
@@ -113,7 +113,6 @@ public class ChatActivity extends AppCompatActivity {
         baseUrl = getIntent().getStringExtra("baseUrl");
 
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
-        viewModalChats = new ViewModalChats(settingsDao.getFirst().getServerUrl());
     }
 
     private Bitmap decodeBase64Image(String base64Image) {

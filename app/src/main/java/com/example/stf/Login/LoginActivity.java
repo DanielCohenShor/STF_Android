@@ -2,7 +2,6 @@ package com.example.stf.Login;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.content.Intent;
@@ -14,12 +13,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -35,7 +29,6 @@ import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.example.stf.SettingsActivity;
-import com.example.stf.entities.Contact;
 import com.example.stf.entities.Settings;
 
 import java.util.HashSet;
@@ -97,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
                     .fallbackToDestructiveMigration()
                     .build();
             settingsDao = db.settingsDao();
-            Log.d("TAG", String.valueOf(settingsDao.getRowCount()));
             if (settingsDao.getRowCount() == 0) {
             // http://10.0.2.2:5000/api/
             Settings defaultSettings = new Settings("http://10.0.2.2:5000/api/", false, "");
@@ -105,7 +97,6 @@ public class LoginActivity extends AppCompatActivity {
             baseUrl = settingsDao.getFirst().getServerUrl();
         } else {
             baseUrl = settingsDao.getFirst().getServerUrl();
-            Log.d("TAG", baseUrl);
         }
             viewModelLogin = new ViewModelLogin(baseUrl);
         });

@@ -1,7 +1,6 @@
 package com.example.stf.Contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -19,7 +18,6 @@ import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
-import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
@@ -63,6 +61,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     public void initDB() {
+        currentUserDisplayName = getIntent().getStringExtra("displayName");
+        currentUserProfilePic = getIntent().getStringExtra("profilePic");
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
@@ -72,6 +72,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             settingsDao = db.settingsDao();
             baseUrl = settingsDao.getFirst().getServerUrl();
             settingsDao.updateDisplayName(baseUrl, currentUserDisplayName);
+            settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
             viewModalContacts = new ViewModalContacts(baseUrl);
             init();
             getContacts();
@@ -103,11 +104,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
-
-        token = getIntent().getStringExtra("token");
         currentUserUsername = getIntent().getStringExtra("username");
+        token = getIntent().getStringExtra("token");
         currentUserDisplayName = getIntent().getStringExtra("displayName");
-        currentUserProfilePic = getIntent().getStringExtra("profilePic");
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -181,7 +180,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());
         intent.putExtra("chatId", clickedContact.getId());
         intent.putExtra("currentUserUsername", currentUserUsername);
-        intent.putExtra("baseUrl", baseUrl);
 
         startActivity(intent);
     }
