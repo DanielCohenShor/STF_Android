@@ -25,6 +25,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.room.Room;
 
+import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
 
@@ -57,6 +59,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private AppDB db;
     private SettingsDao settingsDao;
+
+    private String baseUrl;
+    private ContactsDao contactsDao;
+    private MessagesDao messagesDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +110,9 @@ public class SettingsActivity extends AppCompatActivity {
             settingsDao = db.settingsDao();
             currentUserDisplayName = settingsDao.getFirst().getDisplayname();
             currentUserProfilePic = settingsDao.getFirst().getPhoto();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            contactsDao = db.ContactsDao();
+            messagesDao = db.messagesDao();
             runOnUiThread(this::showDetails);
         });
     }
@@ -191,7 +200,13 @@ public class SettingsActivity extends AppCompatActivity {
         btnContinue.setOnClickListener(v -> {
             popupWindow.dismiss();
             currentUserProfilePic = "";
-            currentUserDisplayName = "";
+            // Delete the local database
+            AsyncTask.execute(() -> {
+                contactsDao.deleteAllContacts();
+                messagesDao.deleteAllMessages();
+                settingsDao.deleteDisplayName(baseUrl);
+                settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
+            });
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
