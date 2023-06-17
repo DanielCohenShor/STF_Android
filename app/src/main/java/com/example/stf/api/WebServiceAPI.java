@@ -1,7 +1,6 @@
 package com.example.stf.api;
 
-import androidx.room.Delete;
-
+import com.example.stf.Notifications.UserNotification;
 import com.example.stf.PushNotfications.PushNotifications;
 import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
@@ -53,6 +52,14 @@ public interface WebServiceAPI {
     @DELETE("Chats/{id}")
     Call<Void> deleteChat(@Header("Authorization") String token, @Path("id") String id);
 
+    @POST("Chats/Notifications")
+    Call<UserNotification> getNotifications(@Header("Authorization") String token);
+
+    @GET("Chats/Notifications/{id}")
+    Call<Void> resetNotifications(@Header("Authorization") String token, @Path("id") String id);
+
+    @POST("Chats/Notifications/{id}")
+    Call<Void> addNotifications(@Header("Authorization") String token, @Path("id") String id);
 
 
     //request to create a "room"

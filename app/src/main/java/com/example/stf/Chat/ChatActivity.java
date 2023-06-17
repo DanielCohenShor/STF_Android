@@ -206,6 +206,9 @@ public class ChatActivity extends AppCompatActivity {
         // request to the server - running on new thread
         viewModalChats.performAddMessage(token, Integer.toString(chatId), content, this::handleAddNewMessageCallback);
         updateContacts();
+
+        // request to the server - add notification
+        viewModalChats.performAddNotifications(token, Integer.toString(chatId));
     }
 
     private void handleAddNewMessageCallback(Message newMessage) {

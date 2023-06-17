@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +25,8 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Notifications.ChatsNotification;
+import com.example.stf.Notifications.UserNotification;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
@@ -54,7 +55,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private AppDB db;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
-
     private SettingsDao settingsDao;
 
     private String currentUserUsername;
@@ -223,9 +223,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     contactsDao.insert(contact);
                 }
             }
-            List<Contact> sortredContacts = contactsDao.indexSortedByDate();
+            List<Contact> sortedContacts = contactsDao.indexSortedByDate();
 
-            runOnUiThread(() -> updateUIWithContacts(sortredContacts));
+            runOnUiThread(() -> updateUIWithContacts(sortedContacts));
         });
     }
 
@@ -236,12 +236,41 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         contactAdapter.setContacts(contacts);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+
+        viewModalContacts.performGetNotifications(token, this::handleGetNotificationsCallback);
+    }
+
+    private void handleGetNotificationsCallback(UserNotification notifications) {
+        AsyncTask.execute(() -> {
+            int notification;
+            for (ChatsNotification chat : notifications.getChats()) {
+                if (!Objects.equals(chat.getUsers().get(0).get("username"), currentUserUsername)) {
+                    notification = Integer.parseInt(Objects.requireNonNull(chat.getUsers().get(0).get("notifications")));
+                } else {
+                    notification = Integer.parseInt(Objects.requireNonNull(chat.getUsers().get(1).get("notifications")));
+                }
+                Contact updateContact = contactsDao.get(chat.getId());
+                updateContact.setNotifications(notification);
+                contactsDao.update(updateContact);
+            }
+
+            runOnUiThread(() -> updateUIWithNotifications(notifications));
+        });
+    }
+
+    private void updateUIWithNotifications(UserNotification notifications) {
+        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
+        contactAdapter.setNotifications(notifications);
+        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
     public void onItemClick(int position) {
         // Retrieve the clicked contact from the adapter
         Contact clickedContact = contactAdapter.getContact(position);
+
+        viewModalContacts.performResetNotifications(token, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
 
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
@@ -255,26 +284,36 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         startActivity(intent);
     }
 
+    public void handleResetNotificationsCallback(String chatId) {
+        AsyncTask.execute(() -> {
+            Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
+            updateContact.setNotifications(0);
+            contactsDao.update(updateContact);
+
+            runOnUiThread(() -> updateUIWithResetNotifications(Integer.parseInt(chatId)));
+        });
+    }
+
+    private void updateUIWithResetNotifications(int chatId) {
+        contactAdapter.resetNotification(chatId);
+        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+    }
+
     @Override
     public void onItemLongClick(int position) {
         String displayNameOfChatDelete = contactAdapter.getContact(position).getUser().getDisplayName();
         // Inside your item click listener or where you want to show the dialog
         new AlertDialog.Builder(ContactsActivity.this)
                 .setTitle("Delete Chat")
-                .setMessage("You will delete " + displayNameOfChatDelete + " chat. Are you sure?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Delete chat logic here
-                        Contact clickedContact = contactAdapter.getContact(position);
-                        viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
-                    }
+                .setMessage("You will delete the chat with " + displayNameOfChatDelete + ". Are you sure?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Delete chat logic here
+                    Contact clickedContact = contactAdapter.getContact(position);
+                    viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // No action needed, dialog will be automatically dismissed
-                    }
+                .setNegativeButton("No", (dialog, which) -> {
+                    // No action needed, dialog will be automatically dismissed
                 })
                 .show();
     }

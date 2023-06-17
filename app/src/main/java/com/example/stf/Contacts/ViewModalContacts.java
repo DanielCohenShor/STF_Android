@@ -1,10 +1,11 @@
 package com.example.stf.Contacts;
-import android.util.Log;
 
 import androidx.lifecycle.ViewModel;
 
+import com.example.stf.Notifications.UserNotification;
 import com.example.stf.api.ChatAPI;
 import com.example.stf.api.ContactAPI;
+import com.example.stf.api.NotificationsAPI;
 import com.example.stf.entities.Contact;
 
 import java.util.Objects;
@@ -14,12 +15,14 @@ public class ViewModalContacts  extends ViewModel {
 
     private ContactAPI contactAPI;
     private final ChatAPI chatAPI;
+    private final NotificationsAPI notificationsAPI;
     private String baseUrl;
 
     public ViewModalContacts(String baseUrl) {
         this.baseUrl = baseUrl;
         this.contactAPI = new ContactAPI(baseUrl);
         this.chatAPI = new ChatAPI(baseUrl);
+        this.notificationsAPI = new NotificationsAPI();
     }
 
     public void performGetContacts(String token, Consumer<Contact[]> callback) {
@@ -40,5 +43,15 @@ public class ViewModalContacts  extends ViewModel {
     public void performDeleteChat(String token, int chatId, Consumer<Integer> callback) {
         chatAPI.setToken(token);
         chatAPI.deleteChat(chatId, callback);
+    }
+
+    public void performGetNotifications(String token, Consumer<UserNotification> callback) {
+        notificationsAPI.setToken(token);
+        notificationsAPI.getNotifications(callback);
+    }
+
+    public void performResetNotifications(String token, String chatId, Consumer<String> callback) {
+        notificationsAPI.setToken(token);
+        notificationsAPI.resetNotifications(chatId, callback);
     }
 }

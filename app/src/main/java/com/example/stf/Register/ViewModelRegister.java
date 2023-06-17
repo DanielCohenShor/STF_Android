@@ -1,7 +1,5 @@
 package com.example.stf.Register;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.stf.api.UserAPI;
@@ -11,7 +9,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ViewModelRegister extends ViewModel {
-    private UserAPI userAPI;
+    private final UserAPI userAPI;
 
     public ViewModelRegister(String baseUrl) {
         this.userAPI = new UserAPI(baseUrl);
@@ -24,7 +22,7 @@ public class ViewModelRegister extends ViewModel {
         // Add your logic to perform the registration process check valdiation
         if (Objects.equals(passwordValue, passwordVerificationValue)) {
             if (!Objects.equals(photo, "data:image/png;base64,null")) {
-                User user = new User(usernameValue, passwordValue, displayNameValue, photo, 0);
+                User user = new User(usernameValue, passwordValue, displayNameValue, photo);
                 userAPI.post(user, callback);
                 return;
             } else {
