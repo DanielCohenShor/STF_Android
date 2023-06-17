@@ -153,15 +153,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     private void createListeners() {
-        //listener for the logout
-        btnLogout.setOnClickListener(v -> logOut());
-
-        btnSettings.setOnClickListener(v -> {
-            // Start the new activity here
-            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        });
-
         btnAddContact.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
@@ -172,8 +163,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void init() {
         // Initialize the views
-        btnLogout = findViewById(R.id.btnLogout);
-        btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
         currentUserUsername = getIntent().getStringExtra("username");
@@ -214,7 +203,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             AsyncTask.execute(() -> {
                 String baseUrl = settingsDao.getFirst().getServerUrl();
                 viewModalContacts.setBaseUrl(baseUrl);
-                Contact[] contacts = contactsDao.indexSortedByDate();
+                List<Contact> contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
         }

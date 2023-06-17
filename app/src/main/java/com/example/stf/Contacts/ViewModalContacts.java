@@ -19,7 +19,7 @@ public class ViewModalContacts  extends ViewModel {
     public ViewModalContacts(String baseUrl) {
         this.baseUrl = baseUrl;
         this.contactAPI = new ContactAPI(baseUrl);
-        this.chatAPI = new ChatAPI();
+        this.chatAPI = new ChatAPI(baseUrl);
     }
 
     public void performGetContacts(String token, Consumer<Contact[]> callback) {

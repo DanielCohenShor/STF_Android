@@ -34,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
