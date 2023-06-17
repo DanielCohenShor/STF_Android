@@ -38,6 +38,9 @@
         </service>
 
         <activity
+            android:name=".ChangeApiActivity"
+            android:exported="false" />
+        <activity
             android:name=".Login.LoginActivity"
             android:exported="true">
             <intent-filter>

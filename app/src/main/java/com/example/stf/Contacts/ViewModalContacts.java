@@ -8,18 +8,20 @@ import com.example.stf.api.ContactAPI;
 import com.example.stf.api.NotificationsAPI;
 import com.example.stf.entities.Contact;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ViewModalContacts  extends ViewModel {
 
-    private final ContactAPI contactAPI;
+    private ContactAPI contactAPI;
     private final ChatAPI chatAPI;
-
     private final NotificationsAPI notificationsAPI;
+    private String baseUrl;
 
-    public ViewModalContacts() {
-        this.contactAPI = new ContactAPI();
-        this.chatAPI = new ChatAPI();
+    public ViewModalContacts(String baseUrl) {
+        this.baseUrl = baseUrl;
+        this.contactAPI = new ContactAPI(baseUrl);
+        this.chatAPI = new ChatAPI(baseUrl);
         this.notificationsAPI = new NotificationsAPI();
     }
 
@@ -33,6 +35,11 @@ public class ViewModalContacts  extends ViewModel {
         contactAPI.post(contactUsername, callback);
     }
 
+    public void setBaseUrl(String baseUrl) {
+        if (!Objects.equals(baseUrl, this.baseUrl)) {
+            this.contactAPI = new ContactAPI(baseUrl);
+        }
+    }
     public void performDeleteChat(String token, int chatId, Consumer<Integer> callback) {
         chatAPI.setToken(token);
         chatAPI.deleteChat(chatId, callback);

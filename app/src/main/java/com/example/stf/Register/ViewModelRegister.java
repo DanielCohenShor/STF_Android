@@ -11,8 +11,8 @@ import java.util.function.Consumer;
 public class ViewModelRegister extends ViewModel {
     private final UserAPI userAPI;
 
-    public ViewModelRegister() {
-        this.userAPI = new UserAPI();
+    public ViewModelRegister(String baseUrl) {
+        this.userAPI = new UserAPI(baseUrl);
     }
 
     public void performRegistration(String usernameValue, String passwordValue,

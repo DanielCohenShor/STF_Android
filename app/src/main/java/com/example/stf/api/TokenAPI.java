@@ -19,13 +19,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TokenAPI {
     Retrofit retrofit;
     WebServiceAPI webServiceAPI;
-    public TokenAPI() {
-
+    String baseUrl;
+    public TokenAPI(String baseUrl) {
+        this.baseUrl = baseUrl;
         retrofit = new Retrofit.Builder()
-                .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         webServiceAPI = retrofit.create(WebServiceAPI.class);
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
     public void post(String username, String password, Consumer<String> callback) {

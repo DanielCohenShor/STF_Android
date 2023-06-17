@@ -27,6 +27,7 @@ import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Notifications.ChatsNotification;
 import com.example.stf.Notifications.UserNotification;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
@@ -54,11 +55,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private AppDB db;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
+    private SettingsDao settingsDao;
 
     private String currentUserUsername;
     private String currentUserDisplayName;
     private String currentUserProfilePic;
     private Toolbar toolbar;
+
+    private String baseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +71,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         // init the data base
         initDB();
-
-        // init the xml and his stuff.
-        init();
-
-        //get all the contacts
-        getContacts();
-
-        //create listeners
-        createListeners();
     }
 
     @Override
@@ -138,12 +133,22 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
 
     public void initDB() {
+        currentUserDisplayName = getIntent().getStringExtra("displayName");
+        currentUserProfilePic = getIntent().getStringExtra("profilePic");
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
+            settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            settingsDao.updateDisplayName(baseUrl, currentUserDisplayName);
+            settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
+            viewModalContacts = new ViewModalContacts(baseUrl);
+            init();
+            getContacts();
+            createListeners();
         });
     }
 
@@ -158,15 +163,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void init() {
         // Initialize the views
-//        btnLogout = findViewById(R.id.btnLogout);
-        viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
-        token = getIntent().getStringExtra("token");
-        currentUserUsername = getIntent().getStringExtra("username");
-        currentUserDisplayName = getIntent().getStringExtra("displayName");
-        currentUserProfilePic = getIntent().getStringExtra("profilePic");
-//        btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
+        currentUserUsername = getIntent().getStringExtra("username");
+        token = getIntent().getStringExtra("token");
+        currentUserDisplayName = getIntent().getStringExtra("displayName");
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
         //init the search bar
         // Set the custom toolbar as the activity's action bar
@@ -179,6 +180,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();
             messagesDao.deleteAllMessages();
+            settingsDao.deleteDisplayName(baseUrl);
+            settingsDao.updatePhoto(baseUrl, "");
         });
         finish();
     }
@@ -198,7 +201,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         } else {
             Log.d("Tag", "inside on resume");
             AsyncTask.execute(() -> {
-               List<Contact> contacts = contactsDao.indexSortedByDate();
+                String baseUrl = settingsDao.getFirst().getServerUrl();
+                viewModalContacts.setBaseUrl(baseUrl);
+                List<Contact> contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
         }

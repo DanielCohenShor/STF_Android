@@ -7,7 +7,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.content.Intent;
@@ -21,8 +20,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -37,7 +34,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Dao.SettingsDao;
+import com.example.stf.R;
+import com.example.stf.Register.RegisterActivity;
+import com.example.stf.SettingsActivity;
+import com.example.stf.entities.Settings;
+
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -55,26 +59,70 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername;
     private EditText etPassword;
     private ImageButton btnPasswordVisibility;
+
+    private ImageButton btnSettings;
+
     private Button btnLogin;
     private TextView linkToRegister;
 
     private HashSet<String> createdTextViews = new HashSet<>();
 
-    private String newToken;
+    private String baseUrl;
 
+    private AppDB db;
+    private SettingsDao settingsDao;
+    private boolean isFirstTime = true;
+    private String newToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        
+        initDB();
+      
         //generate token for firebase
         generateTokenFireBase();
+
         // init the views item of the activity.
         initViewItem();
-        // createListenres
+
+        // createListeners
         createListeners();
-        //init the view model
-        initViewModel();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (isFirstTime) {
+            // This code will run only the first time
+            isFirstTime = false;
+        } else {
+            AsyncTask.execute(() -> {
+                baseUrl = settingsDao.getFirst().getServerUrl();
+                viewModelLogin.setBaseUrl(baseUrl);
+            });
+        }
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            settingsDao = db.settingsDao();
+            if (settingsDao.getRowCount() == 0) {
+            // http://10.0.2.2:5000/api/
+            Settings defaultSettings = new Settings("http://10.0.2.2:5000/api/", false, "");
+            settingsDao.insert(defaultSettings);
+            baseUrl = settingsDao.getFirst().getServerUrl();
+        } else {
+            baseUrl = settingsDao.getFirst().getServerUrl();
+        }
+            viewModelLogin = new ViewModelLogin(baseUrl);
+        });
     }
 
     public void generateTokenFireBase() {
@@ -100,8 +148,17 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void createListeners() {
-        // i dont know for what ?
         Context context = this; // 'this' refers to the current Activity instance
+
+        //create listener for the btnRegister
+        btnLogin.setOnClickListener(view -> {
+            // save the username
+            this.username = etUsername.getText().toString();
+            // Call the registration method in the RegisterViewModel
+            viewModelLogin.performLogin(etUsername.getText().toString(),
+                    etPassword.getText().toString(),
+                    this::handleLogInCallback);
+        });
         btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
             boolean isPasswordVisible = false;
             final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
@@ -130,6 +187,12 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+
+        btnSettings.setOnClickListener(v -> {
+            // Start the new activity here
+            Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
     }
     private void initViewItem() {
         btnPasswordVisibility = findViewById(R.id.btnShowPassword);
@@ -137,18 +200,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister2);
-    }
-    private void initViewModel() {
-        viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
-        //create listener for the btnRegister
-        btnLogin.setOnClickListener(view -> {
-            // save the username
-            this.username = etUsername.getText().toString();
-            // Call the registration method in the RegisterViewModel
-            viewModelLogin.performLogin(etUsername.getText().toString(),
-                    etPassword.getText().toString(),
-                    this::handleLogInCallback);
-        });
+        btnSettings = findViewById(R.id.btnSettings);
     }
 
     private void handleLogInCallback(String token) {
@@ -245,7 +297,6 @@ public class LoginActivity extends AppCompatActivity {
             viewModelLogin.setToken(token);
             viewModelLogin.getDetails(username,this::handleDetailsUser);
         }
-
     }
 
     private void handleDetailsUser(String [] userDetails) {
@@ -263,6 +314,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("displayName", displayName);
         intent.putExtra("profilePic", profilePic);
         intent.putExtra("token", token);
+        intent.putExtra("baseUrl", baseUrl);
         startActivity(intent);
 
     }

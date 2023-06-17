@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -27,8 +29,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.stf.AppDB;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
+import com.example.stf.entities.Settings;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -44,11 +49,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword, etPasswordVerification, etDisplayName;
 
-    private TextView tvProfilePic;
     private TextView linkToLogin;
     private Button btnRegister;
 
-    private String encodedImg;
     private ImageButton btnConfirmationPasswordVisibility;
     private ImageButton btnPasswordVisibility;
     private ViewModelRegister registerViewModel;
@@ -65,14 +68,34 @@ public class RegisterActivity extends AppCompatActivity {
     private String profilePictureBase64;
     private TextView etProfilePic;
 
+    private AppDB db;
+    private SettingsDao settingsDao;
+
+    private String baseUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        //init the fileds of the xml activity.
+
+        initDB();
+
+        //init the fields of the xml activity.
         initView();
+
         //init the listener for the show password.
         initListeners();
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            registerViewModel = new ViewModelRegister(baseUrl);
+        });
     }
 
     private void initView() {
@@ -83,13 +106,10 @@ public class RegisterActivity extends AppCompatActivity {
         etDisplayName = findViewById(R.id.et_displayName);
         btnPasswordVisibility = findViewById(R.id.btnShowPassword);
         btnConfirmationPasswordVisibility = findViewById(R.id.btnShowConfirmationPassword);
-        registerViewModel = new ViewModelProvider(this).get(ViewModelRegister.class);
         btnRegister = findViewById(R.id.btnRegister);
         linkToLogin = findViewById(R.id.linkToLogin2);
         riProfilePic = findViewById(R.id.riProfilePic);
         etProfilePic = findViewById(R.id.et_ProfilePic);
-
-
         errorsText.put("username", "must contain at least one letter");
         errorsText.put("username exist", "username already exist");
         errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");
@@ -193,7 +213,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        linkToLogin.setOnClickListener(view -> navigateToLoginActivity());
+        linkToLogin.setOnClickListener(view -> finish());
     }
 
     private void performRegistration() {
@@ -307,10 +327,5 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    private void navigateToLoginActivity() {
-        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-        startActivity(intent);
     }
 }
