@@ -1,6 +1,9 @@
 package com.example.stf.Contacts;
+import android.util.Log;
+
 import androidx.lifecycle.ViewModel;
 
+import com.example.stf.api.ChatAPI;
 import com.example.stf.api.ContactAPI;
 import com.example.stf.entities.Contact;
 
@@ -10,11 +13,13 @@ import java.util.function.Consumer;
 public class ViewModalContacts  extends ViewModel {
 
     private ContactAPI contactAPI;
+    private final ChatAPI chatAPI;
     private String baseUrl;
 
     public ViewModalContacts(String baseUrl) {
         this.baseUrl = baseUrl;
         this.contactAPI = new ContactAPI(baseUrl);
+        this.chatAPI = new ChatAPI();
     }
 
     public void performGetContacts(String token, Consumer<Contact[]> callback) {
@@ -24,7 +29,6 @@ public class ViewModalContacts  extends ViewModel {
 
     public void performAddContact(String token, String contactUsername, Consumer<Contact> callback) {
         contactAPI.setToken(token);
-        //add new thread
         contactAPI.post(contactUsername, callback);
     }
 
@@ -32,5 +36,9 @@ public class ViewModalContacts  extends ViewModel {
         if (!Objects.equals(baseUrl, this.baseUrl)) {
             this.contactAPI = new ContactAPI(baseUrl);
         }
+    }
+    public void performDeleteChat(String token, int chatId, Consumer<Integer> callback) {
+        chatAPI.setToken(token);
+        chatAPI.deleteChat(chatId, callback);
     }
 }

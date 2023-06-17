@@ -51,9 +51,7 @@ public class AddNewContactActivity extends AppCompatActivity {
                     .build();
             contactsDao = db.ContactsDao();
             settingsDao = db.settingsDao();
-            Log.d("TAG", "hello1");
             baseUrl = settingsDao.getFirst().getServerUrl();
-            Log.d("TAG", baseUrl);
             contactsViewModel = new ViewModalContacts(baseUrl);
             // init the xml and his stuff.
             init();

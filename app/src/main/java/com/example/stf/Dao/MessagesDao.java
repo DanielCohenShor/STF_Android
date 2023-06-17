@@ -15,6 +15,9 @@ public interface MessagesDao {
     @Query("SELECT * FROM Message")
     Message[] index();
 
+    @Query("DELETE FROM Message WHERE chatId = :chatId")
+    void deleteMessagesByChatId(String chatId);
+
     //bring specific message
     @Query("SELECT * FROM Message WHERE message_id =:id")
     Message get(int id);

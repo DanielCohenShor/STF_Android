@@ -1,19 +1,29 @@
 package com.example.stf.Login;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -22,14 +32,22 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.example.stf.SettingsActivity;
 import com.example.stf.entities.Settings;
+
+import com.example.stf.R;
+import com.example.stf.Register.RegisterActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -53,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
     private AppDB db;
     private SettingsDao settingsDao;
     private boolean isFirstTime = true;
+    private String newToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +79,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         
         initDB();
+      
+        //generate token for firebase
+        generateTokenFireBase();
 
         // init the views item of the activity.
         initViewItem();
@@ -101,6 +123,28 @@ public class LoginActivity extends AppCompatActivity {
             viewModelLogin = new ViewModelLogin(baseUrl);
         });
     }
+
+    public void generateTokenFireBase() {
+        FirebaseApp.initializeApp(this);
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        newToken = task.getResult();
+
+                        // Log and toast
+                        Toast.makeText(LoginActivity.this, newToken, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
 
     private void createListeners() {
         Context context = this; // 'this' refers to the current Activity instance
