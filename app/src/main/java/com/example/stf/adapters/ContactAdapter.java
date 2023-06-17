@@ -263,4 +263,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             filteredContacts.set(contactIndex, contact);
         }
     }
+
+    public void resetNotification(int chatId) {
+        int contactIndex = getWantedContact(chatId);
+        Contact contact = filteredContacts.get(contactIndex);
+        contact.setNotifications(0);
+        filteredContacts.set(chatId, contact);
+    }
 }

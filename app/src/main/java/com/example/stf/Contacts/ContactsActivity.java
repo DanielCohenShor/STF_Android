@@ -265,6 +265,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Retrieve the clicked contact from the adapter
         Contact clickedContact = contactAdapter.getContact(position);
 
+        viewModalContacts.performResetNotifications(token, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
+
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
 
@@ -275,6 +277,22 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         intent.putExtra("currentUserUsername", currentUserUsername);
 
         startActivity(intent);
+    }
+
+    public void handleResetNotificationsCallback(String chatId) {
+        AsyncTask.execute(() -> {
+            Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
+            updateContact.setNotifications(0);
+            contactsDao.update(updateContact);
+
+            runOnUiThread(() -> updateUIWithResetNotifications(Integer.parseInt(chatId)));
+        });
+    }
+
+    private void updateUIWithResetNotifications(int chatId) {
+        contactAdapter.resetNotification(chatId);
+        listViewContacts.setAdapter(contactAdapter);
+        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -307,34 +325,4 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             //dont know what to do?
         }
     }
-
-    /*
-    @Override
-public void onItemLongClick(int position) {
-    // Inflate the custom layout for the popover UI
-    View popoverView = getLayoutInflater().inflate(R.layout.popover_layout, null);
-
-    // Inside your item click listener or where you want to show the dialog
-    new AlertDialog.Builder(ContactsActivity.this)
-            .setTitle("Delete Chat")
-            .setView(popoverView) // Set the custom layout as the view
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Delete chat logic here
-                    Contact clickedContact = contactAdapter.getContact(position);
-                    viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
-                }
-            })
-            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // No action needed, dialog will be automatically dismissed
-                }
-            })
-            .show();
-}
-
-     */
-
 }

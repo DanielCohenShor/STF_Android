@@ -55,4 +55,31 @@ public class NotificationsAPI {
             }
         });
     }
+
+    public void resetNotifications(String chatId, Consumer<String> callback) {
+        Call<Integer> call = webServiceAPI.resetNotifications("Bearer {\"token\":\"" + token + "\"}", chatId);
+
+        call.enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                try {
+                    if (response.isSuccessful()) {
+                        Integer isReset = response.body();
+                        if (isReset == 1) {
+                            callback.accept(chatId);
+                        }
+                    } else {
+                        // error from the get contacts?
+                        //todo: what we need to return ?
+                    }
+                } catch (Exception e) {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+            }
+        });
+    }
+
 }

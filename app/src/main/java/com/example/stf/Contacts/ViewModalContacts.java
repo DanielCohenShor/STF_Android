@@ -42,4 +42,9 @@ public class ViewModalContacts  extends ViewModel {
         notificationsAPI.setToken(token);
         notificationsAPI.getNotifications(callback);
     }
+
+    public void performResetNotifications(String token, String chatId, Consumer<String> callback) {
+        notificationsAPI.setToken(token);
+        notificationsAPI.resetNotifications(chatId, callback);
+    }
 }
