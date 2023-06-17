@@ -26,6 +26,11 @@
         <item name="android:background">@drawable/rounded_block_screen_dark_drawable</item>
     </style>
 
+    <!-- Settings icon in login screen background if dark mode on -->
+    <style name="LOGIN_SETTINGS">
+        <item name="android:background">@drawable/login_screen_settings_dark</item>
+    </style>
+
     <!-- Headline texts background if dark mode on -->
     <style name="HEADLINE_TEXT">
         <item name="android:textColor">@color/blue_shade_4</item>

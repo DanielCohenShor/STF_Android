@@ -1,5 +1,7 @@
 package com.example.stf.api;
 
+import com.example.stf.AppDB;
+import com.example.stf.Dao.SettingsDao;
 import android.util.Log;
 
 import com.example.stf.MyApplication;
@@ -34,9 +36,15 @@ public class ChatAPI {
 
     private String token;
 
-    public ChatAPI() {
+    private AppDB db;
+    private SettingsDao settingsDao;
+
+    String baseUrl;
+
+    public ChatAPI(String baseUrl) {
+        this.baseUrl = baseUrl;
         retrofit = new Retrofit.Builder()
-                .baseUrl(MyApplication.context.getString(R.string.BaseUrl))
+                .baseUrl(baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -51,6 +59,15 @@ public class ChatAPI {
 
     }
 
+    public void setRetrofit(String newBaseUrl) {
+        if (newBaseUrl != baseUrl) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(newBaseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            webServiceAPI = retrofit.create(WebServiceAPI.class);
+        }
+    }
 
     public void setToken(String token) {
         this.token = token;

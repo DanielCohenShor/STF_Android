@@ -26,6 +26,7 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
@@ -54,11 +55,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
 
+    private SettingsDao settingsDao;
 
     private String currentUserUsername;
     private String currentUserDisplayName;
     private String currentUserProfilePic;
     private Toolbar toolbar;
+
+    private String baseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +71,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         // init the data base
         initDB();
-
-        // init the xml and his stuff.
-        init();
-
-        //get all the contacts
-        getContacts();
-
-        //create listeners
-        createListeners();
     }
 
     @Override
@@ -138,16 +133,35 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
 
     public void initDB() {
+        currentUserDisplayName = getIntent().getStringExtra("displayName");
+        currentUserProfilePic = getIntent().getStringExtra("profilePic");
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
+            settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            settingsDao.updateDisplayName(baseUrl, currentUserDisplayName);
+            settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
+            viewModalContacts = new ViewModalContacts(baseUrl);
+            init();
+            getContacts();
+            createListeners();
         });
     }
 
     private void createListeners() {
+        //listener for the logout
+        btnLogout.setOnClickListener(v -> logOut());
+
+        btnSettings.setOnClickListener(v -> {
+            // Start the new activity here
+            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
         btnAddContact.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
@@ -158,15 +172,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void init() {
         // Initialize the views
-//        btnLogout = findViewById(R.id.btnLogout);
-        viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
-        token = getIntent().getStringExtra("token");
-        currentUserUsername = getIntent().getStringExtra("username");
-        currentUserDisplayName = getIntent().getStringExtra("displayName");
-        currentUserProfilePic = getIntent().getStringExtra("profilePic");
-//        btnSettings = findViewById(R.id.btnSettings);
+        btnLogout = findViewById(R.id.btnLogout);
+        btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
+        currentUserUsername = getIntent().getStringExtra("username");
+        token = getIntent().getStringExtra("token");
+        currentUserDisplayName = getIntent().getStringExtra("displayName");
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
         //init the search bar
         // Set the custom toolbar as the activity's action bar
@@ -176,12 +188,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void logOut() {
         // Delete the local database
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                contactsDao.deleteAllContacts();
-                messagesDao.deleteAllMessages();
-            }
+        AsyncTask.execute(() -> {
+            contactsDao.deleteAllContacts();
+            messagesDao.deleteAllMessages();
+            settingsDao.deleteDisplayName(baseUrl);
+            settingsDao.updatePhoto(baseUrl, "");
         });
         finish();
     }
@@ -201,7 +212,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         } else {
             Log.d("Tag", "inside on resume");
             AsyncTask.execute(() -> {
-               List<Contact> contacts = contactsDao.indexSortedByDate();
+                String baseUrl = settingsDao.getFirst().getServerUrl();
+                viewModalContacts.setBaseUrl(baseUrl);
+                Contact[] contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
         }
@@ -289,34 +302,4 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             //dont know what to do?
         }
     }
-
-    /*
-    @Override
-public void onItemLongClick(int position) {
-    // Inflate the custom layout for the popover UI
-    View popoverView = getLayoutInflater().inflate(R.layout.popover_layout, null);
-
-    // Inside your item click listener or where you want to show the dialog
-    new AlertDialog.Builder(ContactsActivity.this)
-            .setTitle("Delete Chat")
-            .setView(popoverView) // Set the custom layout as the view
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Delete chat logic here
-                    Contact clickedContact = contactAdapter.getContact(position);
-                    viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
-                }
-            })
-            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // No action needed, dialog will be automatically dismissed
-                }
-            })
-            .show();
-}
-
-     */
-
 }

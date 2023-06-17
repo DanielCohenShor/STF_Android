@@ -2,7 +2,6 @@ package com.example.stf.Chat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -11,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.stf.AppDB;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.adapters.MessageAdapter;
 import com.example.stf.entities.Contact;
@@ -61,6 +62,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private String currentUserUsername;
 
+    private String baseUrl;
+
+    private SettingsDao settingsDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,13 +76,6 @@ public class ChatActivity extends AppCompatActivity {
 
         // init the xml and his stuff.
         init();
-
-        //create listeners
-        createListeners();
-
-        showContactDetails();
-
-        getMessages();
     }
 
     public void initDB() {
@@ -88,6 +85,15 @@ public class ChatActivity extends AppCompatActivity {
                     .build();
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
+            settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            viewModalChats = new ViewModalChats(baseUrl);
+            //create listeners
+            createListeners();
+
+            showContactDetails();
+
+            getMessages();
         });
     }
 
@@ -98,13 +104,15 @@ public class ChatActivity extends AppCompatActivity {
         tvContactName = findViewById(R.id.tvContactName);
         listViewMessages = findViewById(R.id.RecyclerViewMessages);
         etSendMessage = findViewById(R.id.etSendMessage);
-        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
+
         token = getIntent().getStringExtra("token");
         contactProfilePic = getIntent().getStringExtra("contactProfilePic");
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
         currentUserUsername = getIntent().getStringExtra("currentUserUsername");
         chatId = getIntent().getIntExtra("chatId", 0);
-        viewModalChats = new ViewModelProvider(this).get(ViewModalChats.class);
+        baseUrl = getIntent().getStringExtra("baseUrl");
+
+        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private Bitmap decodeBase64Image(String base64Image) {
@@ -170,7 +178,7 @@ public class ChatActivity extends AppCompatActivity {
         btnExitChat.setOnClickListener(v -> finish());
 
         btnSendMessage.setOnClickListener(v -> {
-            if (!etSendMessage.toString().equals("")) {
+            if (!TextUtils.isEmpty(etSendMessage.getText().toString().trim())) {
                 sendNewMessage(etSendMessage.getText().toString());
                 etSendMessage.setText("");
             }

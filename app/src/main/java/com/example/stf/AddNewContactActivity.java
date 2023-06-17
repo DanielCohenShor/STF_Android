@@ -2,7 +2,6 @@ package com.example.stf;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.os.AsyncTask;
@@ -13,6 +12,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.entities.Contact;
 import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
@@ -31,6 +31,10 @@ public class AddNewContactActivity extends AppCompatActivity {
     private AppDB db;
     private ContactsDao contactsDao;
 
+    private String baseUrl;
+
+    private SettingsDao settingsDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,29 +42,24 @@ public class AddNewContactActivity extends AppCompatActivity {
 
         // init the data base
         initDB();
-
-        // init the xml and his stuff.
-        init();
-
-        //create listeners
-        createListeners();
-
-        //init the view model
-        initViewModel();
     }
 
     public void initDB() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
-                        .build();
-                contactsDao = db.ContactsDao();
-            }
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            contactsDao = db.ContactsDao();
+            settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            contactsViewModel = new ViewModalContacts(baseUrl);
+            // init the xml and his stuff.
+            init();
+
+            //create listeners
+            createListeners();
         });
     }
-
-
 
     private void init() {
         btnExitAddNewContact = findViewById(R.id.btnExitAddNewContact);
@@ -83,13 +82,9 @@ public class AddNewContactActivity extends AppCompatActivity {
             // make the edit text to be regular
             etChooseContact.setBackgroundResource(R.drawable.edittext_background);
             //push to the data base local
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d("Tag", "inside on add to local db");
-                    // Perform insert operation on a background thread
-                    contactsDao.insert(contact);
-                }
+            AsyncTask.execute(() -> {
+                // Perform insert operation on a background thread
+                contactsDao.insert(contact);
             });
             // Start the new activity here
             finish();
@@ -118,17 +113,14 @@ public class AddNewContactActivity extends AppCompatActivity {
         }
     }
 
-    private void initViewModel() {
-        contactsViewModel = new ViewModelProvider(this).get(ViewModalContacts.class);
-        // create listener for the btnRegister
-        btnAddContact.setOnClickListener(view -> performAddContact());
-    }
-
 
     private void createListeners() {
         btnExitAddNewContact.setOnClickListener(v -> {
             // back to the activity here
             finish();
         });
+
+        btnAddContact.setOnClickListener(view -> performAddContact());
+
     }
 }

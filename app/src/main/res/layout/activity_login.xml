@@ -186,5 +186,15 @@
             android:contentDescription="@string/cd_bottom_circle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/LOGIN_SETTINGS"
+            android:layout_marginTop="20dp"
+            android:elevation="3dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

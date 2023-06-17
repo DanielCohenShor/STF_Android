@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 public class ViewModalChats extends ViewModel {
     private final ChatAPI chatAPI;
 
-    public ViewModalChats() {
-        this.chatAPI = new ChatAPI();
+    public ViewModalChats(String baseUrl) {
+        this.chatAPI = new ChatAPI(baseUrl);
     }
 
     public void performGetMessages(String token, String chatId, Consumer<Message[]> callback) {
