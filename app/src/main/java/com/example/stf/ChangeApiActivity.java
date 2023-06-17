@@ -118,7 +118,7 @@ public class ChangeApiActivity extends AppCompatActivity {
                 AsyncTask.execute(() -> {
                     settingsDao.updateUrl(baseUrl, NewBaseUrl);
                 });
-
+                popupWindow.dismiss();
             }
         });
     }
