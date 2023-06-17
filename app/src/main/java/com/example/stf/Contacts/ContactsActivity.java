@@ -1,6 +1,8 @@
 package com.example.stf.Contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,8 +14,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
@@ -21,13 +26,13 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
-import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
 import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
@@ -53,6 +58,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private String currentUserUsername;
     private String currentUserDisplayName;
     private String currentUserProfilePic;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +78,65 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         createListeners();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        // Find the search item and get the action view
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        View actionView = searchItem.getActionView();
+
+        // Find the SearchView within the action view
+        SearchView searchView = actionView.findViewById(R.id.searchView);
+
+        // Customize the SearchView and set the listeners
+        if (searchView != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    // Handle search query submission
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    // Handle search query text change
+                    contactAdapter.getFilter().filter(newText);
+                    return true;
+                }
+            });
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_logOut) {
+            logOut();
+            return true;
+        } else if (itemId == R.id.action_setting) {
+            openSettings();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Clear the search query
+        MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+        LinearLayout actionView = (LinearLayout) searchItem.getActionView();
+        SearchView searchView = actionView.findViewById(R.id.searchView);
+        if (searchView != null) {
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+            searchItem.collapseActionView();
+        }
+    }
+
+
     public void initDB() {
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
@@ -83,16 +148,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     private void createListeners() {
-        //listener for the logout
-        btnLogout.setOnClickListener(v -> {logOut();});
-
-        btnSettings.setOnClickListener(v -> {
-            // Start the new activity here
-            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
-            intent.putExtra("token", token);
-            startActivity(intent);
-        });
-
         btnAddContact.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
@@ -103,16 +158,20 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void init() {
         // Initialize the views
-        btnLogout = findViewById(R.id.btnLogout);
+//        btnLogout = findViewById(R.id.btnLogout);
         viewModalContacts = new ViewModelProvider(this).get(ViewModalContacts.class);
         token = getIntent().getStringExtra("token");
         currentUserUsername = getIntent().getStringExtra("username");
         currentUserDisplayName = getIntent().getStringExtra("displayName");
         currentUserProfilePic = getIntent().getStringExtra("profilePic");
-        btnSettings = findViewById(R.id.btnSettings);
+//        btnSettings = findViewById(R.id.btnSettings);
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+        //init the search bar
+        // Set the custom toolbar as the activity's action bar
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     private void logOut() {
@@ -127,6 +186,12 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         finish();
     }
 
+    private void openSettings() {
+         //Start the new activity here
+            Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+            intent.putExtra("token", token);
+            startActivity(intent);
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -136,7 +201,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         } else {
             Log.d("Tag", "inside on resume");
             AsyncTask.execute(() -> {
-                Contact[] contacts = contactsDao.indexSortedByDate();
+               List<Contact> contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
         }
@@ -156,14 +221,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     contactsDao.insert(contact);
                 }
             }
-            Contact[] sortredContacts = contactsDao.indexSortedByDate();
+            List<Contact> sortredContacts = contactsDao.indexSortedByDate();
 
             runOnUiThread(() -> updateUIWithContacts(sortredContacts));
         });
     }
 
 
-    private void updateUIWithContacts(Contact[] contacts) {
+    private void updateUIWithContacts(List<Contact> contacts) {
         // Change the UI using the adapter
         contactAdapter = new ContactAdapter(this, contacts, this);
         contactAdapter.setContacts(contacts);
@@ -217,7 +282,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             AsyncTask.execute(() -> {
                 messagesDao.deleteMessagesByChatId(String.valueOf(chatID));
                 contactsDao.deleteByChatId(chatID);
-                Contact[] contacts = contactsDao.indexSortedByDate();
+                List<Contact> contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
         } else {

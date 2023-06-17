@@ -3,10 +3,13 @@ package com.example.stf.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,21 +21,22 @@ import com.example.stf.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> implements Filterable {
 
-    class ContactViewHolder extends RecyclerView.ViewHolder {
+    static class ContactViewHolder extends RecyclerView.ViewHolder {
         private final TextView displayName;
-
         private final CircleImageView profilePic;
         private final TextView lastMessage;
         private final TextView notification;
-
         private final TextView time;
 
         public ContactViewHolder(@NonNull View itemView, ContactClickListener contactClickListener) {
@@ -65,15 +69,18 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
     private final LayoutInflater mInflater;
-    private Contact[] contacts;
+    private List<Contact> contacts; // Original list of contacts
+    private List<Contact> filteredContacts; // Filtered list of contacts
 
     private final ContactClickListener contactClickListener;
 
-    public ContactAdapter(Context context, Contact[] contacts, ContactClickListener contactClickListener) {
+    public ContactAdapter(Context context, List<Contact> contacts, ContactClickListener contactClickListener) {
         this.mInflater = LayoutInflater.from(context);
         this.contacts = contacts;
+        this.filteredContacts = new ArrayList<>(contacts);
         this.contactClickListener = contactClickListener;
     }
+
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -115,7 +122,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
 
-
         // Get the current date
         Calendar calendar = Calendar.getInstance();
         Date currentDate = calendar.getTime();
@@ -146,8 +152,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        if (contacts != null) {
-            final Contact currentContact = contacts[position];
+        if (filteredContacts != null) {
+            final Contact currentContact = filteredContacts.get(position);
             // Bind the data to the views in the ContactViewHolder
             holder.displayName.setText(currentContact.getUser().getDisplayName());
 
@@ -166,6 +172,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
                 holder.time.setText(getTime(currentContact));
             }
+
             if (currentContact.getUser().getNotfications() != 0) {
                 holder.notification.setText(String.valueOf(currentContact.getUser().getNotfications()));
             } else {
@@ -177,18 +184,51 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     @Override
     public int getItemCount() {
-        return contacts.length;
+        return filteredContacts.size();
     }
 
-    public void setContacts(Contact[] contacts) {
+    // Implement the Filterable interface methods
+    @Override
+    public Filter getFilter() {
+        return contactFilter;
+    }
+
+    private final Filter contactFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            String searchText = constraint.toString().toLowerCase().trim();
+            List<Contact> filteredContactList = new ArrayList<>();
+
+            if (TextUtils.isEmpty(searchText)) {
+                // If the search text is empty, show all contacts
+                filteredContactList.addAll(contacts);
+            } else {
+                // Filter the contacts based on the search text
+                for (Contact contact : contacts) {
+                    if (contact.getUser().getDisplayName().toLowerCase().contains(searchText)) {
+                        filteredContactList.add(contact);
+                    }
+                }
+            }
+
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredContactList;
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            filteredContacts = (List<Contact>) results.values;
+            notifyDataSetChanged();
+        }
+    };
+
+    public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
-    }
-
-    public Contact[] getContacts() {
-        return contacts;
+        this.filteredContacts = new ArrayList<>(contacts);
     }
 
     public Contact getContact(int index) {
-        return contacts[index];
+        return filteredContacts.get(index);
     }
 }

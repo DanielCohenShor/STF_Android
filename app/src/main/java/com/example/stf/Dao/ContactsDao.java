@@ -8,6 +8,8 @@ import androidx.room.Update;
 
 import com.example.stf.entities.Contact;
 
+import java.util.List;
+
 @Dao
 public interface ContactsDao {
 
@@ -29,7 +31,7 @@ public interface ContactsDao {
             "CASE WHEN SUBSTR(last_message_created, 3, 1) = ':' THEN last_message_created " +
             "ELSE SUBSTR(last_message_created, 7, 2) || '.' || SUBSTR(last_message_created, 4, 2) || '.' || SUBSTR(last_message_created, 9) " +
             "END DESC")
-    Contact[] indexSortedByDate();
+    List<Contact> indexSortedByDate();
 
     @Insert
     void insert(Contact... Contacts);
