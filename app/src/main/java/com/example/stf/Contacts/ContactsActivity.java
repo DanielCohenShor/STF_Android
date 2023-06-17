@@ -18,6 +18,7 @@ import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
@@ -44,6 +45,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
 
+    private SettingsDao settingsDao;
 
     private String currentUserUsername;
     private String currentUserDisplayName;
@@ -76,6 +78,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     .build();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
+            settingsDao = db.settingsDao();
         });
     }
 
@@ -86,6 +89,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
+            intent.putExtra("sourceActivity", "ContactsActivity");
             intent.putExtra("token", token);
             intent.putExtra("currentUserDisplayName", currentUserDisplayName);
             intent.putExtra("currentUserProfilePic", currentUserProfilePic);
@@ -97,7 +101,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
             intent.putExtra("token", token);
-            intent.putExtra("baseUrl", baseUrl);
+//            intent.putExtra("baseUrl", baseUrl);
             startActivity(intent);
         });
     }
@@ -113,8 +117,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         currentUserUsername = getIntent().getStringExtra("username");
         currentUserDisplayName = getIntent().getStringExtra("displayName");
         currentUserProfilePic = getIntent().getStringExtra("profilePic");
-        baseUrl = getIntent().getStringExtra("baseUrl");
-        viewModalContacts = new ViewModalContacts(baseUrl);
+//        baseUrl = getIntent().getStringExtra("baseUrl");
+        viewModalContacts = new ViewModalContacts(settingsDao.get().getServerUrl());
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 

@@ -31,9 +31,12 @@ import android.widget.TextView;
 import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.example.stf.SettingsActivity;
+import com.example.stf.entities.Settings;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -57,10 +60,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private String baseUrl;
 
+    private AppDB db;
+    private SettingsDao settingsDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        
+        initDB();
 
         // init the views item of the activity.
         initViewItem();
@@ -70,6 +78,18 @@ public class LoginActivity extends AppCompatActivity {
 
         //init the view model
         initViewModel();
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            settingsDao = db.settingsDao();
+        });
+
+        Settings defaultSettings = new Settings("http://10.100.102.91:5000/api/", false, false);
+        settingsDao.insert(defaultSettings);
     }
 
     private void createListeners() {
@@ -107,6 +127,7 @@ public class LoginActivity extends AppCompatActivity {
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+            intent.putExtra("sourceActivity", "LoginActivity");
             intent.putExtra("token", "");
             intent.putExtra("currentUserDisplayName", "");
             intent.putExtra("currentUserProfilePic", "");
@@ -122,13 +143,13 @@ public class LoginActivity extends AppCompatActivity {
         linkToRegister = findViewById(R.id.linkToRegister2);
         btnSettings = findViewById(R.id.btnSettings);
 
-        String url = "192.168.5.1:5000";
+        String url = "10.100.102.91:5000";
         // The value of `BaseUrl` will be "http://192.168.5.1:5000/api/"
         baseUrl = String.format(getString(R.string.BaseUrl), url);
     }
 
     private void initViewModel() {
-        viewModelLogin = new ViewModelLogin(baseUrl);
+        viewModelLogin = new ViewModelLogin(settingsDao.get().getServerUrl());
         //create listener for the btnRegister
         btnLogin.setOnClickListener(view -> {
             // save the username

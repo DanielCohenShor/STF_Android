@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.example.stf.AppDB;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.adapters.MessageAdapter;
 import com.example.stf.entities.Contact;
@@ -64,6 +65,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private String baseUrl;
 
+    private SettingsDao settingsDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
                     .build();
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
+            settingsDao = db.settingsDao();
         });
     }
 
@@ -109,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
         baseUrl = getIntent().getStringExtra("baseUrl");
 
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
-        viewModalChats = new ViewModalChats(baseUrl);
+        viewModalChats = new ViewModalChats(settingsDao.get().getServerUrl());
     }
 
     private Bitmap decodeBase64Image(String base64Image) {

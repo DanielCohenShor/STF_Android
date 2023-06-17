@@ -94,7 +94,7 @@ public class ChangeApiActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // The value of `BaseUrl` will be the value that the user entered
-                String.format(getString(R.string.BaseUrl), etChangeApi.getText().toString());
+                String baseUrl = String.format(getString(R.string.BaseUrl), etChangeApi.getText().toString());
             }
         });
     }

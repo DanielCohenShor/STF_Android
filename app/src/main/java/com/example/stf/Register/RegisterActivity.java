@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -27,8 +29,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.stf.AppDB;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
+import com.example.stf.entities.Settings;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -63,6 +68,9 @@ public class RegisterActivity extends AppCompatActivity {
     private String profilePictureBase64;
     private TextView etProfilePic;
 
+    private AppDB db;
+    private SettingsDao settingsDao;
+
     private String baseUrl;
 
     @Override
@@ -70,11 +78,22 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        initDB();
+
         //init the fields of the xml activity.
         initView();
 
         //init the listener for the show password.
         initListeners();
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            settingsDao = db.settingsDao();
+        });
     }
 
     private void initView() {
@@ -91,7 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
         etProfilePic = findViewById(R.id.et_ProfilePic);
         baseUrl = getIntent().getStringExtra("baseUrl");
 
-        registerViewModel = new ViewModelRegister(baseUrl);
+        registerViewModel = new ViewModelRegister(settingsDao.get().getServerUrl());
 
         errorsText.put("username", "must contain at least one letter");
         errorsText.put("username exist", "username already exist");

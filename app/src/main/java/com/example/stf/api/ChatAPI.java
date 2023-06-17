@@ -1,7 +1,7 @@
 package com.example.stf.api;
 
-import com.example.stf.MyApplication;
-import com.example.stf.R;
+import com.example.stf.AppDB;
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
 import com.google.gson.Gson;
@@ -23,6 +23,9 @@ public class ChatAPI {
     WebServiceAPI webServiceAPI;
 
     private String token;
+
+    private AppDB db;
+    private SettingsDao settingsDao;
 
     public ChatAPI(String baseUrl) {
         retrofit = new Retrofit.Builder()

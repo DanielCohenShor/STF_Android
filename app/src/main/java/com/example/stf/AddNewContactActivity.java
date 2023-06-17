@@ -12,6 +12,7 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.entities.Contact;
 import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
@@ -31,6 +32,8 @@ public class AddNewContactActivity extends AppCompatActivity {
     private ContactsDao contactsDao;
 
     private String baseUrl;
+
+    private SettingsDao settingsDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class AddNewContactActivity extends AppCompatActivity {
                 db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "ContactsDB")
                         .build();
                 contactsDao = db.ContactsDao();
+                settingsDao = db.settingsDao();
             }
         });
     }
@@ -118,7 +122,7 @@ public class AddNewContactActivity extends AppCompatActivity {
     }
 
     private void initViewModel() {
-        contactsViewModel = new ViewModalContacts(baseUrl);
+        contactsViewModel = new ViewModalContacts(settingsDao.get().getServerUrl());
         // create listener for the btnRegister
         btnAddContact.setOnClickListener(view -> performAddContact());
     }

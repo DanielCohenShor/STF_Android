@@ -80,25 +80,6 @@ public class SettingsActivity extends AppCompatActivity {
         showDetails();
     }
 
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//
-//        // Retrieve the extras data from the new intent
-//        Bundle extras = intent.getExtras();
-//        if (extras != null) {
-//            token = extras.getString("token", "");
-//            currentUserDisplayName = extras.getString("currentUserDisplayName", "");
-//            currentUserProfilePic = extras.getString("currentUserProfilePic", "");
-//        }
-//
-//        // Update the UI based on the value of nightMODE
-//        updateDarkModeUI();
-//
-//        showDetails();
-//    }
-
-
     private void updateDarkModeUI() {
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             switcher.setChecked(true);
