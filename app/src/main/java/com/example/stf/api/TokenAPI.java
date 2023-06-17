@@ -29,14 +29,8 @@ public class TokenAPI {
         webServiceAPI = retrofit.create(WebServiceAPI.class);
     }
 
-    public void setRetrofit(String newBaseUrl) {
-        if (newBaseUrl != baseUrl) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(newBaseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            webServiceAPI = retrofit.create(WebServiceAPI.class);
-        }
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
     public void post(String username, String password, Consumer<String> callback) {

@@ -113,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
         baseUrl = getIntent().getStringExtra("baseUrl");
 
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
-        viewModalChats = new ViewModalChats(settingsDao.get().getServerUrl());
+        viewModalChats = new ViewModalChats(settingsDao.getFirst().getServerUrl());
     }
 
     private Bitmap decodeBase64Image(String base64Image) {

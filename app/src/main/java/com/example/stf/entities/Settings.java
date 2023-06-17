@@ -1,23 +1,24 @@
 package com.example.stf.entities;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 @Entity
 public class Settings {
-    @PrimaryKey
+    @PrimaryKey @NonNull
     private String serverUrl;
 
     private Boolean isDarkMode;
 
-    //true - details.
-    //false - not show
-    private Boolean isShowDetails;
-
-    public Settings(String serverUrl, Boolean isDarkMode, Boolean isShowDetails) {
+    private String displayname;
+    private String photo;
+    public Settings(String serverUrl, Boolean isDarkMode, String displayname) {
         this.serverUrl = serverUrl;
         this.isDarkMode = isDarkMode;
-        this.isShowDetails = isShowDetails;
+        this.displayname = displayname;
     }
 
     public String getServerUrl() {
@@ -36,11 +37,19 @@ public class Settings {
         isDarkMode = darkMode;
     }
 
-    public Boolean getShowDetails() {
-        return isShowDetails;
+    public String getDisplayname() {
+        return displayname;
     }
 
-    public void setShowDetails(Boolean showDetails) {
-        isShowDetails = showDetails;
+    public void setDisplayname(String displayname) {
+        this.displayname = displayname;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }

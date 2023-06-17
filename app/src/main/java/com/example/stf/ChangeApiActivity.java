@@ -2,7 +2,9 @@ package com.example.stf;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.room.Room;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -15,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.example.stf.Dao.SettingsDao;
+
 public class ChangeApiActivity extends AppCompatActivity {
 
     private ImageButton btnExitChangeApi;
@@ -23,12 +27,18 @@ public class ChangeApiActivity extends AppCompatActivity {
 
     private AppCompatButton btnChangeApi;
 
+    private AppDB db;
+    private SettingsDao settingsDao;
+    private String baseUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_api);
 
         init();
+
+        initDB();
 
         createListeners();
     }
@@ -37,6 +47,16 @@ public class ChangeApiActivity extends AppCompatActivity {
         btnExitChangeApi = findViewById(R.id.btnExitChangeApi);
         etChangeApi = findViewById(R.id.etChangeApi);
         btnChangeApi = findViewById(R.id.btnChangeApi);
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+        });
     }
 
     public void createListeners() {
@@ -94,7 +114,11 @@ public class ChangeApiActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // The value of `BaseUrl` will be the value that the user entered
-                String baseUrl = String.format(getString(R.string.BaseUrl), etChangeApi.getText().toString());
+                String NewBaseUrl = etChangeApi.getText().toString();
+                AsyncTask.execute(() -> {
+                    settingsDao.updateUrl(baseUrl, NewBaseUrl);
+                });
+
             }
         });
     }

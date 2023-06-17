@@ -19,6 +19,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.example.stf.SettingsActivity;
+import com.example.stf.entities.Contact;
 import com.example.stf.entities.Settings;
 
 import java.util.HashSet;
@@ -57,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private AppDB db;
     private SettingsDao settingsDao;
+    private boolean isFirstTime = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,21 @@ public class LoginActivity extends AppCompatActivity {
         // createListeners
         createListeners();
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (isFirstTime) {
+            // This code will run only the first time
+            isFirstTime = false;
+        } else {
+            AsyncTask.execute(() -> {
+                baseUrl = settingsDao.getFirst().getServerUrl();
+                viewModelLogin.setBaseUrl(baseUrl);
+            });
+        }
     }
 
     public void initDB() {
@@ -80,10 +97,18 @@ public class LoginActivity extends AppCompatActivity {
                     .fallbackToDestructiveMigration()
                     .build();
             settingsDao = db.settingsDao();
+            Log.d("TAG", String.valueOf(settingsDao.getRowCount()));
+            if (settingsDao.getRowCount() == 0) {
+            // http://10.0.2.2:5000/api/
+            Settings defaultSettings = new Settings("http://10.0.2.2:5000/api/", false, "");
+            settingsDao.insert(defaultSettings);
+            baseUrl = settingsDao.getFirst().getServerUrl();
+        } else {
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            Log.d("TAG", baseUrl);
+        }
+            viewModelLogin = new ViewModelLogin(baseUrl);
         });
-        // http://10.0.2.2:5000:5000/api/
-        Settings defaultSettings = new Settings("http://10.100.102.91:5000/api/", false, false);
-        settingsDao.insert(defaultSettings);
     }
 
     private void createListeners() {
@@ -124,18 +149,12 @@ public class LoginActivity extends AppCompatActivity {
         linkToRegister.setOnClickListener(view -> {
             // Start the new activity here
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            intent.putExtra("baseUrl", baseUrl);
             startActivity(intent);
         });
 
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
-            intent.putExtra("sourceActivity", "LoginActivity");
-            intent.putExtra("token", "");
-            intent.putExtra("currentUserDisplayName", "");
-            intent.putExtra("currentUserProfilePic", "");
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
     }
@@ -146,9 +165,6 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister2);
         btnSettings = findViewById(R.id.btnSettings);
-        AsyncTask.execute(() -> {
-            viewModelLogin = new ViewModelLogin(settingsDao.get().getServerUrl());
-        });
     }
 
     private void handleLogInCallback(String token) {

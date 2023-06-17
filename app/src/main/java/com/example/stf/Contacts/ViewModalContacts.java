@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel;
 import com.example.stf.api.ContactAPI;
 import com.example.stf.entities.Contact;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ViewModalContacts  extends ViewModel {
 
-    private final ContactAPI contactAPI;
+    private ContactAPI contactAPI;
+    private String baseUrl;
 
     public ViewModalContacts(String baseUrl) {
+        this.baseUrl = baseUrl;
         this.contactAPI = new ContactAPI(baseUrl);
     }
 
@@ -23,5 +26,11 @@ public class ViewModalContacts  extends ViewModel {
         contactAPI.setToken(token);
         //add new thread
         contactAPI.post(contactUsername, callback);
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        if (!Objects.equals(baseUrl, this.baseUrl)) {
+            this.contactAPI = new ContactAPI(baseUrl);
+        }
     }
 }

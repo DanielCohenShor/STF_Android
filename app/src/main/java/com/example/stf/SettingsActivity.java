@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.Gravity;
@@ -22,8 +23,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.room.Room;
 
+import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
+import com.example.stf.entities.Settings;
 
 import java.util.Objects;
 
@@ -46,13 +50,15 @@ public class SettingsActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
-    private String token;
 
     private String currentUserDisplayName;
 
     private String currentUserProfilePic;
 
     private RelativeLayout llCurrentUserInfo;
+
+    private AppDB db;
+    private SettingsDao settingsDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         // init the xml and his stuff.
         init();
+
+        // i init the db
+        initDB();
 
         showDetails();
 
@@ -98,9 +107,17 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
         llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
-        token = getIntent().getStringExtra("token");
-        currentUserDisplayName = getIntent().getStringExtra("currentUserDisplayName");
-        currentUserProfilePic = getIntent().getStringExtra("currentUserProfilePic");
+    }
+
+    public void initDB() {
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            settingsDao = db.settingsDao();
+            currentUserDisplayName = settingsDao.getFirst().getDisplayname();
+            currentUserProfilePic = settingsDao.getFirst().getPhoto();
+        });
     }
 
     private Bitmap decodeBase64Image(String base64Image) {
@@ -133,7 +150,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void createListeners() {
         btnExitSettings.setOnClickListener(v -> {
-            onBackPressed();
+            finish();
         });
 
         llChangeApi.setOnClickListener(v -> {
@@ -189,7 +206,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         btnContinue.setOnClickListener(v -> {
             popupWindow.dismiss();
-            token = "";
             currentUserProfilePic = "";
             currentUserDisplayName = "";
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);

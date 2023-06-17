@@ -10,7 +10,7 @@ import com.example.stf.Dao.ContactsDao;
 import com.example.stf.entities.Message;
 import com.example.stf.entities.Settings;
 
-@Database(entities = {Contact.class, Message.class, Settings.class}, version = 14)
+@Database(entities = {Contact.class, Message.class, Settings.class}, version = 19)
 public abstract class AppDB extends RoomDatabase{
     public abstract ContactsDao ContactsDao();
     public abstract MessagesDao messagesDao();

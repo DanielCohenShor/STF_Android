@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.stf.api.TokenAPI;
 import com.example.stf.api.UserAPI;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ViewModelLogin extends ViewModel {
@@ -18,6 +19,16 @@ public class ViewModelLogin extends ViewModel {
         this.tokenAPI = new TokenAPI(baseUrl);
         this.userAPI = new UserAPI(baseUrl);
     }
+
+    public void setBaseUrl(String baseUrl) {
+        if (!Objects.equals(baseUrl, tokenAPI.getBaseUrl())) {
+            this.tokenAPI = new TokenAPI(baseUrl);
+        }
+        if (!Objects.equals(baseUrl, userAPI.getBaseUrl())) {
+            this.userAPI = new UserAPI(baseUrl);
+        }
+    }
+
 
     public void setToken(String token) {
         userAPI.setToken(token);

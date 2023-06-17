@@ -93,6 +93,8 @@ public class RegisterActivity extends AppCompatActivity {
                     .fallbackToDestructiveMigration()
                     .build();
             settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            registerViewModel = new ViewModelRegister(baseUrl);
         });
     }
 
@@ -108,10 +110,6 @@ public class RegisterActivity extends AppCompatActivity {
         linkToLogin = findViewById(R.id.linkToLogin2);
         riProfilePic = findViewById(R.id.riProfilePic);
         etProfilePic = findViewById(R.id.et_ProfilePic);
-        baseUrl = getIntent().getStringExtra("baseUrl");
-
-        registerViewModel = new ViewModelRegister(settingsDao.get().getServerUrl());
-
         errorsText.put("username", "must contain at least one letter");
         errorsText.put("username exist", "username already exist");
         errorsText.put("password", "must contain at least 5 characters,\nwith a combination of digits and letters");

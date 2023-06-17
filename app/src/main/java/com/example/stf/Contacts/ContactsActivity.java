@@ -60,15 +60,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         // init the data base
         initDB();
-
-        // init the xml and his stuff.
-        init();
-
-        //get all the contacts
-        getContacts();
-
-        //create listeners
-        createListeners();
     }
 
     public void initDB() {
@@ -79,6 +70,12 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
             settingsDao = db.settingsDao();
+            baseUrl = settingsDao.getFirst().getServerUrl();
+            settingsDao.updateDisplayName(baseUrl, currentUserDisplayName);
+            viewModalContacts = new ViewModalContacts(baseUrl);
+            init();
+            getContacts();
+            createListeners();
         });
     }
 
@@ -89,11 +86,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         btnSettings.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
-            intent.putExtra("sourceActivity", "ContactsActivity");
-            intent.putExtra("token", token);
-            intent.putExtra("currentUserDisplayName", currentUserDisplayName);
-            intent.putExtra("currentUserProfilePic", currentUserProfilePic);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
 
@@ -101,7 +93,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
             intent.putExtra("token", token);
-//            intent.putExtra("baseUrl", baseUrl);
             startActivity(intent);
         });
     }
@@ -117,8 +108,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         currentUserUsername = getIntent().getStringExtra("username");
         currentUserDisplayName = getIntent().getStringExtra("displayName");
         currentUserProfilePic = getIntent().getStringExtra("profilePic");
-//        baseUrl = getIntent().getStringExtra("baseUrl");
-        viewModalContacts = new ViewModalContacts(settingsDao.get().getServerUrl());
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -127,6 +116,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();
             messagesDao.deleteAllMessages();
+            settingsDao.deleteDisplayName(baseUrl);
+            settingsDao.updatePhoto(baseUrl, "");
         });
         finish();
     }
@@ -139,6 +130,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             isFirstTime = false;
         } else {
             AsyncTask.execute(() -> {
+                String baseUrl = settingsDao.getFirst().getServerUrl();
+                viewModalContacts.setBaseUrl(baseUrl);
                 Contact[] contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });

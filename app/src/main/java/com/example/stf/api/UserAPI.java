@@ -36,16 +36,6 @@ public class UserAPI {
         webServiceAPI = retrofit.create(WebServiceAPI.class);
     }
 
-    public void setRetrofit(String newBaseUrl) {
-        if (newBaseUrl != baseUrl) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(newBaseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            webServiceAPI = retrofit.create(WebServiceAPI.class);
-        }
-    }
-
     public void setToken(String token) {
         this.token = token;
     }
@@ -134,5 +124,9 @@ public class UserAPI {
 
     public String getToken() {
         return token;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 }

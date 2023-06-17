@@ -122,7 +122,7 @@ public class AddNewContactActivity extends AppCompatActivity {
     }
 
     private void initViewModel() {
-        contactsViewModel = new ViewModalContacts(settingsDao.get().getServerUrl());
+        contactsViewModel = new ViewModalContacts(settingsDao.getFirst().getServerUrl());
         // create listener for the btnRegister
         btnAddContact.setOnClickListener(view -> performAddContact());
     }
