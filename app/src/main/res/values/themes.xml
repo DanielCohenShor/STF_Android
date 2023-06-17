@@ -105,6 +105,7 @@
         <item name="android:background">@drawable/circle_border</item>
     </style>
 
+    <!-- Edit text border if light mode on -->
     <style name="INVALID_EDIT_TEXT">
         <item name="android:background">@drawable/invalid_edit_text</item>
     </style>

@@ -33,7 +33,6 @@ import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
-import java.util.Objects;
 
 public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
     private boolean isFirstTime = true;
@@ -176,12 +175,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void logOut() {
         // Delete the local database
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                contactsDao.deleteAllContacts();
-                messagesDao.deleteAllMessages();
-            }
+        AsyncTask.execute(() -> {
+            contactsDao.deleteAllContacts();
+            messagesDao.deleteAllMessages();
         });
         finish();
     }
@@ -259,20 +255,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Inside your item click listener or where you want to show the dialog
         new AlertDialog.Builder(ContactsActivity.this)
                 .setTitle("Delete Chat")
-                .setMessage("You will delete " + displayNameOfChatDelete + " chat. Are you sure?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Delete chat logic here
-                        Contact clickedContact = contactAdapter.getContact(position);
-                        viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
-                    }
+                .setMessage("You will delete the chat with " + displayNameOfChatDelete + ". Are you sure?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Delete chat logic here
+                    Contact clickedContact = contactAdapter.getContact(position);
+                    viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // No action needed, dialog will be automatically dismissed
-                    }
+                .setNegativeButton("No", (dialog, which) -> {
+                    // No action needed, dialog will be automatically dismissed
                 })
                 .show();
     }
