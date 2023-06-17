@@ -1,13 +1,17 @@
 package com.example.stf.entities;
 
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity
 public class Settings {
+    @PrimaryKey
     private String serverUrl;
 
     private Boolean isDarkMode;
 
+    //true - details.
+    //false - not show
     private Boolean isShowDetails;
 
     public Settings(String serverUrl, Boolean isDarkMode, Boolean isShowDetails) {

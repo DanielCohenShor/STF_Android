@@ -27,13 +27,26 @@ public class ChatAPI {
     private AppDB db;
     private SettingsDao settingsDao;
 
+    String baseUrl;
+
     public ChatAPI(String baseUrl) {
+        this.baseUrl = baseUrl;
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         webServiceAPI = retrofit.create(WebServiceAPI.class);
+    }
+
+    public void setRetrofit(String newBaseUrl) {
+        if (newBaseUrl != baseUrl) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(newBaseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            webServiceAPI = retrofit.create(WebServiceAPI.class);
+        }
     }
 
     public void setToken(String token) {

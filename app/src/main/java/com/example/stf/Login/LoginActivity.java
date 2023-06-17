@@ -30,8 +30,6 @@ import android.widget.TextView;
 
 import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
-import com.example.stf.Dao.ContactsDao;
-import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
@@ -40,9 +38,6 @@ import com.example.stf.entities.Settings;
 
 import java.util.HashSet;
 import java.util.Objects;
-
-import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.Dispatchers;
 
 public class LoginActivity extends AppCompatActivity {
     private String username;
@@ -76,8 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         // createListeners
         createListeners();
 
-        //init the view model
-        initViewModel();
+
     }
 
     public void initDB() {
@@ -87,13 +81,23 @@ public class LoginActivity extends AppCompatActivity {
                     .build();
             settingsDao = db.settingsDao();
         });
-
+        // http://10.0.2.2:5000:5000/api/
         Settings defaultSettings = new Settings("http://10.100.102.91:5000/api/", false, false);
         settingsDao.insert(defaultSettings);
     }
 
     private void createListeners() {
         Context context = this; // 'this' refers to the current Activity instance
+
+        //create listener for the btnRegister
+        btnLogin.setOnClickListener(view -> {
+            // save the username
+            this.username = etUsername.getText().toString();
+            // Call the registration method in the RegisterViewModel
+            viewModelLogin.performLogin(etUsername.getText().toString(),
+                    etPassword.getText().toString(),
+                    this::handleLogInCallback);
+        });
         btnPasswordVisibility.setOnClickListener(new View.OnClickListener() {
             boolean isPasswordVisible = false;
             final Drawable showPassword = ContextCompat.getDrawable(context, R.drawable.show_password_icon_drawable);
@@ -142,22 +146,8 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister2);
         btnSettings = findViewById(R.id.btnSettings);
-
-        String url = "10.100.102.91:5000";
-        // The value of `BaseUrl` will be "http://192.168.5.1:5000/api/"
-        baseUrl = String.format(getString(R.string.BaseUrl), url);
-    }
-
-    private void initViewModel() {
-        viewModelLogin = new ViewModelLogin(settingsDao.get().getServerUrl());
-        //create listener for the btnRegister
-        btnLogin.setOnClickListener(view -> {
-            // save the username
-            this.username = etUsername.getText().toString();
-            // Call the registration method in the RegisterViewModel
-            viewModelLogin.performLogin(etUsername.getText().toString(),
-                    etPassword.getText().toString(),
-                    this::handleLogInCallback);
+        AsyncTask.execute(() -> {
+            viewModelLogin = new ViewModelLogin(settingsDao.get().getServerUrl());
         });
     }
 

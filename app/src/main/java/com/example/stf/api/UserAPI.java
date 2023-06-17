@@ -26,14 +26,26 @@ public class UserAPI {
     Retrofit retrofit;
     WebServiceAPI webServiceAPI;
     String token; // Store the token here
+    String baseUrl;
     public UserAPI(String baseUrl) {
-
+        this.baseUrl =baseUrl;
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         webServiceAPI = retrofit.create(WebServiceAPI.class);
     }
+
+    public void setRetrofit(String newBaseUrl) {
+        if (newBaseUrl != baseUrl) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(newBaseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            webServiceAPI = retrofit.create(WebServiceAPI.class);
+        }
+    }
+
     public void setToken(String token) {
         this.token = token;
     }
