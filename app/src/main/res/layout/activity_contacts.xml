@@ -27,7 +27,7 @@
 
         <TextView
             android:id="@+id/tvHeadline"
-            android:layout_width="334dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
@@ -36,39 +36,6 @@
             android:textColor="@color/white"
             android:textSize="23sp"
             android:textStyle="bold" />
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/btnSettings"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:layout_weight="0.1"-->
-<!--            android:adjustViewBounds="true"-->
-<!--            android:background="@android:color/transparent"-->
-<!--            app:srcCompat="@drawable/ic_settings" />-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/btnSearch"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:layout_marginStart="15dp"-->
-<!--            android:layout_weight="0.1"-->
-<!--            android:adjustViewBounds="true"-->
-<!--            android:background="@android:color/transparent"-->
-<!--            app:srcCompat="@drawable/ic_search" />-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/btnLogout"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:layout_marginStart="10dp"-->
-<!--            android:layout_marginEnd="10dp"-->
-<!--            android:layout_weight="0.1"-->
-<!--            android:adjustViewBounds="true"-->
-<!--            android:background="@android:color/transparent"-->
-<!--            app:srcCompat="@drawable/ic_logout" />-->
     </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
