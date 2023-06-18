@@ -71,13 +71,7 @@ public class ChangeApiActivity extends AppCompatActivity {
     public void createListeners() {
         btnExitChangeApi.setOnClickListener(v -> finish());
 
-        btnChangeApi.setOnClickListener(v -> {
-//            if (!TextUtils.isEmpty(etChangeApi.getText().toString().trim())) {
-//                onButtonShowPopupWindowClick(v);
-//            }
-            onButtonShowPopupWindowClick(v);
-
-        });
+        btnChangeApi.setOnClickListener(this::onButtonShowPopupWindowClick);
     }
 
     public String checkUrlValidation(String text) {
@@ -94,12 +88,10 @@ public class ChangeApiActivity extends AppCompatActivity {
         Matcher matcher2 = regex2.matcher(text);
 
         if (matcher1.find()) {
-            String match = matcher1.group();
-            return match;
+            return matcher1.group();
         } else if (matcher2.find()) {
             String match = matcher2.group();
-            String result =  "http://" + match + "/api/";
-            return result;
+            return "http://" + match + "/api/";
         } else {
             //error
             return "error";
@@ -114,11 +106,7 @@ public class ChangeApiActivity extends AppCompatActivity {
                     .setTitle("Change API")
                     .setMessage("You will change the current server address: " + baseUrl +
                             " to: " + result+ ". Are you sure?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        AsyncTask.execute(() -> {
-                            settingsDao.updateUrl(baseUrl, result);
-                        });
-                    })
+                    .setPositiveButton("Yes", (dialog, which) -> AsyncTask.execute(() -> settingsDao.updateUrl(baseUrl, result)))
                     .setNegativeButton("No", (dialog, which) -> {
                         // No action needed, dialog will be automatically dismissed
                     })
@@ -149,7 +137,7 @@ public class ChangeApiActivity extends AppCompatActivity {
                 etChangeApi.setBackgroundResource(drawableResId);
 
                 // Add the error message TextView to your desired parent view
-                LinearLayout parentLayout = findViewById(R.id.linearLayout1);
+                LinearLayout parentLayout = findViewById(R.id.linearLayout3);
                 parentLayout.addView(tvError, layoutParams);
 
                 etChangeApi.addTextChangedListener(new TextWatcher() {
