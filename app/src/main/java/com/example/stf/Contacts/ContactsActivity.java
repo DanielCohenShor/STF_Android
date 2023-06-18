@@ -121,15 +121,22 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         super.onPause();
 
         // Clear the search query
-        MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
-        LinearLayout actionView = (LinearLayout) searchItem.getActionView();
-        SearchView searchView = actionView.findViewById(R.id.searchView);
-        if (searchView != null) {
-            searchView.setQuery("", false);
-            searchView.setIconified(true);
-            searchItem.collapseActionView();
+        if (toolbar != null) {
+            MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            if (searchItem != null) {
+                LinearLayout actionView = (LinearLayout) searchItem.getActionView();
+                if (actionView != null) {
+                    SearchView searchView = actionView.findViewById(R.id.searchView);
+                    if (searchView != null) {
+                        searchView.setQuery("", false);
+                        searchView.setIconified(true);
+                        searchItem.collapseActionView();
+                    }
+                }
+            }
         }
     }
+
 
 
     public void initDB() {
