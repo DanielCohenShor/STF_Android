@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
@@ -63,6 +64,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private Toolbar toolbar;
 
     private String baseUrl;
+
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,8 +140,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         }
     }
 
-
-
     public void initDB() {
         currentUserDisplayName = getIntent().getStringExtra("displayName");
         currentUserProfilePic = getIntent().getStringExtra("profilePic");
@@ -172,6 +173,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Initialize the views
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
+        progressBar = findViewById(R.id.progressBar);
         currentUserUsername = getIntent().getStringExtra("username");
         token = getIntent().getStringExtra("token");
         currentUserDisplayName = getIntent().getStringExtra("displayName");
@@ -217,6 +219,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     private void getContacts() {
+        progressBar.setVisibility(View.VISIBLE);
         viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
     }
 
@@ -270,6 +273,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         contactAdapter.setNotifications(notifications);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
