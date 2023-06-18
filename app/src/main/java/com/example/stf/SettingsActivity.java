@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -51,8 +53,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     SwitchCompat switcher;
     boolean nightMODE;
-    SharedPreferences sharedPreferences;
-
 
     private String currentUserDisplayName;
 
@@ -67,6 +67,8 @@ public class SettingsActivity extends AppCompatActivity {
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
     private boolean isFirstTime = true;
+    private SharedPreferences sharedPreferences;
+    private boolean nightMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,26 +97,8 @@ public class SettingsActivity extends AppCompatActivity {
                 runOnUiThread(this::showDetails);
             });
         }
-    }
-
-    private void updateDarkModeUI() {
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            switcher.setChecked(true);
-            nightMODE = true;
-        } else {
-            switcher.setChecked(false);
-            nightMODE = false;
-        }
-    }
-
-    private void init() {
-        btnExitSettings = findViewById(R.id.btnExitSettings);
-        switcher = findViewById(R.id.switchDarkMode);
-        currentUserImg = findViewById(R.id.currentUserImg);
-        tvCurrentUserDisplayName = findViewById(R.id.tvCurrentUserDisplayName);
-        llChangeApi = findViewById(R.id.llChangeApi);
-        llLogout = findViewById(R.id.llLogout);
-        llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
+        // Set the switch based on the saved mode
+        switcher.setChecked(nightMode);
     }
 
     public void initDB() {
@@ -128,40 +112,33 @@ public class SettingsActivity extends AppCompatActivity {
             baseUrl = settingsDao.getFirst().getServerUrl();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
-            updateDarkModeUI();
 
-            makeDarkMode();
 
             createListeners();
             runOnUiThread(this::showDetails);
         });
     }
 
-    private Bitmap decodeBase64Image(String base64Image) {
-        try {
-            String base64Data = base64Image.substring(base64Image.indexOf(",") + 1);
-            byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
-            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
+    private void init() {
+        // Retrieve the saved mode from SharedPreferences
+        sharedPreferences = getSharedPreferences("MODE", Context.MODE_PRIVATE);
+        nightMode = isSystemInNightMode();
+        btnExitSettings = findViewById(R.id.btnExitSettings);
+        switcher = findViewById(R.id.switchDarkMode);
+        currentUserImg = findViewById(R.id.currentUserImg);
+        tvCurrentUserDisplayName = findViewById(R.id.tvCurrentUserDisplayName);
+        llChangeApi = findViewById(R.id.llChangeApi);
+        llLogout = findViewById(R.id.llLogout);
+        llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
     }
 
-    private void showDetails() {
-        if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
-            // Convert the Base64-encoded string to a Bitmap
-            Bitmap bitmap = decodeBase64Image(currentUserProfilePic);
-
-            if (bitmap != null) {
-                // Set the Bitmap as the image source for the ImageView
-                currentUserImg.setImageBitmap(bitmap);
-            }
-
-            tvCurrentUserDisplayName.setText(currentUserDisplayName);
+    private boolean isSystemInNightMode() {
+        if (Objects.equals(getResources().getString(R.string.mode), "Day")) {
+            //day mode
+            return false;
         } else {
-            llCurrentUserInfo.setVisibility(View.GONE);
-            llLogout.setVisibility(View.GONE);
+            return true;
         }
     }
 
@@ -175,6 +152,35 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
             llLogout.setOnClickListener(this::onButtonShowPopupWindowClick);
+        }
+
+        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    nightMode = true;
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    nightMode = false;
+                }
+
+                // Save the selected mode to SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("nightMode", nightMode);
+                editor.apply();
+            }
+        });    }
+
+
+    private Bitmap decodeBase64Image(String base64Image) {
+        try {
+            String base64Data = base64Image.substring(base64Image.indexOf(",") + 1);
+            byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -214,43 +220,23 @@ public class SettingsActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void makeDarkMode() {
-        sharedPreferences = getSharedPreferences("MODE", Context.MODE_PRIVATE);
-        boolean shouldResetMode = sharedPreferences.getBoolean("should_reset_mode", false);
-        nightMODE = sharedPreferences.getBoolean("night", false);
+    private void showDetails() {
+        // Set the switch based on the saved mode
+        switcher.setChecked(nightMode);
+        if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
+            // Convert the Base64-encoded string to a Bitmap
+            Bitmap bitmap = decodeBase64Image(currentUserProfilePic);
 
-        // Reset the mode if the flag is set
-        if (shouldResetMode) {
-            nightMODE = false;
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("night", false);
-            editor.putBoolean("should_reset_mode", false);
-            editor.apply();
-        }
-
-        // Update the UI based on the initial value of nightMODE
-        if (nightMODE) {
-            switcher.setChecked(true);
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-
-        switcher.setOnClickListener(v -> {
-            // Update the UI based on the new value of nightMODE
-            if (nightMODE) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                nightMODE = false;
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                nightMODE = true;
+            if (bitmap != null) {
+                // Set the Bitmap as the image source for the ImageView
+                currentUserImg.setImageBitmap(bitmap);
             }
 
-            // Set the flag to reset the mode on next launch
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("should_reset_mode", true);
-            editor.putBoolean("night", nightMODE);
-            editor.apply();
-
-            recreate();
-        });
+            tvCurrentUserDisplayName.setText(currentUserDisplayName);
+        } else {
+            llCurrentUserInfo.setVisibility(View.GONE);
+            llLogout.setVisibility(View.GONE);
+        }
     }
+
 }
