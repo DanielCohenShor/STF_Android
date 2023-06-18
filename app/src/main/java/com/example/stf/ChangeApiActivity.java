@@ -75,10 +75,9 @@ public class ChangeApiActivity extends AppCompatActivity {
     }
 
     public String checkUrlValidation(String text) {
-//        String pattern1 = "http://((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\\\d{3,}|[2-9]\\\\d{2,}|1\\\\d{3,})+/api/";
-        String pattern1 = "http://((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\d{3,}|[2-9]\\d{2,}|1\\d{3,}[2-9]\\d{2,}|1\\d{3,})+/api/";
+        String pattern1 = "(?i)http://((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?).(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?).(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?).(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9]))/api/";
+        String pattern2 = "((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?).(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?).(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?).(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9]))";
 
-        String pattern2 = "((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\d{3,}|[2-9]\\d{2,}|1\\d{3,}[2-9]\\d{2,}|1\\d{3,})";
         // Create a Pattern object
         Pattern regex1 = Pattern.compile(pattern1);
         // Create a Pattern object
@@ -90,7 +89,8 @@ public class ChangeApiActivity extends AppCompatActivity {
         Matcher matcher2 = regex2.matcher(text);
 
         if (matcher1.matches()) {
-            return matcher1.group();
+            String match = matcher1.group();
+            return match.substring(0, 4).toLowerCase() + match.substring(4);
         } else if (matcher2.matches()) {
             String match = matcher2.group();
             return "http://" + match + "/api/";
