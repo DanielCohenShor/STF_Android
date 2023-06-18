@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.room.Room;
 
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -78,9 +79,13 @@ public class AddNewContactActivity extends AppCompatActivity {
 
     private void handleAddContactCallback(Contact contact) {
         if (contact != null) {
-            // okay
             // make the edit text to be regular
-            etChooseContact.setBackgroundResource(R.drawable.edittext_background);
+            int styleResId = R.style.EDIT_TEXT;
+            TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+            int drawableResId = styledAttributes.getResourceId(0, 0);
+            styledAttributes.recycle();
+            etChooseContact.setBackgroundResource(drawableResId);
+
             //push to the data base local
             AsyncTask.execute(() -> {
                 // Perform insert operation on a background thread
@@ -89,7 +94,12 @@ public class AddNewContactActivity extends AppCompatActivity {
             // Start the new activity here
             finish();
         } else {
-            etChooseContact.setBackgroundResource(R.drawable.invalid_edit_text);
+
+            int styleResId = R.style.INVALID_EDIT_TEXT;
+            TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+            int drawableResId = styledAttributes.getResourceId(0, 0);
+            styledAttributes.recycle();
+            etChooseContact.setBackgroundResource(drawableResId);
 
             etChooseContact.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -107,7 +117,12 @@ public class AddNewContactActivity extends AppCompatActivity {
                 @Override
                 public void afterTextChanged(Editable s) {
                     // change the border of the text view to none
-                    etChooseContact.setBackgroundResource(R.drawable.edittext_background);
+                    // make the edit text to be regular
+                    int styleResId = R.style.EDIT_TEXT;
+                    TypedArray styledAttributes = obtainStyledAttributes(styleResId, new int[]{android.R.attr.background});
+                    int drawableResId = styledAttributes.getResourceId(0, 0);
+                    styledAttributes.recycle();
+                    etChooseContact.setBackgroundResource(drawableResId);
                 }
             });
         }

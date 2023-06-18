@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,10 +26,12 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.room.Room;
 
+import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
+import com.example.stf.entities.Contact;
 
 import java.util.Objects;
 
@@ -160,57 +163,27 @@ public class SettingsActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     public void onButtonShowPopupWindowClick(View view) {
-
-        // inflate the layout of the popup window
-        LayoutInflater inflater = (LayoutInflater)
-                getSystemService(LAYOUT_INFLATER_SERVICE);
-        @SuppressLint("InflateParams") View popupView = inflater.inflate(R.layout.popup_window, null);
-
-        // Retrieve the TextView from the popup layout
-        TextView tvPopupHeadline = popupView.findViewById(R.id.tvPopupHeadline);
-        TextView tvPopupText = popupView.findViewById(R.id.tvPopupText);
-
-        String popupHeadline = "Logout";
-        tvPopupHeadline.setText(popupHeadline);
-
-        String popupText = "make sure you want to logout from the app.";
-        tvPopupText.setText(popupText);
-
-        AppCompatButton btnCancel = popupView.findViewById(R.id.btnCancel);
-        AppCompatButton btnContinue = popupView.findViewById(R.id.btnContinue);
-
-        // create the popup window
-        int width = LinearLayout.LayoutParams.MATCH_PARENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-        // dismiss the popup window when touched
-        popupView.setOnTouchListener((v, event) -> {
-            popupWindow.dismiss();
-            return true;
-        });
-
-        btnCancel.setOnClickListener(v -> popupWindow.dismiss());
-
-        btnContinue.setOnClickListener(v -> {
-            popupWindow.dismiss();
-            currentUserProfilePic = "";
-            // Delete the local database
-            AsyncTask.execute(() -> {
-                contactsDao.deleteAllContacts();
-                messagesDao.deleteAllMessages();
-                settingsDao.deleteDisplayName(baseUrl);
-                settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
-            });
-            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-        });
+        new AlertDialog.Builder(SettingsActivity.this)
+                .setTitle("Logout")
+                .setMessage("You will logout. Are you sure?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Delete chat logic here
+                    currentUserProfilePic = "";
+                    // Delete the local database
+                    AsyncTask.execute(() -> {
+                        contactsDao.deleteAllContacts();
+                        messagesDao.deleteAllMessages();
+                        settingsDao.deleteDisplayName(baseUrl);
+                        settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
+                    });
+                    Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // No action needed, dialog will be automatically dismissed
+                })
+                .show();
     }
 
     private void makeDarkMode() {
