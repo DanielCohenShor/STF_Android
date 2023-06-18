@@ -111,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
             settingsDao = db.settingsDao();
             if (settingsDao.getRowCount() == 0) {
             // http://10.0.2.2:5000/api/
-            Settings defaultSettings = new Settings("http://10.0.2.2:5000/api/", false, "");
+            Settings defaultSettings = new Settings("http://10.0.2.2:5000/api/", "");
             settingsDao.insert(defaultSettings);
             baseUrl = settingsDao.getFirst().getServerUrl();
         } else {
@@ -315,7 +315,6 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("displayName", displayName);
         intent.putExtra("profilePic", profilePic);
         intent.putExtra("token", token);
-        intent.putExtra("baseUrl", baseUrl);
         startActivity(intent);
         progressBar.setVisibility(View.GONE);
     }

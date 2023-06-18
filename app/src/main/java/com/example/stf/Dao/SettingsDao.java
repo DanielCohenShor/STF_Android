@@ -19,6 +19,9 @@ public interface SettingsDao {
     @Query("UPDATE Settings SET displayname = :displayName WHERE serverUrl = :serverUrl")
     void updateDisplayName(String serverUrl, String displayName);
 
+    @Query("UPDATE Settings SET cuurentChat = :cuurentChat WHERE serverUrl = :serverUrl")
+    void updateCuurentChat(String serverUrl, String cuurentChat);
+
     @Query("UPDATE Settings SET displayname = NULL WHERE serverUrl = :serverUrl")
     void deleteDisplayName(String serverUrl);
 

@@ -92,6 +92,10 @@ public class ChatActivity extends AppCompatActivity {
             settingsDao = db.settingsDao();
             baseUrl = settingsDao.getFirst().getServerUrl();
             viewModalChats = new ViewModalChats(baseUrl);
+            //update the currenct chat
+            chatId = getIntent().getIntExtra("chatId", 0);
+            // update the chatid.
+            AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, String.valueOf(chatId));});
             //create listeners
             createListeners();
 
@@ -114,8 +118,6 @@ public class ChatActivity extends AppCompatActivity {
         contactProfilePic = getIntent().getStringExtra("contactProfilePic");
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
         currentUserUsername = getIntent().getStringExtra("currentUserUsername");
-        chatId = getIntent().getIntExtra("chatId", 0);
-        baseUrl = getIntent().getStringExtra("baseUrl");
 
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -182,7 +184,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void createListeners() {
-        btnExitChat.setOnClickListener(v -> finish());
+        btnExitChat.setOnClickListener(v -> exitChat());
 
         btnSendMessage.setOnClickListener(v -> {
             if (!TextUtils.isEmpty(etSendMessage.getText().toString().trim())) {
@@ -197,6 +199,26 @@ public class ChatActivity extends AppCompatActivity {
                 listViewMessages.scrollToPosition(lastPosition);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        chatId = getIntent().getIntExtra("chatId", 0);
+        AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, String.valueOf(chatId));});
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, "");});
+    }
+
+    public void exitChat() {
+        AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, "");});
+        finish();
+
     }
 
     private void updateContacts() {

@@ -10,15 +10,21 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class Settings {
     @PrimaryKey @NonNull
     private String serverUrl;
-
-    private Boolean isDarkMode;
-
     private String displayname;
     private String photo;
-    public Settings(String serverUrl, Boolean isDarkMode, String displayname) {
+    private String cuurentChat;
+    public Settings(String serverUrl, String displayname) {
         this.serverUrl = serverUrl;
-        this.isDarkMode = isDarkMode;
         this.displayname = displayname;
+        cuurentChat = "";
+    }
+
+    public void setCuurentChat(String cuurentChat) {
+        this.cuurentChat = cuurentChat;
+    }
+
+    public String getCuurentChat() {
+        return cuurentChat;
     }
 
     public String getServerUrl() {
@@ -27,14 +33,6 @@ public class Settings {
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
-    }
-
-    public Boolean getDarkMode() {
-        return isDarkMode;
-    }
-
-    public void setDarkMode(Boolean darkMode) {
-        isDarkMode = darkMode;
     }
 
     public String getDisplayname() {
