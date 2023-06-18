@@ -12,9 +12,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.stf.AppDB;
@@ -66,6 +68,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private SettingsDao settingsDao;
 
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
         tvContactName = findViewById(R.id.tvContactName);
         listViewMessages = findViewById(R.id.RecyclerViewMessages);
         etSendMessage = findViewById(R.id.etSendMessage);
+        progressBar = findViewById(R.id.progressBar);
 
         token = getIntent().getStringExtra("token");
         contactProfilePic = getIntent().getStringExtra("contactProfilePic");
@@ -139,6 +144,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void getMessages() {
+        progressBar.setVisibility(View.VISIBLE);
         // request to the server - running on new thread
         viewModalChats.performGetMessages(token, Integer.toString(chatId), this::handleGetMessagesCallback);
 
@@ -172,6 +178,7 @@ public class ChatActivity extends AppCompatActivity {
         if (lastPosition >= 0) {
             listViewMessages.scrollToPosition(lastPosition);
         }
+        progressBar.setVisibility(View.GONE);
     }
 
     private void createListeners() {

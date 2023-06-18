@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private ImageButton btnSettings;
 
+    private ProgressBar progressBar;
+
     private Button btnLogin;
     private TextView linkToRegister;
 
@@ -83,7 +86,6 @@ public class LoginActivity extends AppCompatActivity {
       
         //generate token for firebase
         generateTokenFireBase();
-
     }
 
     @Override
@@ -144,8 +146,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-
-
     private void createListeners() {
         Context context = this; // 'this' refers to the current Activity instance
 
@@ -200,6 +200,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         linkToRegister = findViewById(R.id.linkToRegister2);
         btnSettings = findViewById(R.id.btnSettings);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     private void handleLogInCallback(String token) {
@@ -293,6 +294,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         } else {
             // save the token
+            progressBar.setVisibility(View.VISIBLE);
             viewModelLogin.setToken(token);
             viewModelLogin.getDetails(username,this::handleDetailsUser);
         }
@@ -315,6 +317,6 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("token", token);
         intent.putExtra("baseUrl", baseUrl);
         startActivity(intent);
-
+        progressBar.setVisibility(View.GONE);
     }
 }
