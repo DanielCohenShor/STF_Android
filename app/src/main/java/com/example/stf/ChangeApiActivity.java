@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.entities.Settings;
@@ -33,6 +35,8 @@ public class ChangeApiActivity extends AppCompatActivity {
 
     private AppDB db;
     private SettingsDao settingsDao;
+    private ContactsDao contactsDao;
+    private MessagesDao messagesDao;
     private String baseUrl;
 
     @Override
@@ -44,7 +48,6 @@ public class ChangeApiActivity extends AppCompatActivity {
 
         initDB();
 
-        createListeners();
     }
 
     private void init() {
@@ -59,7 +62,10 @@ public class ChangeApiActivity extends AppCompatActivity {
                     .fallbackToDestructiveMigration()
                     .build();
             settingsDao = db.settingsDao();
+            contactsDao = db.ContactsDao();
+            messagesDao = db.messagesDao();
             baseUrl = settingsDao.getFirst().getServerUrl();
+            createListeners();
         });
     }
 
@@ -82,6 +88,11 @@ public class ChangeApiActivity extends AppCompatActivity {
                 .setPositiveButton("Yes", (dialog, which) -> {
                     AsyncTask.execute(() -> {
                         settingsDao.updateUrl(baseUrl, NewBaseUrl);
+                        settingsDao.updatePhoto(baseUrl, "");
+                        settingsDao.deleteDisplayName(baseUrl);
+                        contactsDao.deleteAllContacts();
+                        messagesDao.deleteAllMessages();
+                        baseUrl = NewBaseUrl;
                     });
                 })
                 .setNegativeButton("No", (dialog, which) -> {

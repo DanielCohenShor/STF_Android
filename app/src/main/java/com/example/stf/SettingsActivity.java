@@ -66,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String baseUrl;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
+    private boolean isFirstTime = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +78,23 @@ public class SettingsActivity extends AppCompatActivity {
 
         // i init the db
         initDB();
+    }
 
-        updateDarkModeUI();
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-        makeDarkMode();
-
-        createListeners();
+        if (isFirstTime) {
+            // This code will run only the first time
+            isFirstTime = false;
+        } else {
+            AsyncTask.execute(() -> {
+                currentUserDisplayName = settingsDao.getFirst().getDisplayname();
+                currentUserProfilePic = settingsDao.getFirst().getPhoto();
+                baseUrl = settingsDao.getFirst().getServerUrl();
+                runOnUiThread(this::showDetails);
+            });
+        }
     }
 
     private void updateDarkModeUI() {
@@ -116,6 +128,11 @@ public class SettingsActivity extends AppCompatActivity {
             baseUrl = settingsDao.getFirst().getServerUrl();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
+            updateDarkModeUI();
+
+            makeDarkMode();
+
+            createListeners();
             runOnUiThread(this::showDetails);
         });
     }
@@ -149,7 +166,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void createListeners() {
-        btnExitSettings.setOnClickListener(v -> finish());
+        btnExitSettings.setOnClickListener(v -> exit());
 
         llChangeApi.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ChangeApiActivity.class);
@@ -158,6 +175,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
             llLogout.setOnClickListener(this::onButtonShowPopupWindowClick);
+        }
+    }
+
+    public void exit() {
+        if (Objects.equals(currentUserProfilePic, "")) {
+            // Clear the activity stack and start the new activity
+            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } else {
+            finish();
         }
     }
 
