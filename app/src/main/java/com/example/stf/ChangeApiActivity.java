@@ -75,11 +75,10 @@ public class ChangeApiActivity extends AppCompatActivity {
     }
 
     public String checkUrlValidation(String text) {
-//        String pattern1 = "http://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d++/api/";
-        String pattern1 = "http://((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\\\d{3,}|[2-9]\\\\d{2,}|1\\\\d{3,})+/api/";
+//        String pattern1 = "http://((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\\\d{3,}|[2-9]\\\\d{2,}|1\\\\d{3,})+/api/";
+        String pattern1 = "http://((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\d{3,}|[2-9]\\d{2,}|1\\d{3,}[2-9]\\d{2,}|1\\d{3,})+/api/";
 
-//        String pattern2 = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+";
-        String pattern2 = "((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\\\d{3,}|[2-9]\\\\d{2,}|1\\\\d{3,})";
+        String pattern2 = "((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\d{3,}|[2-9]\\d{2,}|1\\d{3,}[2-9]\\d{2,}|1\\d{3,})";
         // Create a Pattern object
         Pattern regex1 = Pattern.compile(pattern1);
         // Create a Pattern object
