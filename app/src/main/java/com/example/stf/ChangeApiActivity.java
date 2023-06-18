@@ -75,8 +75,11 @@ public class ChangeApiActivity extends AppCompatActivity {
     }
 
     public String checkUrlValidation(String text) {
-        String pattern1 = "http://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d++/api/";
-        String pattern2 = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+";
+//        String pattern1 = "http://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d++/api/";
+        String pattern1 = "http://((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\\\d{3,}|[2-9]\\\\d{2,}|1\\\\d{3,})+/api/";
+
+//        String pattern2 = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+";
+        String pattern2 = "((0|1\\d{0,2}|2[0-4]\\d|25[0-5])\\.){3}(0|1\\d{0,2}|2[0-4]\\d|25[0-5]):(?:[1-9]\\\\d{3,}|[2-9]\\\\d{2,}|1\\\\d{3,})";
         // Create a Pattern object
         Pattern regex1 = Pattern.compile(pattern1);
         // Create a Pattern object
@@ -87,9 +90,9 @@ public class ChangeApiActivity extends AppCompatActivity {
         // Create a Matcher object
         Matcher matcher2 = regex2.matcher(text);
 
-        if (matcher1.find()) {
+        if (matcher1.matches()) {
             return matcher1.group();
-        } else if (matcher2.find()) {
+        } else if (matcher2.matches()) {
             String match = matcher2.group();
             return "http://" + match + "/api/";
         } else {
