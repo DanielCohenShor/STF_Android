@@ -84,12 +84,6 @@ public class LoginActivity extends AppCompatActivity {
         //generate token for firebase
         generateTokenFireBase();
 
-        // init the views item of the activity.
-        initViewItem();
-
-        // createListeners
-        createListeners();
-
     }
 
     @Override
@@ -122,6 +116,11 @@ public class LoginActivity extends AppCompatActivity {
             baseUrl = settingsDao.getFirst().getServerUrl();
         }
             viewModelLogin = new ViewModelLogin(baseUrl);
+            // init the views item of the activity.
+            initViewItem();
+
+            // createListeners
+            createListeners();
         });
     }
 

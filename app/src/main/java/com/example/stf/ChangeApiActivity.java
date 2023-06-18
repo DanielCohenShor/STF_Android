@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
 
 import java.util.HashSet;
@@ -36,6 +38,8 @@ public class ChangeApiActivity extends AppCompatActivity {
 
     private AppDB db;
     private SettingsDao settingsDao;
+    private ContactsDao contactsDao;
+    private MessagesDao messagesDao;
     private String baseUrl;
 
     private HashSet<String> createdTextViews = new HashSet<>();
@@ -49,7 +53,6 @@ public class ChangeApiActivity extends AppCompatActivity {
 
         initDB();
 
-        createListeners();
     }
 
     private void init() {
@@ -64,7 +67,10 @@ public class ChangeApiActivity extends AppCompatActivity {
                     .fallbackToDestructiveMigration()
                     .build();
             settingsDao = db.settingsDao();
+            contactsDao = db.ContactsDao();
+            messagesDao = db.messagesDao();
             baseUrl = settingsDao.getFirst().getServerUrl();
+            createListeners();
         });
     }
 
@@ -108,7 +114,16 @@ public class ChangeApiActivity extends AppCompatActivity {
                     .setTitle("Change API")
                     .setMessage("You will change the current server address: " + baseUrl +
                             " to: " + result+ ". Are you sure?")
-                    .setPositiveButton("Yes", (dialog, which) -> AsyncTask.execute(() -> settingsDao.updateUrl(baseUrl, result)))
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                    AsyncTask.execute(() -> {
+                        settingsDao.updateUrl(baseUrl, result);
+                        settingsDao.updatePhoto(baseUrl, "");
+                        settingsDao.deleteDisplayName(baseUrl);
+                        contactsDao.deleteAllContacts();
+                        messagesDao.deleteAllMessages();
+                        baseUrl = NewBaseUrl;
+                    });
+                })
                     .setNegativeButton("No", (dialog, which) -> {
                         // No action needed, dialog will be automatically dismissed
                     })

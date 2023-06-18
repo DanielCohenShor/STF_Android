@@ -1,4 +1,5 @@
 <resources>
+    <string name="mode">Day</string>
     <string name="app_name">Speak, Talk, Friends</string>
     <string name="et_username">Username</string>
     <string name="et_password">Password</string>
