@@ -53,6 +53,8 @@ public class ChangeApiActivity extends AppCompatActivity {
 
         initDB();
 
+        createListeners();
+
     }
 
     private void init() {
@@ -70,7 +72,6 @@ public class ChangeApiActivity extends AppCompatActivity {
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
             baseUrl = settingsDao.getFirst().getServerUrl();
-            createListeners();
         });
     }
 
