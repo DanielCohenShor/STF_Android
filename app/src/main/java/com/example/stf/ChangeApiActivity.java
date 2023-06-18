@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -117,12 +118,12 @@ public class ChangeApiActivity extends AppCompatActivity {
                             " to: " + result+ ". Are you sure?")
                     .setPositiveButton("Yes", (dialog, which) -> {
                     AsyncTask.execute(() -> {
-                        settingsDao.updateUrl(baseUrl, result);
                         settingsDao.updatePhoto(baseUrl, "");
                         settingsDao.deleteDisplayName(baseUrl);
+                        settingsDao.updateUrl(baseUrl, result);
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
-                        baseUrl = NewBaseUrl;
+                        baseUrl = result;
                     });
                 })
                     .setNegativeButton("No", (dialog, which) -> {
