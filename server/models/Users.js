@@ -19,6 +19,10 @@ const user = new Schema (
             type: String,
             required: true
         },
+        androidToken : {
+            type : String,
+            default: ""
+        },
         chats: [{
             type: Schema.Types.ObjectId,
             ref: 'Chats'

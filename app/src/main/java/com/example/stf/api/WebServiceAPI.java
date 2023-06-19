@@ -34,6 +34,12 @@ public interface WebServiceAPI {
     @POST("Tokens")
     Call<Void> createToken(@Body RequestBody tokenRequest);
 
+    @POST("Users/Android")
+    Call<Void> saveAndroidToken(@Header("Authorization") String token, @Body RequestBody androidToken);
+
+    @POST("Users/removeAndroid")
+    Call<Void> removeAndroidToken(@Header("Authorization") String token);
+
     @GET("Chats")
     Call<Contact[]> getContacts(@Header("Authorization") String token);
 

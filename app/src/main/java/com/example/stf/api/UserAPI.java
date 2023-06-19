@@ -5,13 +5,17 @@ package com.example.stf.api;
 import androidx.annotation.NonNull;
 
 import com.example.stf.entities.User;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +41,13 @@ public class UserAPI {
     }
 
     public void get(String username, Consumer<String[]> callback) {
+//        JsonObject usernameRequest = new JsonObject();
+//        usernameRequest.addProperty("androidToken", androidToken);
+//
+//        Gson gson = new Gson();
+//        String jsonBody = gson.toJson(usernameRequest);
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
         Call<User> call = webServiceAPI.getUser("Bearer {\"token\":\"" + token + "\"}", username);
         call.enqueue(new Callback<User>() {
             @Override
@@ -125,5 +136,31 @@ public class UserAPI {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public void saveAndroidToken(String androidToken) {
+        JsonObject usernameRequest = new JsonObject();
+        usernameRequest.addProperty("androidToken", androidToken);
+
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(usernameRequest);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
+        Call<Void> call = webServiceAPI.saveAndroidToken("Bearer {\"token\":\"" + token + "\"}", requestBody);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // okay
+                } else  {
+                    // error
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                //todo: what to return ?
+            }
+        });
     }
 }

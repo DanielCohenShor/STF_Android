@@ -27,4 +27,16 @@ const returnInformationUser = async (username) => {
     return userData
 }
 
-module.exports = { createNewUser, validateUsername, returnInformationUser };
+const saveAndroidToken = async (username, androidToken) => {
+    // console.log(androidToken)
+    const user = await User.findOne({ username })
+    if (user) {
+        user.androidToken = androidToken;
+        await user.save();
+    } else {
+        return -1;
+    }
+    return 1;
+}
+
+module.exports = { createNewUser, validateUsername, returnInformationUser, saveAndroidToken };

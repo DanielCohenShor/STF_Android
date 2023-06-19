@@ -56,4 +56,9 @@ public class ViewModalContacts  extends ViewModel {
         notificationsAPI.setToken(token);
         notificationsAPI.resetNotifications(chatId, callback);
     }
+
+    public void removeAndroidToken(String token) {
+        contactAPI.setToken(token);
+        contactAPI.removeAndroidToken();
+    }
 }

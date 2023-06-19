@@ -6,6 +6,7 @@ const createNewUser = async (req, res) => {
     const password = req.body.password;
     const displayName = req.body.displayName;
     const profilePic = req.body.profilePic;
+    // const androidToken = "";
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
     const usernameRegex = /[a-zA-Z]/;
     const invalidFields = [];
@@ -57,9 +58,8 @@ const createNewUser = async (req, res) => {
 
 const returnInformationUser = async (req,res) => {
     if (req.headers.authorization) {
-        const username = getUserNameFromToken(req.headers.authorization)
+        const username = getUserNameFromToken(req.headers.authorization);
         if (username !== "Invalid Token") {
-            const username = req.params.username;    
             res.json(await userService.returnInformationUser(username));
             return
         } else {
@@ -69,7 +69,39 @@ const returnInformationUser = async (req,res) => {
     else {
         return res.status(401).send('Token required');
     }
-
 };
 
-module.exports = { createNewUser, returnInformationUser };
+const addAndroidToken = async (req,res) => {
+    if (req.headers.authorization) {
+        const username = getUserNameFromToken(req.headers.authorization);
+        if (username !== "Invalid Token") {
+            const androidToken = req.body.androidToken;
+            res.json(await userService.saveAndroidToken(username, androidToken));
+            return
+        } else {
+            return res.status(403).send("Invalid Token");
+        }
+    }
+    else {
+        return res.status(401).send('Token required');
+    }
+};
+
+const removeAndroidToken = async (req,res) => {
+    console.log("in")
+    if (req.headers.authorization) {
+        const username = getUserNameFromToken(req.headers.authorization);
+        console.log("in1")
+        if (username !== "Invalid Token") {
+            res.json(await userService.saveAndroidToken(username, ""));
+            return
+        } else {
+            return res.status(403).send("Invalid Token");
+        }
+    }
+    else {
+        return res.status(401).send('Token required');
+    }
+};
+
+module.exports = { createNewUser, returnInformationUser, addAndroidToken, removeAndroidToken };

@@ -152,11 +152,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             settingsDao = db.settingsDao();
             baseUrl = settingsDao.getFirst().getServerUrl();
             settingsDao.updateDisplayName(baseUrl, currentUserDisplayName);
-            settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
             viewModalContacts = new ViewModalContacts(baseUrl);
-            init();
-            getContacts();
-            createListeners();
+
+            runOnUiThread(() -> {
+                init();
+                getContacts();
+                createListeners();
+            });
         });
     }
 
@@ -185,6 +187,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     private void logOut() {
+        viewModalContacts.removeAndroidToken(token);
         // Delete the local database
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();

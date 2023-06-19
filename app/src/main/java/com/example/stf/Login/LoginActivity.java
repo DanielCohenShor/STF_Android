@@ -296,7 +296,7 @@ public class LoginActivity extends AppCompatActivity {
             // save the token
             progressBar.setVisibility(View.VISIBLE);
             viewModelLogin.setToken(token);
-            viewModelLogin.getDetails(username,this::handleDetailsUser);
+            viewModelLogin.getDetails(username, newToken, this::handleDetailsUser);
         }
     }
 
@@ -309,11 +309,15 @@ public class LoginActivity extends AppCompatActivity {
         // Get the token from the ViewModel (assuming you have a ViewModel instance named viewModelLogin)
         String token = viewModelLogin.getToken();
 
+        AsyncTask.execute(() -> {
+            settingsDao.updatePhoto(baseUrl, profilePic);
+        });
+
         // Start the new activity and pass the data using Intent extras
         Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
         intent.putExtra("username", username);
         intent.putExtra("displayName", displayName);
-        intent.putExtra("profilePic", profilePic);
+//        intent.putExtra("profilePic", profilePic);
         intent.putExtra("token", token);
         startActivity(intent);
         progressBar.setVisibility(View.GONE);

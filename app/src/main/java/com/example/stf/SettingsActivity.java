@@ -29,6 +29,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.room.Room;
 
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Dao.SettingsDao;
@@ -69,6 +70,10 @@ public class SettingsActivity extends AppCompatActivity {
     private boolean isFirstTime = true;
     private SharedPreferences sharedPreferences;
     private boolean nightMode;
+
+    private String token;
+
+    private ViewModalContacts viewModalContacts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +118,11 @@ public class SettingsActivity extends AppCompatActivity {
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
 
-
-            createListeners();
-            runOnUiThread(this::showDetails);
+            runOnUiThread(() -> {
+                viewModalContacts = new ViewModalContacts(baseUrl);
+                createListeners();
+                showDetails();
+            });
         });
     }
 
@@ -131,6 +138,8 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
         llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
+
+        token = getIntent().getStringExtra("token");
     }
 
     private boolean isSystemInNightMode() {
@@ -186,6 +195,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void exit() {
         if (Objects.equals(currentUserProfilePic, "")) {
+            viewModalContacts.removeAndroidToken(token);
             // Clear the activity stack and start the new activity
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -210,6 +220,7 @@ public class SettingsActivity extends AppCompatActivity {
                         settingsDao.deleteDisplayName(baseUrl);
                         settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
                     });
+                    viewModalContacts.removeAndroidToken(token);
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
