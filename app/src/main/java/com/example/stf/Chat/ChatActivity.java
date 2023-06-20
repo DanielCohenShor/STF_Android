@@ -96,14 +96,11 @@ public class ChatActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         getSharedPreferences();
 
-        initDB();
-
-
         // init the xml and his stuff.
         init();
+        initDB();
 
         createListeners();
-        showContactDetails();
         fetchFromLocalDB();
     }
 
@@ -128,6 +125,7 @@ public class ChatActivity extends AppCompatActivity {
             contactDao = db.ContactsDao();
             viewModalChats = new ViewModalChats(serverUrl);
             contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
+            runOnUiThread(this::showContactDetails);
         });
     }
 

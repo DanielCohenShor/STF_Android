@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Login.LoginActivity;
 import com.example.stf.entities.Contact;
 import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
@@ -232,6 +233,8 @@ public class AddNewContactActivity extends AppCompatActivity {
     private void createListeners() {
         btnExitAddNewContact.setOnClickListener(v -> {
             // back to the activity here
+            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
+            startActivity(intent);
             finish();
         });
 
