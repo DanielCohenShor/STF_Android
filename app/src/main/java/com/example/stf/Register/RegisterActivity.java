@@ -4,11 +4,11 @@ package com.example.stf.Register;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -30,10 +30,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.stf.AppDB;
-import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
 import com.example.stf.R;
-import com.example.stf.entities.Settings;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -69,7 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView etProfilePic;
 
     private AppDB db;
-    private SettingsDao settingsDao;
 
     private String baseUrl;
 
@@ -77,6 +74,10 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        baseUrl = sharedPreferences.getString("serverUrl", "");
+
 
         initDB();
 
@@ -92,8 +93,6 @@ public class RegisterActivity extends AppCompatActivity {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
-            settingsDao = db.settingsDao();
-            baseUrl = settingsDao.getFirst().getServerUrl();
             registerViewModel = new ViewModelRegister(baseUrl);
         });
     }

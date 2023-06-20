@@ -1,26 +1,20 @@
 package com.example.stf.api;
 
 import com.example.stf.AppDB;
-import com.example.stf.Dao.SettingsDao;
+
 import android.util.Log;
 
-import com.example.stf.MyApplication;
 import com.example.stf.PushNotfications.PushNotifications;
-import com.example.stf.R;
 import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.function.Consumer;
+
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,11 +27,11 @@ public class ChatAPI {
     Retrofit retrofit;
     Retrofit retrofitForFireBAse;
     WebServiceAPI webServiceAPI;
+    WebServiceAPI webServiceAPIFireBase;
 
     private String token;
 
     private AppDB db;
-    private SettingsDao settingsDao;
 
     String baseUrl;
 
@@ -56,6 +50,9 @@ public class ChatAPI {
                 .build();
 
         webServiceAPI = retrofit.create(WebServiceAPI.class);
+
+        webServiceAPIFireBase = retrofitForFireBAse.create(WebServiceAPI.class);
+
 
     }
 
@@ -175,37 +172,38 @@ public class ChatAPI {
     token: The registration token of the device that will be added to the room. It should be a string value.
     callback: A callback function that accepts a string parameter. It will be invoked with the result of the operation.
      */
-    public void PostCreateRoom(String chat_id, String token, Consumer<String> callback) throws JSONException {
-        // Create the JSON request body
-        JSONObject requestBodyJson = new JSONObject();
-        requestBodyJson.put("operation", "create");
-        //notification_key_name should be uniqe like the chat id.
-        requestBodyJson.put("notification_key_name", chat_id);
-        JSONArray registrationIds = new JSONArray();
-        registrationIds.put(token);
 
-        // Convert the JSON request body to RequestBody
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson.toString());
-        Call<ResponseBody> createRoomCall = webServiceAPI.createRoom(requestBody);
-        createRoomCall.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                     callback.accept("good");
-                } else {
-                    // Room creation failed
-                    // Handle the error here
-                    callback.accept("bad");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                // Room creation failed
-                // Handle the failure here
-            }
-        });
-    }
+//    public void PostCreateRoom(String chat_id, String token, Consumer<String> callback) throws JSONException {
+//        // Create the JSON request body
+//        JSONObject requestBodyJson = new JSONObject();
+//        requestBodyJson.put("operation", "create");
+//        //notification_key_name should be uniqe like the chat id.
+//        requestBodyJson.put("notification_key_name", chat_id);
+//        JSONArray registrationIds = new JSONArray();
+//        registrationIds.put(token);
+//
+//        // Convert the JSON request body to RequestBody
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson.toString());
+//        Call<ResponseBody> createRoomCall = webServiceAPI.createRoom(requestBody);
+//        createRoomCall.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
+//                     callback.accept("good");
+//                } else {
+//                    // Room creation failed
+//                    // Handle the error here
+//                    callback.accept("bad");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                // Room creation failed
+//                // Handle the failure here
+//            }
+//        });
+//    }
 
     /*
     This method is used to retrieve the notification key associated with a specific room or group.
@@ -213,36 +211,37 @@ public class ChatAPI {
     chat_id: The unique identifier of the room or group for which to retrieve the notification key. It should be a string value.
     callback: A callback function that accepts a string parameter. It will be invoked with the retrieved notification key.
      */
-    public void GetRoom(String chat_id, Consumer<String> callback) {
-        Call<ResponseBody> call = webServiceAPI.getNotificationKey(chat_id);
-        // Enqueue the call and define the callbacks
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    // Handle the successful response here
-                    String notificationKey;
-                    try {
-                        String responseString = response.body().toString();
-                        JSONObject responseJson = new JSONObject(responseString);
-                        notificationKey = responseJson.getString("notification_key");
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // with this parameter i can send message to the chat
-                    callback.accept(notificationKey);
-                } else {
-                    // Handle the error response here
-                    // You can access the error code and message using response.code() and response.message()
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                // Handle the failure here
-            }
-        });
-    }
+//    public void GetRoom(String chat_id, Consumer<String> callback) {
+//        Call<ResponseBody> call = webServiceAPIFireBase.getNotificationKey(chat_id);
+//        // Enqueue the call and define the callbacks
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
+//                    // Handle the successful response here
+//                    String notificationKey;
+//                    try {
+//                        String responseString = response.body().toString();
+//                        JSONObject responseJson = new JSONObject(responseString);
+//                        notificationKey = responseJson.getString("notification_key");
+//                    } catch (JSONException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    // with this parameter i can send message to the chat
+//                    callback.accept(notificationKey);
+//                } else {
+//                    // Handle the error response here
+//                    // You can access the error code and message using response.code() and response.message()
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                // Handle the failure here
+//            }
+//        });
+//    }
 
     /*
     This method is used to add a device to an existing room or group.
@@ -253,44 +252,44 @@ public class ChatAPI {
     registration_ids: An array of registration IDs representing the devices to add to the room. It should be an array of string values.
     callback: A callback function that accepts a string parameter. It will be invoked with the result of the operation.
      */
-    public void PostAddToRoom(String operation, String notification_key_name,
-                              String notification_key, String[] registration_ids,
-                              Consumer<String> callback) throws JSONException {
-        // Create the JSON request body
-        JSONObject requestBodyJson = new JSONObject();
-        requestBodyJson.put("operation", operation);
-        requestBodyJson.put("notification_key_name", notification_key_name);
-        requestBodyJson.put("notification_key", notification_key);
-        JSONArray registrationIds = new JSONArray();
-        registrationIds.put(registration_ids);
-        requestBodyJson.put("registration_ids", registrationIds);
-
-        // Convert the JSON request body to RequestBody
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson.toString());
-
-        Call<ResponseBody> addDeviceCall = webServiceAPI.addDeviceToNotificationKey(requestBody);
-        addDeviceCall.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    // Device added successfully
-                    // Handle the response here
-                    callback.accept("add");
-                } else {
-                    // Device addition failed
-                    // Handle the error here
-                    callback.accept("fail to add");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                // Device addition failed
-                // Handle the failure here
-            }
-        });
-
-    }
+//    public void PostAddToRoom(String operation, String notification_key_name,
+//                              String notification_key, String[] registration_ids,
+//                              Consumer<String> callback) throws JSONException {
+//        // Create the JSON request body
+//        JSONObject requestBodyJson = new JSONObject();
+//        requestBodyJson.put("operation", operation);
+//        requestBodyJson.put("notification_key_name", notification_key_name);
+//        requestBodyJson.put("notification_key", notification_key);
+//        JSONArray registrationIds = new JSONArray();
+//        registrationIds.put(registration_ids);
+//        requestBodyJson.put("registration_ids", registrationIds);
+//
+//        // Convert the JSON request body to RequestBody
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), requestBodyJson.toString());
+//
+//        Call<ResponseBody> addDeviceCall = webServiceAPIFireBase.addDeviceToNotificationKey(requestBody);
+//        addDeviceCall.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
+//                    // Device added successfully
+//                    // Handle the response here
+//                    callback.accept("add");
+//                } else {
+//                    // Device addition failed
+//                    // Handle the error here
+//                    callback.accept("fail to add");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                // Device addition failed
+//                // Handle the failure here
+//            }
+//        });
+//
+//    }
 
     /*
     This method is used to send push notifications to devices or rooms.
@@ -303,7 +302,7 @@ public class ChatAPI {
      such as the title, body, recipient devices or rooms, etc.
      */
     public void PostNotifaction(PushNotifications notifications) {
-        Call<PushNotifications> call = webServiceAPI.PostNotifaction(notifications);
+        Call<PushNotifications> call = webServiceAPIFireBase.PostNotifaction(notifications);
         call.enqueue(new Callback<PushNotifications>() {
             @Override
             public void onResponse(Call<PushNotifications> call, Response<PushNotifications> response) {
@@ -314,11 +313,12 @@ public class ChatAPI {
                 //  "success": 2,
                 //  "failure": 0
                 //}
+                int x = 5;
             }
 
             @Override
             public void onFailure(Call<PushNotifications> call, Throwable t) {
-
+                int x = 5;
             }
         });
 

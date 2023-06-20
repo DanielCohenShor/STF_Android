@@ -2,27 +2,21 @@ package com.example.stf.Login;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.room.Room;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -37,14 +31,10 @@ import android.widget.Toast;
 
 import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
-import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.example.stf.SettingsActivity;
-import com.example.stf.entities.Settings;
 
-import com.example.stf.R;
-import com.example.stf.Register.RegisterActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 
 import com.google.android.gms.tasks.Task;
@@ -70,22 +60,105 @@ public class LoginActivity extends AppCompatActivity {
 
     private HashSet<String> createdTextViews = new HashSet<>();
 
-    private String baseUrl;
+    private String serverUrl;
 
     private AppDB db;
-    private SettingsDao settingsDao;
     private boolean isFirstTime = true;
     private String newToken;
+    private SharedPreferences sharedPreferences;
+    private final String SERVERURL = "serverUrl";
+    private final String USERNAME = "userName";
+    private final String SERVERTOKEN = "serverToken";
+    private final String DISPLAYNAME = "displayName";
+    private final String PROFILEPIC = "photo";
+    private final String CURRENTCHAT = "currentChat";
+
+    private boolean check() {
+        if (isFirstTimeLogin()) {
+            // User is logging in for the first time
+            createSharedPreferences();
+            return true;
+        } else if (!isUserConnected()) {
+            // User is not connected to the app
+            serverUrl = sharedPreferences.getString(SERVERURL, "");
+            return true;
+        } else {
+            // User is already logged in and connected
+            Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
+            startActivity(intent);
+            finish();
+            return false;
+        }
+    }
+
+    private boolean isFirstTimeLogin() {
+        // Check if the photo key exists in SharedPreferences
+        boolean hasPhoto = sharedPreferences.contains(PROFILEPIC);
+
+        // Check if the serverUrl key exists in SharedPreferences
+        boolean hasServerUrl = sharedPreferences.contains(SERVERURL);
+
+        // Return true if either the photo or serverUrl key is missing
+        return !(hasPhoto && hasServerUrl);
+    }
+
+    private boolean isUserConnected() {
+        // Retrieve the serverToken and username values from SharedPreferences
+        String serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+        String username = sharedPreferences.getString(USERNAME, "");
+
+        // Check if both serverToken and username are not empty
+        return !TextUtils.isEmpty(serverToken) && !TextUtils.isEmpty(username);
+
+    }
+
+    private void createSharedPreferences() {
+        if (sharedPreferences.contains(SERVERURL)) {
+            // Key exists, retrieve the serverUrl
+            serverUrl = sharedPreferences.getString(SERVERURL, "");
+        } else {
+            // Key does not exist, save the serverUrl and other fields
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            serverUrl = "http://192.168.1.37:5000/api/";
+            editor.putString(SERVERURL, serverUrl);
+            editor.putString(SERVERTOKEN, "");
+            editor.putString(DISPLAYNAME, "");
+            editor.putString(USERNAME, "");
+            editor.putString(CURRENTCHAT, "");
+            editor.apply();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        
-        initDB();
-      
-        //generate token for firebase
-        generateTokenFireBase();
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+
+        if(check()) {
+            //generate token for firebase
+            generateTokenFireBase();
+
+            // init the views item of the activity.
+            initViewItem();
+
+            // createListeners
+            createListeners();
+        }
+
+
+        //        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+//         Retrieve the data extras from the intent
+//        Bundle dataExtras = getIntent().getExtras();
+//        if (dataExtras != null) {
+//            // Iterate over the key-value pairs in the data extras and print them
+//            for (String key : dataExtras.keySet()) {
+//                Object value = dataExtras.get(key);
+//                Log.d("Payload", "Key: " + key + ", Value: " + value);
+//            }
+//        }
+
     }
 
     @Override
@@ -96,34 +169,9 @@ public class LoginActivity extends AppCompatActivity {
             // This code will run only the first time
             isFirstTime = false;
         } else {
-            AsyncTask.execute(() -> {
-                baseUrl = settingsDao.getFirst().getServerUrl();
-                viewModelLogin.setBaseUrl(baseUrl);
-            });
+            serverUrl = sharedPreferences.getString("serverUrl", "");
+            viewModelLogin.setBaseUrl(serverUrl);
         }
-    }
-
-    public void initDB() {
-        AsyncTask.execute(() -> {
-            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
-                    .fallbackToDestructiveMigration()
-                    .build();
-            settingsDao = db.settingsDao();
-            if (settingsDao.getRowCount() == 0) {
-            // http://10.0.2.2:5000/api/
-            Settings defaultSettings = new Settings("http://10.0.2.2:5000/api/", false, "");
-            settingsDao.insert(defaultSettings);
-            baseUrl = settingsDao.getFirst().getServerUrl();
-        } else {
-            baseUrl = settingsDao.getFirst().getServerUrl();
-        }
-            viewModelLogin = new ViewModelLogin(baseUrl);
-            // init the views item of the activity.
-            initViewItem();
-
-            // createListeners
-            createListeners();
-        });
     }
 
     public void generateTokenFireBase() {
@@ -191,6 +239,7 @@ public class LoginActivity extends AppCompatActivity {
             // Start the new activity here
             Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
             startActivity(intent);
+            finish();
         });
     }
     private void initViewItem() {
@@ -201,6 +250,7 @@ public class LoginActivity extends AppCompatActivity {
         linkToRegister = findViewById(R.id.linkToRegister2);
         btnSettings = findViewById(R.id.btnSettings);
         progressBar = findViewById(R.id.progressBar);
+        viewModelLogin = new ViewModelLogin(serverUrl);
     }
 
     private void handleLogInCallback(String token) {
@@ -301,22 +351,37 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleDetailsUser(String [] userDetails) {
+        progressBar.setVisibility(View.GONE);
         // Extract the user details from the array
         String username = userDetails[0];
         String displayName = userDetails[1];
         String profilePic = userDetails[2];
-
-        // Get the token from the ViewModel (assuming you have a ViewModel instance named viewModelLogin)
         String token = viewModelLogin.getToken();
+
+        saveSharedPreferences(username, token, displayName, profilePic);
 
         // Start the new activity and pass the data using Intent extras
         Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
-        intent.putExtra("username", username);
-        intent.putExtra("displayName", displayName);
-        intent.putExtra("profilePic", profilePic);
-        intent.putExtra("token", token);
-        intent.putExtra("baseUrl", baseUrl);
         startActivity(intent);
-        progressBar.setVisibility(View.GONE);
+        finish();
+    }
+
+    private void saveSharedPreferences(String username, String serverToken, String displayName, String profilePic) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(SERVERURL, serverUrl);
+        editor.putString(SERVERTOKEN, serverToken);
+        editor.putString(DISPLAYNAME, displayName);
+        editor.putString(USERNAME, username);
+        editor.putString(CURRENTCHAT, "");
+        editor.putString(PROFILEPIC, profilePic);
+        editor.apply();
+        Log.d("TAG", "values:");
+        Log.d("TAG", sharedPreferences.getString(SERVERURL, ""));
+        Log.d("TAG", sharedPreferences.getString(USERNAME, ""));
+
+
+
+
+
     }
 }

@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.92591980.css",
+    "main.js": "/static/js/main.24ef64b5.js",
+    "static/media/incom_chat_screen_pic_2.png": "/static/media/incom_chat_screen_pic_2.8fe55f6f1d818ec2cbde.png",
+    "index.html": "/index.html",
+    "main.92591980.css.map": "/static/css/main.92591980.css.map",
+    "main.24ef64b5.js.map": "/static/js/main.24ef64b5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.92591980.css",
+    "static/js/main.24ef64b5.js"
+  ]
+}

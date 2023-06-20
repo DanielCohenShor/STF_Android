@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="mode">Night</string>
     <string name="et_username">Username</string>
     <string name="et_password">Password</string>

@@ -52,6 +52,7 @@ public class NotificationsAPI {
 
             @Override
             public void onFailure(Call<UserNotification> call, Throwable t) {
+                int x =5;
             }
         });
     }

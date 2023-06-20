@@ -5,13 +5,14 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -22,7 +23,6 @@ import android.widget.TextView;
 
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
-import com.example.stf.Dao.SettingsDao;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -38,17 +38,23 @@ public class ChangeApiActivity extends AppCompatActivity {
     private AppCompatButton btnChangeApi;
 
     private AppDB db;
-    private SettingsDao settingsDao;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
     private String baseUrl;
 
     private HashSet<String> createdTextViews = new HashSet<>();
 
+    private  SharedPreferences sharedPreferences;
+    private final String SERVERURL = "serverUrl";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_api);
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+
+        baseUrl = sharedPreferences.getString(SERVERURL, "");
 
         init();
 
@@ -69,15 +75,17 @@ public class ChangeApiActivity extends AppCompatActivity {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
-            settingsDao = db.settingsDao();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
-            baseUrl = settingsDao.getFirst().getServerUrl();
         });
     }
 
     public void createListeners() {
-        btnExitChangeApi.setOnClickListener(v -> finish());
+        btnExitChangeApi.setOnClickListener(v -> {
+            Intent intent = new Intent(ChangeApiActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         btnChangeApi.setOnClickListener(this::onButtonShowPopupWindowClick);
     }
@@ -108,6 +116,21 @@ public class ChangeApiActivity extends AppCompatActivity {
         }
     }
 
+    private void resetSharedPreferences(String newBaseUrl) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Reset each value to its default or empty value
+        editor.putString("serverUrl", newBaseUrl);
+        editor.putString("serverToken", "");
+        editor.putString("displayname", "");
+        editor.putString("userName", "");
+        editor.putString("cuurentChat", "");
+        editor.putString("photo", "");
+        // Apply the changes
+        editor.apply();
+    }
+
+
     public void onButtonShowPopupWindowClick(View view) {
         String NewBaseUrl = etChangeApi.getText().toString();
         String result = checkUrlValidation(NewBaseUrl);
@@ -117,10 +140,8 @@ public class ChangeApiActivity extends AppCompatActivity {
                     .setMessage("You will change the current server address: " + baseUrl +
                             " to: " + result+ ". Are you sure?")
                     .setPositiveButton("Yes", (dialog, which) -> {
+                        resetSharedPreferences(result);
                     AsyncTask.execute(() -> {
-                        settingsDao.updatePhoto(baseUrl, "");
-                        settingsDao.deleteDisplayName(baseUrl);
-                        settingsDao.updateUrl(baseUrl, result);
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
                         baseUrl = result;

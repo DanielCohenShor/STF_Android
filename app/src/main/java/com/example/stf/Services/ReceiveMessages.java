@@ -5,41 +5,55 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.room.Room;
 
-import com.example.stf.Login.LoginActivity;
+import com.example.stf.AppDB;
+import com.example.stf.Chat.ChatActivity;
 import com.example.stf.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.logging.LogRecord;
-
 public class ReceiveMessages extends FirebaseMessagingService {
     int notificationId;
+    AppDB db;
+    private String chatID;
+    private SharedPreferences sharedPreferences;
 
-    public ReceiveMessages() {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         notificationId = 0;
+    }
+
+
+    public void getChatId() {
+        chatID = sharedPreferences.getString("currentChat", "");
     }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
+        getChatId();
         sendNotification(message.getNotification().getBody());
     }
 
     private void sendNotification(String messageBody) {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_IMMUTABLE);
+        // need to pass the chad id, the displayname, the token to the chat.
+        // so it will open the right chat with the right messeages.
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         String channelId = "any_value";
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -62,7 +76,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
                     NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
-
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 }
