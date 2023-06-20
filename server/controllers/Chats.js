@@ -106,8 +106,8 @@ const updateChats = async (req, res) => {
         const chat = await Chats.findOne({ id });
         const userOne = chat.users[0].username
         const userTwo = chat.users[1].username
-        const updatedChatsOne = await chatsService.updateChats(userOne ,id);
-        const updatedChatsTwo = await chatsService.updateChats(userTwo ,id);
+        const updatedChatsOne = await chatsService.updateChats(userOne, id);
+        const updatedChatsTwo = await chatsService.updateChats(userTwo, id);
         if (updatedChatsOne != -1 && updatedChatsTwo != -1) {
             res.status(200).send("success");
         } else {

@@ -1,6 +1,7 @@
 const User = require('../models/Users');
 const Chats = require('../models/Chats');
 const Message = require('../models/Message');
+const admin = require('firebase-admin');
 
 const checkWhichUserToReturn = (chat, username) => {
     if (chat.users[0].username === username) {
@@ -164,7 +165,46 @@ const addNewMessage = async (username, messageContent, id) => {
     await newMessage.save();
     await messageList.save();
 
+    // get the contact information
+    const conversation = await Chats.findOne({ id: parseInt(id) });
+    
+    let contactUsername;
+    if (conversation.users[1].username === username) {
+        contactUsername = conversation.users[0].username;
+    } else {
+        contactUsername = conversation.users[1].username;
+    }
+    const contact = await User.findOne({ username: contactUsername });
+
+    // check if the contact has android token - if the contact is connected from the android
+    if(contact.androidToken != "") {
+        // sending message throw the firebase
+        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken);
+    }
+
     return newMessage;
+}
+
+function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken) {
+    console.log("in")
+    console.log(contactAndroidToken)
+    const message = {
+        notification: {
+            title: userDisplayName,
+            body: messageContent
+        },
+        token: contactAndroidToken
+    };
+
+    // Send the notification
+    // Send the notification
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Notification sent successfully:', response);
+        })
+        .catch((error) => {
+            console.error('Error sending notification:', error);
+        });
 }
 
 const returnAllTheMessages = async (id) => {
