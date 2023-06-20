@@ -240,14 +240,19 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 if (existingContact == null) {
                     contactsDao.insert(contact);
                 } else {
-                    String oldLastMessage = existingContact.getLastMessage().getContent();
-                    String newLastMessage = contact.getLastMessage().getContent();
-                    //and for time
-                    String oldLastMessageTime = existingContact.getLastMessage().getCreated();
-                    String newLastMessageTime = contact.getLastMessage().getCreated();
-                    if (!Objects.equals(oldLastMessage, newLastMessage) ||
-                            !Objects.equals(oldLastMessageTime, newLastMessageTime)) {
+                    if (contact.getLastMessage() != null) {
                         contactsDao.update(contact);
+                    }
+                    if (existingContact.getLastMessage() != null) {
+                        String oldLastMessage = existingContact.getLastMessage().getContent();
+                        String newLastMessage = contact.getLastMessage().getContent();
+                        //and for time
+                        String oldLastMessageTime = existingContact.getLastMessage().getCreated();
+                        String newLastMessageTime = contact.getLastMessage().getCreated();
+                        if (!Objects.equals(oldLastMessage, newLastMessage) ||
+                                !Objects.equals(oldLastMessageTime, newLastMessageTime)) {
+                            contactsDao.update(contact);
+                        }
                     }
                 }
             }
