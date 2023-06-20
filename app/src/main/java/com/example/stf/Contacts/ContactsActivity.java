@@ -300,7 +300,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     public void onItemClick(int position) {
         // Retrieve the clicked contact from the adapter
         Contact clickedContact = contactAdapter.getContact(position);
-        Log.d("test", "1");
         viewModalContacts.performResetNotifications(serverToken, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
         String chatId = String.valueOf(clickedContact.getId());
         SharedPreferences.Editor editor = sharedPreferences.edit();

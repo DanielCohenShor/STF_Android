@@ -27,6 +27,12 @@ public class ReceiveMessages extends FirebaseMessagingService {
     AppDB db;
     private String chatID;
     private SharedPreferences sharedPreferences;
+    private final String SERVERTOKEN = "serverToken";
+    private final String DISPLAYNAME = "displayName";
+    private final String PROFILEPIC = "photo";
+    private final String CURRENTCHAT = "currentChat";
+    private final String SERVERURL = "serverUrl";
+    private final String USERNAME = "userName";
 
     @Override
     public void onCreate() {
@@ -38,22 +44,46 @@ public class ReceiveMessages extends FirebaseMessagingService {
 
     public void getChatId() {
         chatID = sharedPreferences.getString("currentChat", "");
+        Log.d("id", chatID);
     }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         getChatId();
-        sendNotification(message.getNotification().getBody());
+        String newchatId = message.getData().get("chatId");
+        assert newchatId != null;
+        if (!newchatId.equals(chatID)) {
+            //not in the chat need to open this chat
+            sendNotification(message.getNotification().getBody(), newchatId, message.getNotification().getTitle());
+        } else {
+            // meant i am in the chat need to update the message live
+            Log.d("tests", "not sending");
+        }
+    }
+    private void updateSharedPreferences(String newchatId) {
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(CURRENTCHAT, newchatId);
+        editor.apply();
     }
 
-    private void sendNotification(String messageBody) {
-        // need to pass the chad id, the displayname, the token to the chat.
+    private void sendNotification(String messageBody, String newchatId, String displayName) {
+        //update the current chat to be the right chat.
+        updateSharedPreferences(newchatId);
+        // need to pass the chad id, the displayname.
         // so it will open the right chat with the right messeages.
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra("contactDisplayName", displayName);// If the picture is a Bitmap
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        // Updated code
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_MUTABLE;
+        } else {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, flags);
 
         String channelId = "any_value";
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
