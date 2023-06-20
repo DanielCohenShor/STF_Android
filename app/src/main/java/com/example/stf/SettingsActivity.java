@@ -225,6 +225,7 @@ public class SettingsActivity extends AppCompatActivity {
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
+                    finish();
                 })
                 .setNegativeButton("No", (dialog, which) -> {
                     // No action needed, dialog will be automatically dismissed

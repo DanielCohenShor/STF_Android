@@ -130,9 +130,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,8 +148,8 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
-            //        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-//        // Retrieve the data extras from the intent
+        //        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+//         Retrieve the data extras from the intent
 //        Bundle dataExtras = getIntent().getExtras();
 //        if (dataExtras != null) {
 //            // Iterate over the key-value pairs in the data extras and print them
@@ -161,6 +158,7 @@ public class LoginActivity extends AppCompatActivity {
 //                Log.d("Payload", "Key: " + key + ", Value: " + value);
 //            }
 //        }
+
     }
 
     @Override
