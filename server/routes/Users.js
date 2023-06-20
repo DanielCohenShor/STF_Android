@@ -7,4 +7,8 @@ router.route('/').post(usersController.createNewUser);
 
 router.route('/:username').get(usersController.returnInformationUser);
 
+router.route('/Android').post(usersController.addAndroidToken);
+
+router.route('/removeAndroid').post(usersController.removeAndroidToken);
+
 module.exports = router;

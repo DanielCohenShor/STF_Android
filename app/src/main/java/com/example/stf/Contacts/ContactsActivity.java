@@ -205,7 +205,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     private void logOut() {
-        // Delete the local database and the shared
         resetSharedPreferences();
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();
@@ -216,8 +215,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         startActivity(intent);
         finish();
     }
-
-
 
     private void openSettings() {
          //Start the new activity here

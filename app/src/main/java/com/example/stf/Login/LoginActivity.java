@@ -346,7 +346,7 @@ public class LoginActivity extends AppCompatActivity {
             // save the token
             progressBar.setVisibility(View.VISIBLE);
             viewModelLogin.setToken(token);
-            viewModelLogin.getDetails(username,this::handleDetailsUser);
+            viewModelLogin.getDetails(username, newToken, this::handleDetailsUser);
         }
     }
 
@@ -357,7 +357,6 @@ public class LoginActivity extends AppCompatActivity {
         String displayName = userDetails[1];
         String profilePic = userDetails[2];
         String token = viewModelLogin.getToken();
-
         saveSharedPreferences(username, token, displayName, profilePic);
 
         // Start the new activity and pass the data using Intent extras
@@ -375,13 +374,5 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString(CURRENTCHAT, "");
         editor.putString(PROFILEPIC, profilePic);
         editor.apply();
-        Log.d("TAG", "values:");
-        Log.d("TAG", sharedPreferences.getString(SERVERURL, ""));
-        Log.d("TAG", sharedPreferences.getString(USERNAME, ""));
-
-
-
-
-
     }
 }

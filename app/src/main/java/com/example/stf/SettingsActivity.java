@@ -24,6 +24,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.room.Room;
 
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Login.LoginActivity;
@@ -73,6 +74,7 @@ public class SettingsActivity extends AppCompatActivity {
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
     }
+  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,8 +86,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         // i init the db
         initDB();
-
-
     }
 
     @Override
@@ -120,6 +120,8 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
         llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
+
+        token = getIntent().getStringExtra("token");
     }
 
     private boolean isSystemInNightMode() {
@@ -191,6 +193,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void exit() {
         if (Objects.equals(currentUserProfilePic, "")) {
+            viewModalContacts.removeAndroidToken(token);
             // Clear the activity stack and start the new activity
             // Delete the local database
             resetSharedPreferences();
@@ -222,6 +225,7 @@ public class SettingsActivity extends AppCompatActivity {
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
                     });
+                    viewModalContacts.removeAndroidToken(token);
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);

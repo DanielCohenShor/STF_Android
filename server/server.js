@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const admin = require('firebase-admin');
 
 CustomEnv.env(process.env.NODE_ENV, './config');
 
@@ -32,6 +33,15 @@ const io = new Server(server, {
   }
 });
 module.exports = { io };
+
+var serviceAccount = require("./stf-speak-talk-friends-firebase-adminsdk-x3kd7-46b5c33735.json");
+
+// Initialize Firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  // Or use your server key directly:
+  // credential: admin.credential.refreshToken(serverKey),
+});
 
 const socketHandler = require('./HandleSocketServer');
 const users = require('./routes/Users');

@@ -1,5 +1,7 @@
 package com.example.stf.api;
 
+import androidx.annotation.NonNull;
+
 import com.example.stf.entities.Contact;
 import com.example.stf.MyApplication;
 import com.example.stf.R;
@@ -87,6 +89,26 @@ public class ContactAPI {
             @Override
             public void onFailure(Call<Contact> call, Throwable t) {
 
+            }
+        });
+    }
+
+    public void removeAndroidToken() {
+        Call<Void> call = webServiceAPI.removeAndroidToken("Bearer {\"token\":\"" + token + "\"}");
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // okay
+                } else  {
+                    // error
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                //todo: what to return ?
+                int x= 4;
             }
         });
     }

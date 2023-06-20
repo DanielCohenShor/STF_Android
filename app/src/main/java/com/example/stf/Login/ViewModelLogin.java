@@ -29,7 +29,6 @@ public class ViewModelLogin extends ViewModel {
         }
     }
 
-
     public void setToken(String token) {
         userAPI.setToken(token);
     }
@@ -43,7 +42,8 @@ public class ViewModelLogin extends ViewModel {
         tokenAPI.post(usernameValue, passwordValue, callback);
     }
 
-    public void getDetails(String username, Consumer<String[]> callback) {
+    public void getDetails(String username, String androidToken, Consumer<String[]> callback) {
         userAPI.get(username, callback);
+        userAPI.saveAndroidToken(androidToken);
     }
 }
