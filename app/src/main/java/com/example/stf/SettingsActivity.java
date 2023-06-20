@@ -23,6 +23,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.room.Room;
 
+import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Login.LoginActivity;
@@ -59,12 +60,18 @@ public class SettingsActivity extends AppCompatActivity {
     private boolean nightMode;
     private String serverToken;
     private String serverUrl;
+    private final String SERVERURL = "serverUrl";
+    private final String USERNAME = "userName";
+    private final String SERVERTOKEN = "serverToken";
+    private final String DISPLAYNAME = "displayName";
+    private final String PROFILEPIC = "photo";
+    private final String CURRENTCHAT = "currentChat";
 
     private void getSharedPreferences() {
-        serverUrl = sharedPreferences.getString("serverUrl", "");
-        currentUserProfilePic = sharedPreferences.getString("photo", "");
-        currentUserDisplayName = sharedPreferences.getString("displayName", "");
-        serverToken = sharedPreferences.getString("serverToken", "");
+        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
+        currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,15 +91,6 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (isFirstTime) {
-            // This code will run only the first time
-            isFirstTime = false;
-        } else {
-            getSharedPreferences();
-            showDetails();
-        }
-        // Set the switch based on the saved mode
         switcher.setChecked(nightMode);
     }
 
@@ -139,6 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ChangeApiActivity.class);
             startActivity(intent);
+            finish();
         });
 
         if (!Objects.equals(currentUserProfilePic, "") && !Objects.equals(currentUserDisplayName, "")) {
@@ -179,11 +178,11 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // Reset each value to its default or empty value
-        editor.putString("serverToken", "");
-        editor.putString("displayname", "");
-        editor.putString("userName", "");
-        editor.putString("cuurentChat", "");
-        editor.putString("photo","");
+        editor.putString(SERVERTOKEN, "");
+        editor.putString(DISPLAYNAME, "");
+        editor.putString(USERNAME, "");
+        editor.putString(CURRENTCHAT, "");
+        editor.putString(PROFILEPIC,"");
         // Apply the changes
         editor.apply();
     }
@@ -202,7 +201,11 @@ public class SettingsActivity extends AppCompatActivity {
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
+            finish();
         } else {
+            Intent intent = new Intent(SettingsActivity.this, ContactsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
             finish();
         }
     }

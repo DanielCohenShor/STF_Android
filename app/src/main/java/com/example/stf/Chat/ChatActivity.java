@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -21,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.stf.AppDB;
+import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.R;
@@ -64,16 +67,23 @@ public class ChatActivity extends AppCompatActivity {
 
     private String currentUserUsername;
 
-    private String baseUrl;
+    private String serverUrl;
 
     private ProgressBar progressBar;
     private SharedPreferences sharedPreferences;
+    private final String SERVERURL = "serverUrl";
+    private final String USERNAME = "userName";
+    private final String SERVERTOKEN = "serverToken";
+    private final String DISPLAYNAME = "displayName";
+    private final String PROFILEPIC = "photo";
+    private final String CURRENTCHAT = "currentChat";
+
 
     private void getSharedPreferences() {
-        baseUrl = sharedPreferences.getString("serverUrl", "");
-        currentUserUsername = sharedPreferences.getString("userName", "");
-        serverToken = sharedPreferences.getString("serverToken", "");
-        chatId = Integer.parseInt(sharedPreferences.getString("currentChat", ""));
+        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        currentUserUsername = sharedPreferences.getString(USERNAME, "");
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+        chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
         // Retrieve the Parcelable extra "picture" as a Bitmap
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
     }
@@ -86,11 +96,27 @@ public class ChatActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         getSharedPreferences();
 
-
         initDB();
+
 
         // init the xml and his stuff.
         init();
+
+        createListeners();
+        showContactDetails();
+        fetchFromLocalDB();
+    }
+
+    private void fetchFromLocalDB() {
+        AsyncTask.execute(() -> {
+            if (messagesDao.index().length != 0) {
+                viewModalChats = new ViewModalChats(serverUrl);
+                Message[] messages = messagesDao.index();
+                runOnUiThread(() -> updateUIWithMessages(messages));
+            }
+            //get all messagegs.
+            runOnUiThread(this::getMessages);
+        });
     }
 
     public void initDB() {
@@ -100,15 +126,8 @@ public class ChatActivity extends AppCompatActivity {
                     .build();
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
-            viewModalChats = new ViewModalChats(baseUrl);
+            viewModalChats = new ViewModalChats(serverUrl);
             contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
-
-            //create listeners
-            createListeners();
-
-            showContactDetails();
-
-            getMessages();
         });
     }
 
@@ -142,7 +161,6 @@ public class ChatActivity extends AppCompatActivity {
             // Set the Bitmap as the image source for the ImageView
             contactImg.setImageBitmap(bitmap);
         }
-
         tvContactName.setText(contactDisplayName);
     }
 
@@ -203,25 +221,20 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        chatId = Integer.parseInt(sharedPreferences.getString("currentChat", ""));
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("currentChat", "");
+        editor.putString(CURRENTCHAT, "");
         editor.apply();
     }
 
     public void exitChat() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("currentChat", "");
+        editor.putString(CURRENTCHAT, "");
         editor.apply();
+        Intent intent = new Intent(ChatActivity.this, ContactsActivity.class);
+        startActivity(intent);
         finish();
-
     }
 
     private void updateContacts() {

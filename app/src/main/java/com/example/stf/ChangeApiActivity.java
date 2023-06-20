@@ -5,6 +5,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -44,6 +45,7 @@ public class ChangeApiActivity extends AppCompatActivity {
     private HashSet<String> createdTextViews = new HashSet<>();
 
     private  SharedPreferences sharedPreferences;
+    private final String SERVERURL = "serverUrl";
 
 
     @Override
@@ -52,7 +54,7 @@ public class ChangeApiActivity extends AppCompatActivity {
         setContentView(R.layout.activity_change_api);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 
-        baseUrl = sharedPreferences.getString("serverUrl", "");
+        baseUrl = sharedPreferences.getString(SERVERURL, "");
 
         init();
 
@@ -79,14 +81,13 @@ public class ChangeApiActivity extends AppCompatActivity {
     }
 
     public void createListeners() {
-        btnExitChangeApi.setOnClickListener(v -> finishT());
+        btnExitChangeApi.setOnClickListener(v -> {
+            Intent intent = new Intent(ChangeApiActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         btnChangeApi.setOnClickListener(this::onButtonShowPopupWindowClick);
-    }
-
-    private void finishT() {
-        baseUrl = sharedPreferences.getString("serverUrl", "");
-        finish();
     }
 
     public String checkUrlValidation(String text) {
@@ -116,7 +117,6 @@ public class ChangeApiActivity extends AppCompatActivity {
     }
 
     private void resetSharedPreferences(String newBaseUrl) {
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // Reset each value to its default or empty value

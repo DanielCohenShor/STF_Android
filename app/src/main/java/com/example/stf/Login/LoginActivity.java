@@ -241,6 +241,7 @@ public class LoginActivity extends AppCompatActivity {
             // Start the new activity here
             Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
             startActivity(intent);
+            finish();
         });
     }
     private void initViewItem() {
@@ -352,6 +353,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleDetailsUser(String [] userDetails) {
+        progressBar.setVisibility(View.GONE);
         // Extract the user details from the array
         String username = userDetails[0];
         String displayName = userDetails[1];
@@ -363,7 +365,7 @@ public class LoginActivity extends AppCompatActivity {
         // Start the new activity and pass the data using Intent extras
         Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
         startActivity(intent);
-        progressBar.setVisibility(View.GONE);
+        finish();
     }
 
     private void saveSharedPreferences(String username, String serverToken, String displayName, String profilePic) {

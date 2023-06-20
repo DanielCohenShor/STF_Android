@@ -180,9 +180,9 @@ public class AddNewContactActivity extends AppCompatActivity {
             etChooseContact.setBackgroundResource(drawableResId);
             //push to the data base local
             AsyncTask.execute(() -> {
-//                String base64Photo = removePrefix(contact.getUser().getProfilePic());
-//                String compressedPhoto = decreasePhoto(base64Photo);
-//                contact.getUser().setProfilePic(compressedPhoto);
+                String base64Photo = removePrefix(contact.getUser().getProfilePic());
+                String compressedPhoto = decreasePhoto(base64Photo);
+                contact.getUser().setProfilePic(compressedPhoto);
                 // Perform insert operation on a background thread
                 contactsDao.insert(contact);
             });
