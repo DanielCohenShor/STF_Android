@@ -8,32 +8,24 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.room.Room;
 
-import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
-import com.example.stf.Dao.SettingsDao;
 import com.example.stf.Login.LoginActivity;
-import com.example.stf.entities.Contact;
 
 import java.util.Objects;
 
@@ -52,7 +44,6 @@ public class SettingsActivity extends AppCompatActivity {
     private LinearLayout llLogout;
 
     SwitchCompat switcher;
-    boolean nightMODE;
 
     private String currentUserDisplayName;
 
@@ -61,25 +52,33 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout llCurrentUserInfo;
 
     private AppDB db;
-    private SettingsDao settingsDao;
-
-    private String baseUrl;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
     private boolean isFirstTime = true;
     private SharedPreferences sharedPreferences;
     private boolean nightMode;
+    private String serverToken;
+    private String serverUrl;
 
+    private void getSharedPreferences() {
+        serverUrl = sharedPreferences.getString("serverUrl", "");
+        currentUserProfilePic = sharedPreferences.getString("photo", "");
+        currentUserDisplayName = sharedPreferences.getString("displayName", "");
+        serverToken = sharedPreferences.getString("serverToken", "");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        getSharedPreferences();
         // init the xml and his stuff.
         init();
 
         // i init the db
         initDB();
+
+
     }
 
     @Override
@@ -90,12 +89,8 @@ public class SettingsActivity extends AppCompatActivity {
             // This code will run only the first time
             isFirstTime = false;
         } else {
-            AsyncTask.execute(() -> {
-                currentUserDisplayName = settingsDao.getFirst().getDisplayname();
-                currentUserProfilePic = settingsDao.getFirst().getPhoto();
-                baseUrl = settingsDao.getFirst().getServerUrl();
-                runOnUiThread(this::showDetails);
-            });
+            getSharedPreferences();
+            showDetails();
         }
         // Set the switch based on the saved mode
         switcher.setChecked(nightMode);
@@ -106,16 +101,12 @@ public class SettingsActivity extends AppCompatActivity {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
-            settingsDao = db.settingsDao();
-            currentUserDisplayName = settingsDao.getFirst().getDisplayname();
-            currentUserProfilePic = settingsDao.getFirst().getPhoto();
-            baseUrl = settingsDao.getFirst().getServerUrl();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
-
-
-            createListeners();
-            runOnUiThread(this::showDetails);
+            runOnUiThread(() -> {
+                createListeners();
+                showDetails();
+            });
         });
     }
 
@@ -183,12 +174,33 @@ public class SettingsActivity extends AppCompatActivity {
             return null;
         }
     }
+    private void resetSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Reset each value to its default or empty value
+        editor.putString("serverToken", "");
+        editor.putString("displayname", "");
+        editor.putString("userName", "");
+        editor.putString("cuurentChat", "");
+        editor.putString("photo","");
+        // Apply the changes
+        editor.apply();
+    }
+
+
 
     public void exit() {
         if (Objects.equals(currentUserProfilePic, "")) {
             // Clear the activity stack and start the new activity
+            // Delete the local database
+            resetSharedPreferences();
+            AsyncTask.execute(() -> {
+                contactsDao.deleteAllContacts();
+                messagesDao.deleteAllMessages();
+            });
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         } else {
             finish();
@@ -201,14 +213,11 @@ public class SettingsActivity extends AppCompatActivity {
                 .setTitle("Logout")
                 .setMessage("You will logout. Are you sure?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    // Delete chat logic here
-                    currentUserProfilePic = "";
                     // Delete the local database
+                    resetSharedPreferences();
                     AsyncTask.execute(() -> {
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
-                        settingsDao.deleteDisplayName(baseUrl);
-                        settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
                     });
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);

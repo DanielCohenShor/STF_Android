@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -22,7 +23,6 @@ import android.widget.TextView;
 import com.example.stf.AppDB;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
-import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.adapters.MessageAdapter;
 import com.example.stf.entities.Contact;
@@ -43,7 +43,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private TextView tvContactName;
 
-    private String token;
+    private String serverToken;
 
     private int chatId;
 
@@ -66,15 +66,26 @@ public class ChatActivity extends AppCompatActivity {
 
     private String baseUrl;
 
-    private SettingsDao settingsDao;
-
     private ProgressBar progressBar;
+    private SharedPreferences sharedPreferences;
+
+    private void getSharedPreferences() {
+        baseUrl = sharedPreferences.getString("serverUrl", "");
+        currentUserUsername = sharedPreferences.getString("userName", "");
+        serverToken = sharedPreferences.getString("serverToken", "");
+        chatId = Integer.parseInt(sharedPreferences.getString("currentChat", ""));
+        // Retrieve the Parcelable extra "picture" as a Bitmap
+        contactDisplayName = getIntent().getStringExtra("contactDisplayName");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContentView(R.layout.activity_chat);
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        getSharedPreferences();
+
 
         initDB();
 
@@ -89,13 +100,9 @@ public class ChatActivity extends AppCompatActivity {
                     .build();
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
-            settingsDao = db.settingsDao();
-            baseUrl = settingsDao.getFirst().getServerUrl();
             viewModalChats = new ViewModalChats(baseUrl);
-            //update the currenct chat
-            chatId = getIntent().getIntExtra("chatId", 0);
-            // update the chatid.
-            AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, String.valueOf(chatId));});
+            contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
+
             //create listeners
             createListeners();
 
@@ -113,12 +120,6 @@ public class ChatActivity extends AppCompatActivity {
         listViewMessages = findViewById(R.id.RecyclerViewMessages);
         etSendMessage = findViewById(R.id.etSendMessage);
         progressBar = findViewById(R.id.progressBar);
-
-        token = getIntent().getStringExtra("token");
-        contactProfilePic = getIntent().getStringExtra("contactProfilePic");
-        contactDisplayName = getIntent().getStringExtra("contactDisplayName");
-        currentUserUsername = getIntent().getStringExtra("currentUserUsername");
-
         listViewMessages.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -148,7 +149,7 @@ public class ChatActivity extends AppCompatActivity {
     private void getMessages() {
         progressBar.setVisibility(View.VISIBLE);
         // request to the server - running on new thread
-        viewModalChats.performGetMessages(token, Integer.toString(chatId), this::handleGetMessagesCallback);
+        viewModalChats.performGetMessages(serverToken, Integer.toString(chatId), this::handleGetMessagesCallback);
 
         // request to the local database - running on new thread
         AsyncTask.execute(() -> {
@@ -204,19 +205,21 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        chatId = getIntent().getIntExtra("chatId", 0);
-        AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, String.valueOf(chatId));});
-
+        chatId = Integer.parseInt(sharedPreferences.getString("currentChat", ""));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, "");});
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("currentChat", "");
+        editor.apply();
     }
 
     public void exitChat() {
-        AsyncTask.execute(() -> {settingsDao.updateCuurentChat(baseUrl, "");});
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("currentChat", "");
+        editor.apply();
         finish();
 
     }
@@ -224,7 +227,7 @@ public class ChatActivity extends AppCompatActivity {
     private void updateContacts() {
         try {
             // request to the server - running on new thread
-            viewModalChats.performUpdateContacts(token, Integer.toString(chatId));
+            viewModalChats.performUpdateContacts(serverToken, Integer.toString(chatId));
         }
         catch (Exception e) {
             // error
@@ -233,11 +236,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendNewMessage(String content) {
         // request to the server - running on new thread
-        viewModalChats.performAddMessage(token, Integer.toString(chatId), content, this::handleAddNewMessageCallback);
+        viewModalChats.performAddMessage(serverToken, Integer.toString(chatId), content, this::handleAddNewMessageCallback);
         updateContacts();
 
         // request to the server - add notification
-        viewModalChats.performAddNotifications(token, Integer.toString(chatId));
+        viewModalChats.performAddNotifications(serverToken, Integer.toString(chatId));
     }
 
     private void handleAddNewMessageCallback(Message newMessage) {

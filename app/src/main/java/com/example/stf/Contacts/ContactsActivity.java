@@ -3,20 +3,22 @@ package com.example.stf.Contacts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -28,27 +30,23 @@ import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Notifications.ChatsNotification;
 import com.example.stf.Notifications.UserNotification;
-import com.example.stf.Dao.SettingsDao;
 import com.example.stf.R;
 import com.example.stf.SettingsActivity;
 import com.example.stf.adapters.ContactAdapter;
 import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Objects;
 
 public class ContactsActivity extends AppCompatActivity implements ContactClickListener {
     private boolean isFirstTime = true;
 
-    private ImageButton btnLogout;
-
-    private ImageButton btnSettings;
-
     private FloatingActionButton btnAddContact;
 
     private ViewModalContacts viewModalContacts;
-    private String token;
+    private String serverToken;
     private RecyclerView listViewContacts;
 
     private ContactAdapter contactAdapter;
@@ -56,24 +54,50 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private AppDB db;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
-    private SettingsDao settingsDao;
-
     private String currentUserUsername;
     private String currentUserDisplayName;
     private String currentUserProfilePic;
     private Toolbar toolbar;
 
-    private String baseUrl;
+    private String serverUrl;
 
     private ProgressBar progressBar;
+    private  SharedPreferences sharedPreferences;
+    private final String SERVERURL = "serverUrl";
+    private final String USERNAME = "userName";
+    private final String SERVERTOKEN = "serverToken";
+    private final String DISPLAYNAME = "displayName";
+    private final String PROFILEPIC = "photo";
+    private final String CURRENTCHAT = "currentChat";
 
+
+    private void getSharedPreferences() {
+        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        currentUserUsername = sharedPreferences.getString(USERNAME, "");
+        currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
+        currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        getSharedPreferences();
 
         // init the data base
         initDB();
+
+        //init the views.
+        init();
+
+        //listeners
+        createListeners();
+
+        //get all contacts
+        getContacts();
+
+
     }
 
     @Override
@@ -98,7 +122,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     // Handle search query text change
-                    contactAdapter.getFilter().filter(newText);
+                    if (contactAdapter != null) {
+                        contactAdapter.getFilter().filter(newText);
+                    }
                     return true;
                 }
             });
@@ -122,7 +148,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     @Override
     protected void onPause() {
         super.onPause();
-
         // Clear the search query
         if (toolbar != null) {
             MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
@@ -141,30 +166,22 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     }
 
     public void initDB() {
-        currentUserDisplayName = getIntent().getStringExtra("displayName");
-        currentUserProfilePic = getIntent().getStringExtra("profilePic");
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
             messagesDao = db.messagesDao();
-            settingsDao = db.settingsDao();
-            baseUrl = settingsDao.getFirst().getServerUrl();
-            settingsDao.updateDisplayName(baseUrl, currentUserDisplayName);
-            settingsDao.updatePhoto(baseUrl, currentUserProfilePic);
-            viewModalContacts = new ViewModalContacts(baseUrl);
-            init();
-            getContacts();
-            createListeners();
+//            runOnUiThread(() -> {
+//            });
         });
     }
+
 
     private void createListeners() {
         btnAddContact.setOnClickListener(v -> {
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
-            intent.putExtra("token", token);
             startActivity(intent);
         });
     }
@@ -174,23 +191,33 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         listViewContacts = findViewById(R.id.RecyclerViewContacts);
         btnAddContact = findViewById(R.id.btnAddContact);
         progressBar = findViewById(R.id.progressBar);
-        currentUserUsername = getIntent().getStringExtra("username");
-        token = getIntent().getStringExtra("token");
-        currentUserDisplayName = getIntent().getStringExtra("displayName");
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+        viewModalContacts = new ViewModalContacts(serverUrl);
         //init the search bar
         // Set the custom toolbar as the activity's action bar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
+    private void resetSharedPreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Reset each value to its default or empty value
+        editor.putString(SERVERTOKEN, "");
+        editor.putString(DISPLAYNAME, "");
+        editor.putString(USERNAME, "");
+        editor.putString(CURRENTCHAT, "");
+
+        // Apply the changes
+        editor.apply();
+    }
+
     private void logOut() {
-        // Delete the local database
+        // Delete the local database and the shared
+        resetSharedPreferences();
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();
             messagesDao.deleteAllMessages();
-            settingsDao.deleteDisplayName(baseUrl);
-            settingsDao.updatePhoto(baseUrl, "");
         });
         finish();
     }
@@ -198,7 +225,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private void openSettings() {
          //Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, SettingsActivity.class);
-            intent.putExtra("token", token);
             startActivity(intent);
     }
     @Override
@@ -208,10 +234,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             // This code will run only the first time
             isFirstTime = false;
         } else {
-            Log.d("Tag", "inside on resume");
+            serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+            viewModalContacts.setBaseUrl(serverUrl);
             AsyncTask.execute(() -> {
-                String baseUrl = settingsDao.getFirst().getServerUrl();
-                viewModalContacts.setBaseUrl(baseUrl);
                 List<Contact> contacts = contactsDao.indexSortedByDate();
                 runOnUiThread(() -> updateUIWithContacts(contacts));
             });
@@ -220,7 +245,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void getContacts() {
         progressBar.setVisibility(View.VISIBLE);
-        viewModalContacts.performGetContacts(token, this::handleGetContactsCallback);
+        viewModalContacts.performGetContacts(serverToken, this::handleGetContactsCallback);
     }
 
     private void handleGetContactsCallback(Contact[] contacts) {
@@ -230,15 +255,89 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 Log.d("MyApp", contactId); // Print "Hello" for each iteration
                 Contact existingContact = contactsDao.get(contact.getId());
                 if (existingContact == null) {
+//                    String base64Photo = removePrefix(contact.getUser().getProfilePic());
+//                    String compressedPhoto = decreasePhoto(base64Photo);
+//                    contact.getUser().setProfilePic(compressedPhoto);
                     contactsDao.insert(contact);
                 }
             }
             List<Contact> sortedContacts = contactsDao.indexSortedByDate();
-
             runOnUiThread(() -> updateUIWithContacts(sortedContacts));
         });
     }
 
+
+//    public String removePrefix(String input) {
+//        input = input.substring("data:image/png;base64,".length());
+//        return input;
+//    }
+//
+//    private String decreasePhoto(String photo) {
+//        Log.d("photo", "in start decrease");
+//        // Decode the Base64 string to obtain the image byte array
+//        byte[] imageBytes = Base64.decode(photo, Base64.DEFAULT);
+//        // Convert the byte array to a Bitmap object
+//        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+//
+//        if (bitmap != null) {
+//            // Compress the bitmap using the compressBitmap() method
+//            Bitmap compressedBitmap = compressBitmap(bitmap);
+//
+//            if (compressedBitmap != null) {
+//                // Encode the compressed bitmap back to a Base64 string
+//                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//                compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+//                byte[] compressedBytes = outputStream.toByteArray();
+//                Log.d("photo", "in finish good decrease");
+//                return Base64.encodeToString(compressedBytes, Base64.DEFAULT);
+//            } else {
+//                Log.d("photo", "in finish compression fails decrease");
+//                return null; // Return null if compression fails
+//            }
+//        } else {
+//            Log.d("photo", "in finish decoding fails decrease");
+//            return null; // Return null if decoding fails
+//        }
+//    }
+//    private Bitmap compressBitmap(Bitmap bitmap) {
+//        Log.d("photo", "in compress");
+//        if (bitmap == null) {
+//            return null;
+//        }
+//
+//        try {
+//            // Calculate the desired dimensions for the compressed bitmap
+//            int desiredSize = 75; // Desired size in pixels
+//
+//            // Get the original dimensions of the bitmap
+//            int originalWidth = bitmap.getWidth();
+//            int originalHeight = bitmap.getHeight();
+//
+//            // Calculate the aspect ratio of the original bitmap
+//            float aspectRatio = (float) originalWidth / originalHeight;
+//
+//            // Calculate the new dimensions for the compressed bitmap
+//            int newWidth = Math.round(aspectRatio > 1 ? desiredSize : desiredSize * aspectRatio);
+//            int newHeight = Math.round(aspectRatio > 1 ? desiredSize / aspectRatio : desiredSize);
+//
+//            // Create the compressed bitmap with the new dimensions
+//            Bitmap compressedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+//
+//            // Compress the bitmap further if needed
+//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//            compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+//
+//            // Create the final compressed bitmap
+//            byte[] compressedBytes = outputStream.toByteArray();
+//            Bitmap finalBitmap = BitmapFactory.decodeByteArray(compressedBytes, 0, compressedBytes.length);
+//
+//            // Return the final compressed bitmap
+//            return finalBitmap;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     private void updateUIWithContacts(List<Contact> contacts) {
         // Change the UI using the adapter
@@ -247,7 +346,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
 
-        viewModalContacts.performGetNotifications(token, this::handleGetNotificationsCallback);
+        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     }
 
     private void handleGetNotificationsCallback(UserNotification notifications) {
@@ -263,8 +362,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 updateContact.setNotifications(notification);
                 contactsDao.update(updateContact);
             }
-
-            runOnUiThread(() -> updateUIWithNotifications(notifications));
+            runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                updateUIWithNotifications(notifications);
+            });
         });
     }
 
@@ -281,17 +382,18 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Retrieve the clicked contact from the adapter
         Contact clickedContact = contactAdapter.getContact(position);
 
-        viewModalContacts.performResetNotifications(token, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
+        viewModalContacts.performResetNotifications(serverToken, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
 
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
 
-        intent.putExtra("token", token);
-        intent.putExtra("contactProfilePic", clickedContact.getUser().getProfilePic());
-        intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());
-        intent.putExtra("chatId", clickedContact.getId());
-        intent.putExtra("currentUserUsername", currentUserUsername);
+        String chatId = String.valueOf(clickedContact.getId());
 
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(CURRENTCHAT, chatId);
+        // Apply the changes
+        editor.apply();
+        intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName()); // If the picture is a Bitmap
         startActivity(intent);
     }
 
@@ -321,7 +423,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 .setPositiveButton("Yes", (dialog, which) -> {
                     // Delete chat logic here
                     Contact clickedContact = contactAdapter.getContact(position);
-                    viewModalContacts.performDeleteChat(token, clickedContact.getId(), ContactsActivity.this::deleteChatById);
+                    viewModalContacts.performDeleteChat(serverToken, clickedContact.getId(), ContactsActivity.this::deleteChatById);
                 })
                 .setNegativeButton("No", (dialog, which) -> {
                     // No action needed, dialog will be automatically dismissed
