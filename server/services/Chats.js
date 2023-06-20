@@ -186,8 +186,6 @@ const addNewMessage = async (username, messageContent, id) => {
 }
 
 function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken) {
-    console.log("in")
-    console.log(contactAndroidToken)
     const message = {
         notification: {
             title: userDisplayName,
@@ -196,7 +194,6 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
         token: contactAndroidToken
     };
 
-    // Send the notification
     // Send the notification
     admin.messaging().send(message)
         .then((response) => {

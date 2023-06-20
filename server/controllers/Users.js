@@ -88,10 +88,8 @@ const addAndroidToken = async (req,res) => {
 };
 
 const removeAndroidToken = async (req,res) => {
-    console.log("in")
     if (req.headers.authorization) {
         const username = getUserNameFromToken(req.headers.authorization);
-        console.log("in1")
         if (username !== "Invalid Token") {
             res.json(await userService.saveAndroidToken(username, ""));
             return
