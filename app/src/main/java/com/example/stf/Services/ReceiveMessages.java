@@ -19,7 +19,10 @@ import androidx.room.Room;
 import com.example.stf.AppDB;
 import com.example.stf.Chat.ChatActivity;
 import com.example.stf.Dao.ContactsDao;
+import com.example.stf.Dao.MessagesDao;
 import com.example.stf.R;
+import com.example.stf.entities.Contact;
+import com.example.stf.entities.Message;
 import com.example.stf.entities.User;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -28,6 +31,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     int notificationId;
     AppDB db;
     ContactsDao contactsDao;
+    MessagesDao messagesDao;
     private String chatID;
     private SharedPreferences sharedPreferences;
     private final String SERVERTOKEN = "serverToken";
@@ -47,11 +51,9 @@ public class ReceiveMessages extends FirebaseMessagingService {
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
-
+            messagesDao = db.messagesDao();
         });
-
     }
-
 
     public void getChatId() {
         chatID = sharedPreferences.getString("currentChat", "");
@@ -61,19 +63,32 @@ public class ReceiveMessages extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         getChatId();
-        String newchatId = message.getData().get("chatId");
-        assert newchatId != null;
-        if (!newchatId.equals(chatID)) {
+        String newChatId = message.getData().get("chatId");
+        assert newChatId != null;
+        if (!newChatId.equals(chatID)) {
             // not in the chat render the localdb to be in the right order
             // add the new message to the messages db
 
+            String messageId = message.getData().get("messageId");
+            String created = message.getData().get("messageDate");
+            String senderUsername = message.getData().get("senderUsername");
+            Contact contact = contactsDao.get(Integer.parseInt(newChatId));
+            User sender = null;
+            if (contact != null) {
+                sender = contact.getUser();
+            } else {
+                // get from server
+            }
+            String content = message.getNotification().getBody();
+            Message newMessage = new Message(Integer.parseInt(messageId), created, sender, content, Integer.parseInt(newChatId));
+            messagesDao.insert(newMessage);
+
             // update the last message in the db
-
-
-
+            contact.setLastMessage(newMessage);
+            contactsDao.update(contact);
 
             //not in the chat need to open this chat
-            sendNotification(message.getNotification().getBody(), newchatId, message.getNotification().getTitle());
+            sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle());
         } else {
             // meant i am in the chat need to update the message live
             // reset the notfication

@@ -181,26 +181,13 @@ const addNewMessage = async (username, messageContent, id) => {
     // check if the contact has android token - if the contact is connected from the android
     if (contact.androidToken != "") {
         // sending message throw the firebase
-        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, contact.profilePic);
+        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, newMessage.id);
     }
 
     return newMessage;
 }
 
-function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, contactProfilePic) {
-    // const message = {
-    //     notification: {
-    //         title: userDisplayName,
-    //         body: messageContent
-    //     },
-    //     token: contactAndroidToken,
-    //     data: {
-    //         chatId: chatId,
-    //         messageDate: messageDate,
-    //         contactProfilePic: contactProfilePic
-    //     }
-    // };
-
+function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, messageId) {
     const message = {
         notification: {
             title: userDisplayName,
@@ -209,6 +196,8 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
         token: contactAndroidToken,
         data: {
             chatId: chatId,
+            messageDate: messageDate.toString(),
+            messageId: messageId
         }
     };
 
