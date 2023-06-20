@@ -173,6 +173,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             // Start the new activity here
             Intent intent = new Intent(ContactsActivity.this, AddNewContactActivity.class);
             startActivity(intent);
+            finish();
         });
     }
 
@@ -223,21 +224,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             startActivity(intent);
             finish();
     }
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if (isFirstTime) {
-//            // This code will run only the first time
-//            isFirstTime = false;
-//        } else {
-//            serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-//            viewModalContacts.setBaseUrl(serverUrl);
-//            AsyncTask.execute(() -> {
-//                List<Contact> contacts = contactsDao.indexSortedByDate();
-//                runOnUiThread(() -> updateUIWithContacts(contacts));
-//            });
-//        }
-//    }
 
     private void getContacts() {
         progressBar.setVisibility(View.VISIBLE);
@@ -379,30 +365,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         Contact clickedContact = contactAdapter.getContact(position);
         Log.d("test", "1");
         viewModalContacts.performResetNotifications(serverToken, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
-        Log.d("test", "2");
-
         String chatId = String.valueOf(clickedContact.getId());
-        Log.d("test", "3");
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Log.d("test", "4");
-
         editor.putString(CURRENTCHAT, chatId);
-        Log.d("test", "5");
-
         // Apply the changes
         editor.apply();
-        Log.d("test", "6");
-
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-        Log.d("test", "7");
-
-        intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());
-        Log.d("test", "8");
-// If the picture is a Bitmap
+        intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());// If the picture is a Bitmap
         startActivity(intent);
-        Log.d("test", "9");
         finish();
     }
 

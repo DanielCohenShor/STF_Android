@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.room.Room;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.entities.Contact;
 import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
@@ -185,8 +187,11 @@ public class AddNewContactActivity extends AppCompatActivity {
                 contact.getUser().setProfilePic(compressedPhoto);
                 // Perform insert operation on a background thread
                 contactsDao.insert(contact);
+                Log.d("test", "1");
             });
             // Start the new activity here
+            Intent intent = new Intent(AddNewContactActivity.this, ContactsActivity.class);
+            startActivity(intent);
             finish();
         } else {
 
