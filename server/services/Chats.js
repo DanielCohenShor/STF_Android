@@ -121,7 +121,7 @@ const returnTheConversation = async (id, username) => {
             username: conversation.users[0].username,
             displayName: conversation.users[0].displayName,
             profilePic: conversation.users[0].profilePic,
-        },{
+        }, {
             username: conversation.users[1].username,
             displayName: conversation.users[1].displayName,
             profilePic: conversation.users[1].profilePic,
@@ -131,7 +131,7 @@ const returnTheConversation = async (id, username) => {
     return updatedConversation;
 }
 
-async function createMessageSchema(sender, messageContent) {
+async function createMessageSchema(sender, messageContent, messageDate) {
     const userNameForChat = createUserNameForChat(sender.username, sender.displayName, sender.profilePic);
 
     // Fetch the highest existing id value from the Chats collection
@@ -143,7 +143,7 @@ async function createMessageSchema(sender, messageContent) {
     // creat the chat
     const newMessage = new Message({
         id: nextId, // Generate a unique ID for the message
-        created: new Date(),
+        created: messageDate,
         sender: userNameForChat,
         content: messageContent
     });
@@ -154,8 +154,10 @@ const addNewMessage = async (username, messageContent, id) => {
     //find the username in users:
     const user = await findUser(username);
 
+    const messageDate = new Date();
+
     // new chat when the username is sender
-    const newMessage = await createMessageSchema(user, messageContent)
+    const newMessage = await createMessageSchema(user, messageContent, messageDate)
 
     const messageList = await Chats.findOne({ id: parseInt(id) });
 
@@ -167,7 +169,7 @@ const addNewMessage = async (username, messageContent, id) => {
 
     // get the contact information
     const conversation = await Chats.findOne({ id: parseInt(id) });
-    
+
     let contactUsername;
     if (conversation.users[1].username === username) {
         contactUsername = conversation.users[0].username;
@@ -177,21 +179,26 @@ const addNewMessage = async (username, messageContent, id) => {
     const contact = await User.findOne({ username: contactUsername });
 
     // check if the contact has android token - if the contact is connected from the android
-    if(contact.androidToken != "") {
+    if (contact.androidToken != "") {
         // sending message throw the firebase
-        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken);
+        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, contact.profilePic);
     }
 
     return newMessage;
 }
 
-function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken) {
+function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, contactProfilePic) {
     const message = {
         notification: {
             title: userDisplayName,
             body: messageContent
         },
-        token: contactAndroidToken
+        token: contactAndroidToken,
+        data: {
+            chatId: chatId,
+            messageDate: messageDate,
+            contactProfilePic: contactProfilePic
+        }
     };
 
     // Send the notification
@@ -247,7 +254,7 @@ const deleteChat = async (username, id) => {
     const conversation = await Chats.findOne({ id: parseInt(id) }).populate('messages');
 
     await deleteMessages(conversation.messages);
-    
+
     let contactUsername;
     if (conversation.users[1].username === username) {
         contactUsername = conversation.users[0].username;
@@ -282,7 +289,7 @@ const getNotifications = async (username) => {
 const addNotification = async (username, id) => {
     const messageList = await Chats.findOne({ id: parseInt(id) });
 
-    if(messageList.users[0].username === username) {
+    if (messageList.users[0].username === username) {
         messageList.users[0].notifications += 1;
     } else {
         messageList.users[1].notifications += 1;
@@ -295,7 +302,7 @@ const addNotification = async (username, id) => {
 const resetNotifications = async (username, id) => {
     const conversation = await Chats.findOne({ id: parseInt(id) });
 
-    if(conversation.users[0].username === username) {
+    if (conversation.users[0].username === username) {
         conversation.users[1].notifications = 0;
     } else {
         conversation.users[0].notifications = 0;
