@@ -188,6 +188,19 @@ const addNewMessage = async (username, messageContent, id) => {
 }
 
 function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, contactProfilePic) {
+    // const message = {
+    //     notification: {
+    //         title: userDisplayName,
+    //         body: messageContent
+    //     },
+    //     token: contactAndroidToken,
+    //     data: {
+    //         chatId: chatId,
+    //         messageDate: messageDate,
+    //         contactProfilePic: contactProfilePic
+    //     }
+    // };
+
     const message = {
         notification: {
             title: userDisplayName,
@@ -196,8 +209,6 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
         token: contactAndroidToken,
         data: {
             chatId: chatId,
-            messageDate: messageDate,
-            contactProfilePic: contactProfilePic
         }
     };
 
