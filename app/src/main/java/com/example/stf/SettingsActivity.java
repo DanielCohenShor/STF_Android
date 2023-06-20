@@ -120,8 +120,6 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
         llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
-
-        token = getIntent().getStringExtra("token");
     }
 
     private boolean isSystemInNightMode() {
@@ -193,7 +191,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void exit() {
         if (Objects.equals(currentUserProfilePic, "")) {
-            viewModalContacts.removeAndroidToken(token);
             // Clear the activity stack and start the new activity
             // Delete the local database
             resetSharedPreferences();
@@ -225,7 +222,6 @@ public class SettingsActivity extends AppCompatActivity {
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
                     });
-                    viewModalContacts.removeAndroidToken(token);
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
