@@ -1,5 +1,8 @@
 const userService = require('../services/Users');
 const { getUserNameFromToken } = require('./Chats');
+const sharp = require('sharp');
+const { promisify } = require('util');
+const base64 = require('base64-js');
 
 const createNewUser = async (req, res) => {
     const username = req.body.username;
@@ -39,7 +42,9 @@ const createNewUser = async (req, res) => {
     }
 
     if (invalidFields.length === 0 && invalid > 0) {
-        res.json(await userService.createNewUser(username, password, displayName, profilePic));
+        
+        const smallerProfilePic = await smaller(profilePic);
+        res.json(await userService.createNewUser(username, password, displayName, smallerProfilePic));
         return
     } else if (invalidFields.length > 0) {
         res.status(400).json({
@@ -55,6 +60,41 @@ const createNewUser = async (req, res) => {
         return
     }
 };
+
+async function smaller(photo) {
+    let smallerPhoto = await removePrefix(photo);
+    smallerPhoto = await decreasePhoto(smallerPhoto);
+    smallerPhoto = addPrefix(smallerPhoto);
+    return smallerPhoto;
+  }
+  
+  function removePrefix(input) {
+    const prefix = 'data:image/png;base64,';
+    return input.substring(prefix.length);
+  }
+  
+  async function decreasePhoto(photo) {
+    try {
+      const imageBuffer = Buffer.from(photo, 'base64');
+      const image = sharp(imageBuffer);
+  
+      // Resize the image using sharp
+      const resizedImage = await image.resize({ width: 800 }).jpeg({ quality: 80 }).toBuffer();
+  
+      // Encode the resized image back to a Base64 string
+      const resizedBase64 = resizedImage.toString('base64');
+  
+      return resizedBase64;
+    } catch (error) {
+      console.error('Error resizing image:', error);
+      return null;
+    }
+  }
+  
+  function addPrefix(input) {
+    const prefix = 'data:image/png;base64,';
+    return prefix + input;
+  }
 
 const returnInformationUser = async (req,res) => {
     if (req.headers.authorization) {
