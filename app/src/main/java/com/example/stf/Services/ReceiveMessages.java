@@ -18,13 +18,16 @@ import androidx.room.Room;
 
 import com.example.stf.AppDB;
 import com.example.stf.Chat.ChatActivity;
+import com.example.stf.Dao.ContactsDao;
 import com.example.stf.R;
+import com.example.stf.entities.User;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class ReceiveMessages extends FirebaseMessagingService {
     int notificationId;
     AppDB db;
+    ContactsDao contactsDao;
     private String chatID;
     private SharedPreferences sharedPreferences;
     private final String SERVERTOKEN = "serverToken";
@@ -39,12 +42,19 @@ public class ReceiveMessages extends FirebaseMessagingService {
         super.onCreate();
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         notificationId = 0;
+        AsyncTask.execute(() -> {
+            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                    .fallbackToDestructiveMigration()
+                    .build();
+            contactsDao = db.ContactsDao();
+
+        });
+
     }
 
 
     public void getChatId() {
         chatID = sharedPreferences.getString("currentChat", "");
-        Log.d("id", chatID);
     }
 
     @Override
@@ -54,18 +64,27 @@ public class ReceiveMessages extends FirebaseMessagingService {
         String newchatId = message.getData().get("chatId");
         assert newchatId != null;
         if (!newchatId.equals(chatID)) {
+            // not in the chat render the localdb to be in the right order
+            // add the new message to the messages db
+
+            // update the last message in the db
+
+
+
+
             //not in the chat need to open this chat
             sendNotification(message.getNotification().getBody(), newchatId, message.getNotification().getTitle());
         } else {
             // meant i am in the chat need to update the message live
+            // reset the notfication
+            // update last message
+            // update localdb
             Log.d("tests", "not sending");
         }
     }
-    private void updateSharedPreferences(String newchatId) {
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, newchatId);
-        editor.apply();
+
+    private void addMessageToDB(int messageID, String created, User sender, String content, int chatid) {
+        //get contact in the db and get the infromation from the db
     }
 
     private void sendNotification(String messageBody, String newchatId, String displayName) {
@@ -74,7 +93,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
         // need to pass the chad id, the displayname.
         // so it will open the right chat with the right messeages.
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-        intent.putExtra("contactDisplayName", displayName);// If the picture is a Bitmap
+        intent.putExtra("contactDisplayName", displayName);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         // Updated code
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
@@ -107,5 +126,12 @@ public class ReceiveMessages extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    private void updateSharedPreferences(String newchatId) {
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(CURRENTCHAT, newchatId);
+        editor.apply();
     }
 }
