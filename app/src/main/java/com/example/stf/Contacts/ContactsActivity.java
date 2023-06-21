@@ -275,8 +275,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 }
             }
         });
-        contactsLiveDataList.setContactsList(contacts);
-        progressBar.setVisibility(View.GONE);
+        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     }
 
     private void updateUIWithContacts(List<Contact> contacts) {
@@ -289,7 +288,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 //        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     }
 
-    //create observe for the notfications
     //        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     private void handleGetNotificationsCallback(UserNotification notifications) {
         AsyncTask.execute(() -> {
@@ -304,9 +302,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 updateContact.setNotifications(notification);
                 contactsDao.update(updateContact);
             }
+            List<Contact> contacts = contactsDao.getAllContacts();
             runOnUiThread(() -> {
+                contactsLiveDataList.setContactsList(contacts);
                 progressBar.setVisibility(View.GONE);
-                updateUIWithNotifications(notifications);
             });
         });
     }
