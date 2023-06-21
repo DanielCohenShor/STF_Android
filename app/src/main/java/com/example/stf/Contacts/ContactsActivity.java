@@ -32,6 +32,7 @@ import com.example.stf.ContactsListLiveData;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Login.LoginActivity;
+import com.example.stf.MessagesListLiveData;
 import com.example.stf.Notifications.ChatsNotification;
 import com.example.stf.Notifications.UserNotification;
 import com.example.stf.R;
@@ -41,6 +42,7 @@ import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,6 +77,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private final String CURRENTCHAT = "currentChat";
     private ContactsListLiveData contactsLiveDataList;
 
+    private MessagesListLiveData messagesListLiveData;
 
     private void getSharedPreferences() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -86,6 +89,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
         contactsLiveDataList = ContactsListLiveData.getInstance();
+        messagesListLiveData = MessagesListLiveData.getInstance();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,7 +183,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         });
     }
 
-
     private void createListeners() {
         btnAddContact.setOnClickListener(v -> {
             // Start the new activity here
@@ -223,6 +226,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             contactsDao.deleteAllContacts();
             messagesDao.deleteAllMessages();
         });
+        contactsLiveDataList.setContactsList(Collections.emptyList());
+        messagesListLiveData.setMessagesList(Collections.emptyList());
         //Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, LoginActivity.class);
         startActivity(intent);

@@ -25,6 +25,7 @@ import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -54,18 +55,24 @@ public class ChangeApiActivity extends AppCompatActivity {
     private final String SERVERURL = "serverUrl";
 
     private final String SERVERTOKEN = "serverToken";
+    private ContactsListLiveData contactsLiveDataList;
+
+    private MessagesListLiveData messagesListLiveData;
 
 
+
+    private void getSharedPreferences() {
+        baseUrl = sharedPreferences.getString(SERVERURL, "");
+        token = sharedPreferences.getString(SERVERTOKEN, "");
+        contactsLiveDataList = ContactsListLiveData.getInstance();
+        messagesListLiveData = MessagesListLiveData.getInstance();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_api);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-
-        baseUrl = sharedPreferences.getString(SERVERURL, "");
-
-        token = sharedPreferences.getString(SERVERTOKEN, "");
-
+        getSharedPreferences();
         init();
 
         initDB();
@@ -159,6 +166,8 @@ public class ChangeApiActivity extends AppCompatActivity {
                             messagesDao.deleteAllMessages();
                             baseUrl = result;
                         });
+                        contactsLiveDataList.setContactsList(Collections.emptyList());
+                        messagesListLiveData.setMessagesList(Collections.emptyList());
                 })
                     .setNegativeButton("No", (dialog, which) -> {
                         // No action needed, dialog will be automatically dismissed

@@ -143,7 +143,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-
     public void initDB() {
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")

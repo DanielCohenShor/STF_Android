@@ -29,6 +29,7 @@ import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Login.LoginActivity;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -70,12 +71,16 @@ public class SettingsActivity extends AppCompatActivity {
     private final String DISPLAYNAME = "displayName";
     private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
+    private ContactsListLiveData contactsLiveDataList;
 
+    private MessagesListLiveData messagesListLiveData;
     private void getSharedPreferences() {
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+        contactsLiveDataList = ContactsListLiveData.getInstance();
+        messagesListLiveData = MessagesListLiveData.getInstance();
     }
   
     @Override
@@ -136,7 +141,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void createListeners() {
-        btnExitSettings.setOnClickListener(v -> exit());
+        btnExitSettings.setOnClickListener(v -> backToPrevScreen());
 
         llChangeApi.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ChangeApiActivity.class);
@@ -192,16 +197,15 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-
-    public void exit() {
+    public void backToPrevScreen() {
         if (Objects.equals(currentUserProfilePic, "")) {
             // Clear the activity stack and start the new activity
             // Delete the local database
-            resetSharedPreferences();
-            AsyncTask.execute(() -> {
-                contactsDao.deleteAllContacts();
-                messagesDao.deleteAllMessages();
-            });
+//            resetSharedPreferences();
+//            AsyncTask.execute(() -> {
+//                contactsDao.deleteAllContacts();
+//                messagesDao.deleteAllMessages();
+//            });
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
@@ -227,6 +231,8 @@ public class SettingsActivity extends AppCompatActivity {
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
                     });
+                    contactsLiveDataList.setContactsList(Collections.emptyList());
+                    messagesListLiveData.setMessagesList(Collections.emptyList());
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
