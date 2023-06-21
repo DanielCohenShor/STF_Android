@@ -376,7 +376,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         }
     }
 
-    // rendring when new contact add me message.
+    // rendering when new contact add me message.
     private void observeContactsChanges() {
         contactsLiveDataList.getList().observe(this, new Observer<List<Contact>>() {
             @Override
@@ -400,9 +400,5 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 }
             }
         });
-
-
-
     }
-
 }

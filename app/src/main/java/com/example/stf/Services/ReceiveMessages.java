@@ -105,6 +105,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     private void deleteChat(String newChatId) {
         AsyncTask.execute(() -> {contactsDao.deleteByChatId(Integer.parseInt(newChatId));});
         contactsLiveDataList.setSomeoneDeleteMe(true);
+        contactsLiveDataList.deleteContact(Integer.parseInt(newChatId));
     }
 
     private void receiveMessage(@NonNull RemoteMessage message, String newChatId) {
