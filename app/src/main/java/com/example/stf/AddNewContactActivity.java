@@ -48,13 +48,13 @@ public class AddNewContactActivity extends AppCompatActivity {
     private String currentUserProfilePic;
     private String currentUserDisplayName;
 
-
     private void getSharedPreferences() {
         baseUrl = sharedPreferences.getString("serverUrl", "");
         currentUserProfilePic = sharedPreferences.getString("photo", "");
         currentUserDisplayName = sharedPreferences.getString("displayName", "");
         serverToken = sharedPreferences.getString("serverToken", "");
         currentUsername = sharedPreferences.getString("userName", "");
+
     }
 
     @Override

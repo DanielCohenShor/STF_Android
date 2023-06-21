@@ -6,7 +6,6 @@ import com.example.stf.api.ChatAPI;
 import com.example.stf.api.NotificationsAPI;
 import com.example.stf.entities.Message;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class ViewModalChats extends ViewModel {
@@ -21,7 +20,7 @@ public class ViewModalChats extends ViewModel {
         this.notificationsAPI = new NotificationsAPI(baseUrl);
     }
 
-    public void performGetMessages(String token, String chatId, Consumer<List<Message>> callback) {
+    public void performGetMessages(String token, String chatId, Consumer<Message[]> callback) {
         chatAPI.setToken(token);
         chatAPI.get(chatId, callback);
     }

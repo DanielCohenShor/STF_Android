@@ -8,7 +8,6 @@ import com.example.stf.R;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import okhttp3.MediaType;
@@ -38,15 +37,15 @@ public class ContactAPI {
         this.token = token;
     }
 
-    public void get(Consumer<List<Contact>> callback) {
-        Call<List<Contact>> call = webServiceAPI.getContacts("Bearer {\"token\":\"" + token + "\"}");
+    public void get(Consumer<Contact[]> callback) {
+        Call<Contact[]> call = webServiceAPI.getContacts("Bearer {\"token\":\"" + token + "\"}");
 
-        call.enqueue(new Callback<List<Contact>>() {
+        call.enqueue(new Callback<Contact[]>() {
             @Override
-            public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
+            public void onResponse(Call<Contact[]> call, Response<Contact[]> response) {
                 try {
                     if (response.isSuccessful()) {
-                        List<Contact> contacts = response.body();
+                        Contact[] contacts = response.body();
                         callback.accept(contacts);
                     } else {
                         // error from the get contacts?
@@ -58,7 +57,7 @@ public class ContactAPI {
             }
 
             @Override
-            public void onFailure(Call<List<Contact>> call, Throwable t) {
+            public void onFailure(Call<Contact[]> call, Throwable t) {
                 int x = 5;
             }
         });

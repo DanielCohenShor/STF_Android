@@ -3,8 +3,6 @@ package com.example.stf.Contacts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -28,11 +26,9 @@ import com.example.stf.AddNewContactActivity;
 import com.example.stf.AppDB;
 import com.example.stf.Chat.ChatActivity;
 import com.example.stf.ContactClickListener;
-import com.example.stf.ContactsListLiveData;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Login.LoginActivity;
-import com.example.stf.MessagesListLiveData;
 import com.example.stf.Notifications.ChatsNotification;
 import com.example.stf.Notifications.UserNotification;
 import com.example.stf.R;
@@ -42,7 +38,6 @@ import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,21 +70,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private final String DISPLAYNAME = "displayName";
     private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
-    private ContactsListLiveData contactsLiveDataList;
 
-    private MessagesListLiveData messagesListLiveData;
 
     private void getSharedPreferences() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, "");
-        editor.apply();
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        contactsLiveDataList = ContactsListLiveData.getInstance();
-        messagesListLiveData = MessagesListLiveData.getInstance();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,21 +96,19 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         //listeners
         createListeners();
+
+
     }
 
     private void fetchFromLocalDB() {
         AsyncTask.execute(() -> {
-            if (contactsDao.getAllContacts().isEmpty()) {
-                // zero contacts
+            if (contactsDao.index().length != 0) {
                 viewModalContacts = new ViewModalContacts(serverUrl);
-                //get all contacts rom server
-                Log.d("TAG", "12234242144") ;
-                runOnUiThread(this::getContacts);
-            } else {
-                // not zero contacts
-                contactsLiveDataList.setContactsList(contactsDao.getAllContacts());
-                runOnUiThread(() -> updateUIWithContacts(contactsLiveDataList.getList().getValue()));
+                List<Contact> contacts = contactsDao.indexSortedByDate();
+                runOnUiThread(() -> updateUIWithContacts(contacts));
             }
+            //get all contacts
+            runOnUiThread(this::getContacts);
         });
     }
 
@@ -177,11 +163,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
-            // Start observing changes in the ContactsDao
-            runOnUiThread(this::observeContactsChanges);
             messagesDao = db.messagesDao();
         });
     }
+
 
     private void createListeners() {
         btnAddContact.setOnClickListener(v -> {
@@ -221,13 +206,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void logOut() {
         resetSharedPreferences();
-        viewModalContacts.removeAndroidToken(serverToken);
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();
             messagesDao.deleteAllMessages();
         });
-        contactsLiveDataList.setContactsList(Collections.emptyList());
-        messagesListLiveData.setMessagesList(Collections.emptyList());
         //Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, LoginActivity.class);
         startActivity(intent);
@@ -246,18 +228,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         viewModalContacts.performGetContacts(serverToken, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(List<Contact> contacts) {
+    private void handleGetContactsCallback(Contact[] contacts) {
         AsyncTask.execute(() -> {
             for (Contact contact : contacts) {
                 String contactId = String.valueOf(contact.getId()); // Convert to string
-                Log.d("test1111", contactId); // Print "Hello" for each iteration
+                Log.d("MyApp", contactId); // Print "Hello" for each iteration
                 Contact existingContact = contactsDao.get(contact.getId());
-                Log.d("test2222", contactId); // Print "Hello" for each iteration
                 if (existingContact == null) {
-                    Log.d("test3333", contactId); // Print "Hello" for each iteration
                     contactsDao.insert(contact);
                 } else {
-                    Log.d("test4444", contactId); // Print "Hello" for each iteration
                     if (contact.getLastMessage() != null) {
                         contactsDao.update(contact);
                     }
@@ -274,9 +253,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     }
                 }
             }
+            List<Contact> sortedContacts = contactsDao.indexSortedByDate();
+            runOnUiThread(() -> updateUIWithContacts(sortedContacts));
         });
-        contactsLiveDataList.setContactsList(contacts);
-        progressBar.setVisibility(View.GONE);
     }
 
     private void updateUIWithContacts(List<Contact> contacts) {
@@ -285,12 +264,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         contactAdapter.setContacts(contacts);
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        progressBar.setVisibility(View.GONE);
-//        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
+
+        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     }
 
-    //create observe for the notfications
-    //        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     private void handleGetNotificationsCallback(UserNotification notifications) {
         AsyncTask.execute(() -> {
             int notification;
@@ -323,6 +300,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     public void onItemClick(int position) {
         // Retrieve the clicked contact from the adapter
         Contact clickedContact = contactAdapter.getContact(position);
+        Log.d("test", "1");
         viewModalContacts.performResetNotifications(serverToken, String.valueOf(clickedContact.getId()), this::handleResetNotificationsCallback);
         String chatId = String.valueOf(clickedContact.getId());
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -332,7 +310,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
         intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());// If the picture is a Bitmap
-        intent.putExtra("flag", "exist chat");
         startActivity(intent);
         finish();
     }
@@ -376,36 +353,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             AsyncTask.execute(() -> {
                 messagesDao.deleteMessagesByChatId(String.valueOf(chatID));
                 contactsDao.deleteByChatId(chatID);
+                List<Contact> contacts = contactsDao.indexSortedByDate();
+                runOnUiThread(() -> updateUIWithContacts(contacts));
             });
-            contactsLiveDataList.deleteContact(chatID);
         } else {
             //dont know what to do?
         }
-    }
-
-    // rendering when new contact add me message.
-    private void observeContactsChanges() {
-        contactsLiveDataList.getList().observe(this, new Observer<List<Contact>>() {
-            @Override
-            public void onChanged(List<Contact> contacts) {
-                // Handle the onChanged event here
-                updateUIWithContacts(contacts);
-            }
-        });
-
-        contactsLiveDataList.getSomeoneAddMe().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                // Handle the onChanged event here
-                if (value) {
-                    // Someone added you
-                    //get all contacts rom server
-                    runOnUiThread(ContactsActivity.this::getContacts);
-                    // Perform the desired action
-                    // Update the value of someoneAddMe to false
-                    contactsLiveDataList.setSomeoneAddMe(false);
-                }
-            }
-        });
     }
 }

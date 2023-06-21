@@ -7,8 +7,6 @@ import com.example.stf.entities.Message;
 import com.example.stf.entities.User;
 
 
-import java.util.List;
-
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -43,13 +41,13 @@ public interface WebServiceAPI {
     Call<Void> removeAndroidToken(@Header("Authorization") String token);
 
     @GET("Chats")
-    Call<List<Contact>> getContacts(@Header("Authorization") String token);
+    Call<Contact[]> getContacts(@Header("Authorization") String token);
 
     @POST("Chats")
     Call<Contact> addContact(@Header("Authorization") String token, @Body RequestBody username);
 
     @GET("Chats/{id}/Messages")
-    Call<List<Message>> getMessages(@Header("Authorization") String token, @Path("id") String id);
+    Call<Message[]> getMessages(@Header("Authorization") String token, @Path("id") String id);
 
     @POST("Chats/{id}/Messages")
     Call<Message> addMessage(@Header("Authorization") String token, @Path("id") String id, @Body RequestBody message);

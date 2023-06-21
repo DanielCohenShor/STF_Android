@@ -29,7 +29,6 @@ import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 import com.example.stf.Login.LoginActivity;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -62,25 +61,18 @@ public class SettingsActivity extends AppCompatActivity {
     private boolean nightMode;
     private String serverToken;
     private String serverUrl;
-
-    private ViewModalContacts viewModalContacts;
-
     private final String SERVERURL = "serverUrl";
     private final String USERNAME = "userName";
     private final String SERVERTOKEN = "serverToken";
     private final String DISPLAYNAME = "displayName";
     private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
-    private ContactsListLiveData contactsLiveDataList;
 
-    private MessagesListLiveData messagesListLiveData;
     private void getSharedPreferences() {
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        contactsLiveDataList = ContactsListLiveData.getInstance();
-        messagesListLiveData = MessagesListLiveData.getInstance();
     }
   
     @Override
@@ -128,7 +120,6 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
         llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
-        viewModalContacts = new ViewModalContacts(serverUrl);
     }
 
     private boolean isSystemInNightMode() {
@@ -141,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void createListeners() {
-        btnExitSettings.setOnClickListener(v -> backToPrevScreen());
+        btnExitSettings.setOnClickListener(v -> exit());
 
         llChangeApi.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ChangeApiActivity.class);
@@ -197,15 +188,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-    public void backToPrevScreen() {
+
+    public void exit() {
         if (Objects.equals(currentUserProfilePic, "")) {
             // Clear the activity stack and start the new activity
             // Delete the local database
-//            resetSharedPreferences();
-//            AsyncTask.execute(() -> {
-//                contactsDao.deleteAllContacts();
-//                messagesDao.deleteAllMessages();
-//            });
+            resetSharedPreferences();
+            AsyncTask.execute(() -> {
+                contactsDao.deleteAllContacts();
+                messagesDao.deleteAllMessages();
+            });
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
@@ -224,15 +216,12 @@ public class SettingsActivity extends AppCompatActivity {
                 .setTitle("Logout")
                 .setMessage("You will logout. Are you sure?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    viewModalContacts.removeAndroidToken(serverToken);
                     // Delete the local database
                     resetSharedPreferences();
                     AsyncTask.execute(() -> {
                         contactsDao.deleteAllContacts();
                         messagesDao.deleteAllMessages();
                     });
-                    contactsLiveDataList.setContactsList(Collections.emptyList());
-                    messagesListLiveData.setMessagesList(Collections.emptyList());
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);

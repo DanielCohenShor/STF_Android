@@ -102,35 +102,12 @@ const createChat = async (usernameContact, username) => {
             lastMessage: null
         };
 
-        if(userContact.androidToken != "") {
-            updateWithFireBase(userContact.androidToken, newChat.id, "new contact")
-        }
-
         // return the new chat.
         return answer;
     } else {
         //not exist 
         return -1;
     }
-}
-
-function updateWithFireBase(contactAndroidToken, chatId, type) {
-    const message = {
-        token: contactAndroidToken,
-        data: {
-            chatId: chatId.toString(),
-            type: type
-        }
-    };
-
-    // Send the notification
-    admin.messaging().send(message)
-        .then((response) => {
-            console.log('Notification sent successfully:', response);
-        })
-        .catch((error) => {
-            console.error('Error sending notification:', error);
-        });
 }
 
 const returnTheConversation = async (id, username) => {
@@ -204,13 +181,26 @@ const addNewMessage = async (username, messageContent, id) => {
     // check if the contact has android token - if the contact is connected from the android
     if (contact.androidToken != "") {
         // sending message throw the firebase
-        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, newMessage.id, username);
+        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, contact.profilePic);
     }
 
     return newMessage;
 }
 
-function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, messageId, senderUsername) {
+function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, contactProfilePic) {
+    // const message = {
+    //     notification: {
+    //         title: userDisplayName,
+    //         body: messageContent
+    //     },
+    //     token: contactAndroidToken,
+    //     data: {
+    //         chatId: chatId,
+    //         messageDate: messageDate,
+    //         contactProfilePic: contactProfilePic
+    //     }
+    // };
+
     const message = {
         notification: {
             title: userDisplayName,
@@ -219,10 +209,6 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
         token: contactAndroidToken,
         data: {
             chatId: chatId,
-            messageDate: messageDate.toString(),
-            messageId: messageId.toString(),
-            senderUsername: senderUsername,
-            type: "message"
         }
     };
 
@@ -287,10 +273,6 @@ const deleteChat = async (username, id) => {
         contactUsername = conversation.users[1].username;
     }
     const contact = await User.findOne({ username: contactUsername }).populate('chats');
-
-    if(contact.androidToken != "") {
-        updateWithFireBase(contact.androidToken, id, "delete chat")
-    }
 
     await Chats.deleteOne({ id: parseInt(id) });
 

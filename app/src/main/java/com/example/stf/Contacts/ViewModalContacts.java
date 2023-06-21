@@ -8,7 +8,6 @@ import com.example.stf.api.ContactAPI;
 import com.example.stf.api.NotificationsAPI;
 import com.example.stf.entities.Contact;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -26,7 +25,7 @@ public class ViewModalContacts  extends ViewModel {
         this.notificationsAPI = new NotificationsAPI(baseUrl);
     }
 
-    public void performGetContacts(String token, Consumer<List<Contact>> callback) {
+    public void performGetContacts(String token, Consumer<Contact[]> callback) {
         contactAPI.setToken(token);
         contactAPI.get(callback);
     }

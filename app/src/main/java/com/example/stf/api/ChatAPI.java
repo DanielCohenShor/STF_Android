@@ -10,7 +10,6 @@ import com.example.stf.entities.Message;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -62,15 +61,15 @@ public class ChatAPI {
         this.token = token;
     }
 
-    public void get(String chatId, Consumer<List<Message>> callback) {
-        Call< List<Message>> call = webServiceAPI.getMessages("Bearer {\"token\":\"" + token + "\"}", chatId);
+    public void get(String chatId, Consumer<Message[]> callback) {
+        Call<Message[]> call = webServiceAPI.getMessages("Bearer {\"token\":\"" + token + "\"}", chatId);
 
-        call.enqueue(new Callback<List<Message>>() {
+        call.enqueue(new Callback<Message[]>() {
             @Override
-            public void onResponse(Call< List<Message>> call, Response< List<Message>> response) {
+            public void onResponse(Call<Message[]> call, Response<Message[]> response) {
                 try {
                     if (response.isSuccessful()) {
-                        List<Message> messages = response.body();
+                        Message[] messages = response.body();
                         callback.accept(messages);
                     } else {
                         // error from the get contacts?
@@ -81,7 +80,7 @@ public class ChatAPI {
             }
 
             @Override
-            public void onFailure(Call< List<Message>> call, Throwable t) {
+            public void onFailure(Call<Message[]> call, Throwable t) {
             }
         });
     }

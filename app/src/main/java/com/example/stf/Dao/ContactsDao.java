@@ -1,6 +1,5 @@
 package com.example.stf.Dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -15,14 +14,8 @@ import java.util.List;
 public interface ContactsDao {
 
     //bring all the contacts
-//    @Query("SELECT * FROM Contact")
-//    Contact[] index();
-
-    @Query("SELECT * FROM Contact ORDER BY " +
-            "CASE WHEN SUBSTR(last_message_created, 3, 1) = ':' THEN last_message_created " +
-            "ELSE SUBSTR(last_message_created, 7, 2) || '.' || SUBSTR(last_message_created, 4, 2) || '.' || SUBSTR(last_message_created, 9) " +
-            "END DESC")
-    List<Contact> getAllContacts();
+    @Query("SELECT * FROM Contact")
+    Contact[] index();
 
     @Query("DELETE FROM Contact WHERE user_id = :id")
     void deleteByChatId(int id);
@@ -33,6 +26,12 @@ public interface ContactsDao {
 
     @Query("DELETE FROM Contact")
     void deleteAllContacts();
+
+    @Query("SELECT * FROM Contact ORDER BY " +
+            "CASE WHEN SUBSTR(last_message_created, 3, 1) = ':' THEN last_message_created " +
+            "ELSE SUBSTR(last_message_created, 7, 2) || '.' || SUBSTR(last_message_created, 4, 2) || '.' || SUBSTR(last_message_created, 9) " +
+            "END DESC")
+    List<Contact> indexSortedByDate();
 
     @Insert
     void insert(Contact... Contacts);

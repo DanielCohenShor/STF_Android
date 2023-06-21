@@ -21,11 +21,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -44,35 +42,20 @@ public class ChangeApiActivity extends AppCompatActivity {
     private MessagesDao messagesDao;
     private String baseUrl;
 
-    private String token;
-
     private HashSet<String> createdTextViews = new HashSet<>();
 
     private  SharedPreferences sharedPreferences;
-
-    private ViewModalContacts viewModalContacts;
-
     private final String SERVERURL = "serverUrl";
 
-    private final String SERVERTOKEN = "serverToken";
-    private ContactsListLiveData contactsLiveDataList;
 
-    private MessagesListLiveData messagesListLiveData;
-
-
-
-    private void getSharedPreferences() {
-        baseUrl = sharedPreferences.getString(SERVERURL, "");
-        token = sharedPreferences.getString(SERVERTOKEN, "");
-        contactsLiveDataList = ContactsListLiveData.getInstance();
-        messagesListLiveData = MessagesListLiveData.getInstance();
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_api);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        getSharedPreferences();
+
+        baseUrl = sharedPreferences.getString(SERVERURL, "");
+
         init();
 
         initDB();
@@ -85,8 +68,6 @@ public class ChangeApiActivity extends AppCompatActivity {
         btnExitChangeApi = findViewById(R.id.btnExitChangeApi);
         etChangeApi = findViewById(R.id.etChangeApi);
         btnChangeApi = findViewById(R.id.btnChangeApi);
-
-        viewModalContacts = new ViewModalContacts(baseUrl);
     }
 
     public void initDB() {
@@ -160,14 +141,11 @@ public class ChangeApiActivity extends AppCompatActivity {
                             " to: " + result+ ". Are you sure?")
                     .setPositiveButton("Yes", (dialog, which) -> {
                         resetSharedPreferences(result);
-                        viewModalContacts.removeAndroidToken(token);
-                        AsyncTask.execute(() -> {
-                            contactsDao.deleteAllContacts();
-                            messagesDao.deleteAllMessages();
-                            baseUrl = result;
-                        });
-                        contactsLiveDataList.setContactsList(Collections.emptyList());
-                        messagesListLiveData.setMessagesList(Collections.emptyList());
+                    AsyncTask.execute(() -> {
+                        contactsDao.deleteAllContacts();
+                        messagesDao.deleteAllMessages();
+                        baseUrl = result;
+                    });
                 })
                     .setNegativeButton("No", (dialog, which) -> {
                         // No action needed, dialog will be automatically dismissed

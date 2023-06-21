@@ -1,23 +1,19 @@
 package com.example.stf.Dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
-
-import java.util.List;
 
 @Dao
 public interface MessagesDao {
 
     //bring all the messages
     @Query("SELECT * FROM Message")
-    List<Message> index();
+    Message[] index();
 
     @Query("DELETE FROM Message WHERE chatId = :chatId")
     void deleteMessagesByChatId(String chatId);
@@ -27,7 +23,7 @@ public interface MessagesDao {
     Message get(int id);
 
     @Query("SELECT * FROM Message WHERE chatId =:id")
-    List<Message> getAllMessages(int id);
+    Message[] getAllMessages(int id);
 
     @Query("DELETE FROM Message")
     void deleteAllMessages();
