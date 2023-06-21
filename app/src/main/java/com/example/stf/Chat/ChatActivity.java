@@ -110,6 +110,8 @@ public class ChatActivity extends AppCompatActivity {
         flag = getIntent().getStringExtra("flag");
         messagesListLiveData = MessagesListLiveData.getInstance();
         contactsLiveDataList = ContactsListLiveData.getInstance();
+
+        //reset the notfications in db
     }
 
     @Override
