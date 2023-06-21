@@ -92,6 +92,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
                 performGetNewContact();
                 break;
             default:
+                //delete chat
                 deleteChat(newChatId);
                 break;
         }
