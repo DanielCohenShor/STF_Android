@@ -119,13 +119,23 @@ public class ReceiveMessages extends FirebaseMessagingService {
             // update last message
             // update localdb
             createMessageANDupdateLastMessage(message, newChatId);
-            resetNotfications(newChatId);
+            resetNotifications(newChatId);
         }
     }
 
-    private void resetNotfications(String newChatId) {
-        //dont know what to do
+    private void resetNotifications(String newChatId) {
+        //send to server req
+        viewModalContacts.performResetNotifications(serverToken, newChatId, this::handleResetNotificationsCallback);
     }
+
+    public void handleResetNotificationsCallback(String chatId) {
+        AsyncTask.execute(() -> {
+            Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
+            updateContact.setNotifications(0);
+            contactsDao.update(updateContact);
+        });
+    }
+
     private void createMessageANDupdateLastMessage(@NonNull RemoteMessage message, String newChatId) {
         //get contact in the db and get the infromation from the db
         String messageId = message.getData().get("messageId");

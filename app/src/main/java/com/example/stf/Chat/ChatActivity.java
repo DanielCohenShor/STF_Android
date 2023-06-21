@@ -97,11 +97,15 @@ public class ChatActivity extends AppCompatActivity {
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+        viewModalContacts =  new ViewModalContacts(serverUrl);
+        viewModalChats = new ViewModalChats(serverUrl);
         if (sharedPreferences.getString(CURRENTCHAT, "").isEmpty()) {
+            // enter this if only if we arrive from notifications.
             chatId = Integer.parseInt(getIntent().getStringExtra("newchatId"));
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(CURRENTCHAT, String.valueOf(chatId));
             editor.apply();
+            viewModalContacts.performResetNotifications(serverToken, String.valueOf(chatId), this::handleResetNotificationsCallback);
         } else {
             chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
         }
@@ -114,17 +118,31 @@ public class ChatActivity extends AppCompatActivity {
         //reset the notfications in db
     }
 
+    public void handleResetNotificationsCallback(String chatId) {
+        AsyncTask.execute(() -> {
+            Contact updateContact = contactDao.get(Integer.parseInt(chatId));
+            updateContact.setNotifications(0);
+            contactDao.update(updateContact);
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContentView(R.layout.activity_chat);
-        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        getSharedPreferences();
-        // init the xml and his stuff.
-        init();
         // init the db
         initDB();
+
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+
+        getSharedPreferences();
+        // init the xml and his stuff.
+
+        init();
+
+        initViews();
+
         // create listeners
         createListeners();
         // fecth from localdb
@@ -136,8 +154,6 @@ public class ChatActivity extends AppCompatActivity {
         if (Objects.equals(flag, "exist chat")) {
             // need to fetch only from db
             AsyncTask.execute(() -> {
-                viewModalChats = new ViewModalChats(serverUrl);
-                viewModalContacts =  new ViewModalContacts(serverUrl);
                 List<Message> messagesList = messagesDao.getAllMessages(chatId);
                 if (!messagesList.isEmpty()) {
                     Log.d("TAG", "test");
@@ -154,19 +170,22 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    public void initDB() {
+    private void initDB() {
         AsyncTask.execute(() -> {
             db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
                     .fallbackToDestructiveMigration()
                     .build();
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
-            viewModalChats = new ViewModalChats(serverUrl);
-            viewModalContacts =  new ViewModalContacts(serverUrl);
-            contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
-            runOnUiThread(this::showContactDetails);
-            runOnUiThread(this::observeContactsChanges);
         });
+    }
+
+    private void initViews() {
+        AsyncTask.execute(() -> {
+            contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
+        });
+        showContactDetails();
+        observeContactsChanges();
     }
 
     private void init() {
