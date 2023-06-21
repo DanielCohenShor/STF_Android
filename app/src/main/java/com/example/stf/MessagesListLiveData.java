@@ -35,10 +35,12 @@ public class MessagesListLiveData {
     public void addMessage(Message message) {
         List<Message> currentList = data.getValue();
         if (currentList != null) {
-            currentList.add(message);
-            data.postValue(currentList);
+            List<Message> updatedList = new ArrayList<>(currentList); // Create a mutable copy
+            updatedList.add(message); // Add the new message
+            data.postValue(updatedList); // Update the LiveData with the updated list
         }
     }
+
 }
 
 

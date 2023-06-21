@@ -36,6 +36,7 @@ import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -128,8 +129,9 @@ public class ChatActivity extends AppCompatActivity {
             AsyncTask.execute(() -> {
                 viewModalChats = new ViewModalChats(serverUrl);
                 viewModalContacts =  new ViewModalContacts(serverUrl);
-                List<Message> messagesList = messagesDao.index();
+                List<Message> messagesList = messagesDao.getAllMessages(chatId);
                 if (!messagesList.isEmpty()) {
+                    Log.d("TAG", "test");
                     runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
                 } else {
                     // Handle the case when the list of dao is empty
@@ -199,8 +201,9 @@ public class ChatActivity extends AppCompatActivity {
         // request to the local database - running on new thread
         AsyncTask.execute(() -> {
             List<Message> messages = messagesDao.getAllMessages(chatId);
-            runOnUiThread(() -> updateUIWithMessages(messages));
+            runOnUiThread(() -> messagesListLiveData.setMessagesList(messages));
         });
+
     }
 
     private void handleGetMessagesCallback(@NonNull List<Message> messages) {
@@ -212,7 +215,7 @@ public class ChatActivity extends AppCompatActivity {
                     messagesDao.insert(message);
                 }
             }
-            runOnUiThread(() -> updateUIWithMessages(messages));
+            runOnUiThread(() -> messagesListLiveData.setMessagesList(messages));
         });
     }
 
@@ -259,6 +262,7 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(CURRENTCHAT, "");
         editor.apply();
+        messagesListLiveData.setMessagesList(Collections.emptyList());
         Intent intent = new Intent(ChatActivity.this, ContactsActivity.class);
         startActivity(intent);
         finish();
