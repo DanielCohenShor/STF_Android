@@ -183,9 +183,12 @@ public class ChatActivity extends AppCompatActivity {
     private void initViews() {
         AsyncTask.execute(() -> {
             contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
+            runOnUiThread(() -> {
+                showContactDetails();
+                observeContactsChanges();
+            });
         });
-        showContactDetails();
-        observeContactsChanges();
+
     }
 
     private void init() {
