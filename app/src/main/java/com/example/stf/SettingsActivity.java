@@ -61,6 +61,9 @@ public class SettingsActivity extends AppCompatActivity {
     private boolean nightMode;
     private String serverToken;
     private String serverUrl;
+
+    private ViewModalContacts viewModalContacts;
+
     private final String SERVERURL = "serverUrl";
     private final String USERNAME = "userName";
     private final String SERVERTOKEN = "serverToken";
@@ -120,6 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
         llChangeApi = findViewById(R.id.llChangeApi);
         llLogout = findViewById(R.id.llLogout);
         llCurrentUserInfo = findViewById(R.id.llCurrentUserInfo);
+        viewModalContacts = new ViewModalContacts(serverUrl);
     }
 
     private boolean isSystemInNightMode() {
@@ -216,6 +220,7 @@ public class SettingsActivity extends AppCompatActivity {
                 .setTitle("Logout")
                 .setMessage("You will logout. Are you sure?")
                 .setPositiveButton("Yes", (dialog, which) -> {
+                    viewModalContacts.removeAndroidToken(serverToken);
                     // Delete the local database
                     resetSharedPreferences();
                     AsyncTask.execute(() -> {

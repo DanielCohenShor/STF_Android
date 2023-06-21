@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
 
@@ -42,10 +43,17 @@ public class ChangeApiActivity extends AppCompatActivity {
     private MessagesDao messagesDao;
     private String baseUrl;
 
+    private String token;
+
     private HashSet<String> createdTextViews = new HashSet<>();
 
     private  SharedPreferences sharedPreferences;
+
+    private ViewModalContacts viewModalContacts;
+
     private final String SERVERURL = "serverUrl";
+
+    private final String SERVERTOKEN = "serverToken";
 
 
     @Override
@@ -55,6 +63,8 @@ public class ChangeApiActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 
         baseUrl = sharedPreferences.getString(SERVERURL, "");
+
+        token = sharedPreferences.getString(SERVERTOKEN, "");
 
         init();
 
@@ -68,6 +78,8 @@ public class ChangeApiActivity extends AppCompatActivity {
         btnExitChangeApi = findViewById(R.id.btnExitChangeApi);
         etChangeApi = findViewById(R.id.etChangeApi);
         btnChangeApi = findViewById(R.id.btnChangeApi);
+
+        viewModalContacts = new ViewModalContacts(baseUrl);
     }
 
     public void initDB() {
@@ -141,11 +153,12 @@ public class ChangeApiActivity extends AppCompatActivity {
                             " to: " + result+ ". Are you sure?")
                     .setPositiveButton("Yes", (dialog, which) -> {
                         resetSharedPreferences(result);
-                    AsyncTask.execute(() -> {
-                        contactsDao.deleteAllContacts();
-                        messagesDao.deleteAllMessages();
-                        baseUrl = result;
-                    });
+                        viewModalContacts.removeAndroidToken(token);
+                        AsyncTask.execute(() -> {
+                            contactsDao.deleteAllContacts();
+                            messagesDao.deleteAllMessages();
+                            baseUrl = result;
+                        });
                 })
                     .setNegativeButton("No", (dialog, which) -> {
                         // No action needed, dialog will be automatically dismissed

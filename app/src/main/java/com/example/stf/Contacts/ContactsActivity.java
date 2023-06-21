@@ -217,6 +217,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void logOut() {
         resetSharedPreferences();
+        viewModalContacts.removeAndroidToken(serverToken);
         AsyncTask.execute(() -> {
             contactsDao.deleteAllContacts();
             messagesDao.deleteAllMessages();
