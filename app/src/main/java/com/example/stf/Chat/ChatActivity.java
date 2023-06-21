@@ -99,6 +99,9 @@ public class ChatActivity extends AppCompatActivity {
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
         if (sharedPreferences.getString(CURRENTCHAT, "").isEmpty()) {
             chatId = Integer.parseInt(getIntent().getStringExtra("newchatId"));
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(CURRENTCHAT, String.valueOf(chatId));
+            editor.apply();
         } else {
             chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
         }
