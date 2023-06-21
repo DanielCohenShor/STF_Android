@@ -197,7 +197,7 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
         data: {
             chatId: chatId,
             messageDate: messageDate.toString(),
-            messageId: messageId
+            messageId: messageId.toString()
         }
     };
 
