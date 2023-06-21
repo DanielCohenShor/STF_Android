@@ -37,7 +37,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     AppDB db;
     ContactsDao contactsDao;
     MessagesDao messagesDao;
-    private String chatID;
+    private String currentChatID;
     private ViewModalContacts viewModalContacts;
     private SharedPreferences sharedPreferences;
     private final String SERVERTOKEN = "serverToken";
@@ -70,7 +70,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     public void getSharedPreferences() {
-        chatID = sharedPreferences.getString(CURRENTCHAT, "");
+        currentChatID = sharedPreferences.getString(CURRENTCHAT, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
         baseUrl = sharedPreferences.getString(SERVERURL, "");
         viewModalContacts = new ViewModalContacts(baseUrl);
@@ -109,7 +109,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     private void receiveMessage(@NonNull RemoteMessage message, String newChatId) {
-        if (!newChatId.equals(chatID)) {
+        if (!newChatId.equals(currentChatID)) {
             // not in the chat render the localdb to be in the right order
             // add the new message to the messages db
             addMessageToDB(message, newChatId);
@@ -166,7 +166,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             //not in the chat need to open this chat
             sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "exist chat");
         } else {
-            Log.d("new chat", "new chat");
             //the contact not exist
             // get from server
             newChatAdded(newChatId);
@@ -186,14 +185,13 @@ public class ReceiveMessages extends FirebaseMessagingService {
 
     private void sendNotification(String messageBody, String newchatId, String displayName, String flag) {
         if (!Objects.equals(flag, "in chat")) {
-
             //update the current chat to be the right chat.
-            updateSharedPreferences(newchatId);
             // need to pass the chad id, the displayname.
             // so it will open the right chat with the right messeages.
             Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
             intent.putExtra("contactDisplayName", displayName);
             intent.putExtra("flag", flag);
+            intent.putExtra("newchatId", newchatId);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             // Updated code
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
@@ -227,12 +225,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             }
             notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
         }
-    }
-
-    private void updateSharedPreferences(String newchatId) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, newchatId);
-        editor.apply();
     }
 
     private void newChatAdded(String newChatId) {

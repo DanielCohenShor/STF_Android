@@ -97,7 +97,11 @@ public class ChatActivity extends AppCompatActivity {
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
+        if (sharedPreferences.getString(CURRENTCHAT, "").isEmpty()) {
+            chatId = Integer.parseInt(getIntent().getStringExtra("newchatId"));
+        } else {
+            chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
+        }
         // Retrieve the Parcelable extra "picture" as a Bitmap
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
         flag = getIntent().getStringExtra("flag");
