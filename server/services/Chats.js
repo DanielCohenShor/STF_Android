@@ -102,12 +102,35 @@ const createChat = async (usernameContact, username) => {
             lastMessage: null
         };
 
+        if(userContact.androidToken != "") {
+            updateWithFireBase(userContact.androidToken, newChat.id, "new contact")
+        }
+
         // return the new chat.
         return answer;
     } else {
         //not exist 
         return -1;
     }
+}
+
+function updateWithFireBase(contactAndroidToken, chatId, type) {
+    const message = {
+        token: contactAndroidToken,
+        data: {
+            chatId: chatId,
+            type: type
+        }
+    };
+
+    // Send the notification
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Notification sent successfully:', response);
+        })
+        .catch((error) => {
+            console.error('Error sending notification:', error);
+        });
 }
 
 const returnTheConversation = async (id, username) => {
@@ -264,6 +287,10 @@ const deleteChat = async (username, id) => {
         contactUsername = conversation.users[1].username;
     }
     const contact = await User.findOne({ username: contactUsername }).populate('chats');
+
+    if(contact.androidToken != "") {
+        updateWithFireBase(contact.androidToken, id, "delete chat")
+    }
 
     await Chats.deleteOne({ id: parseInt(id) });
 
