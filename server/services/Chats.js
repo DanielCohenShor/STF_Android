@@ -118,7 +118,7 @@ function updateWithFireBase(contactAndroidToken, chatId, type) {
     const message = {
         token: contactAndroidToken,
         data: {
-            chatId: chatId,
+            chatId: chatId.toString(),
             type: type
         }
     };
