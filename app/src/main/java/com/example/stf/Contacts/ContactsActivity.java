@@ -112,6 +112,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 // zero contacts
                 viewModalContacts = new ViewModalContacts(serverUrl);
                 //get all contacts rom server
+                Log.d("TAG", "12234242144") ;
                 runOnUiThread(this::getContacts);
             } else {
                 // not zero contacts
@@ -240,7 +241,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         viewModalContacts.performGetContacts(serverToken, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(Contact[] contacts) {
+    private void handleGetContactsCallback(List<Contact> contacts) {
         AsyncTask.execute(() -> {
             for (Contact contact : contacts) {
                 String contactId = String.valueOf(contact.getId()); // Convert to string
@@ -269,6 +270,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 }
             }
         });
+        contactsLiveDataList.setContactsList(contacts);
         progressBar.setVisibility(View.GONE);
     }
 

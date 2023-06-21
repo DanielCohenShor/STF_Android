@@ -118,7 +118,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             // reset the notfication
             // update last message
             // update localdb
-            Log.d("tests", "not sending");
             createMessageANDupdateLastMessage(message, newChatId);
             resetNotfications(newChatId);
         }
@@ -172,7 +171,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             // get from server
             newChatAdded(newChatId);
             sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "new chat");
-
         }
     }
 

@@ -43,7 +43,7 @@ public interface WebServiceAPI {
     Call<Void> removeAndroidToken(@Header("Authorization") String token);
 
     @GET("Chats")
-    Call<Contact[]> getContacts(@Header("Authorization") String token);
+    Call<List<Contact>> getContacts(@Header("Authorization") String token);
 
     @POST("Chats")
     Call<Contact> addContact(@Header("Authorization") String token, @Body RequestBody username);

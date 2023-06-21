@@ -309,7 +309,7 @@ public class ChatActivity extends AppCompatActivity {
         viewModalContacts.performGetContacts(serverToken, this::handleGetContactsCallback);
     }
 
-    private void handleGetContactsCallback(Contact[] contacts) {
+    private void handleGetContactsCallback(List<Contact> contacts) {
         AsyncTask.execute(() -> {
             for (Contact contact : contacts) {
                 Contact existingContact = contactDao.get(contact.getId());
