@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.ContactsListLiveData;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
@@ -61,6 +62,7 @@ public class ChatActivity extends AppCompatActivity {
     private String contactDisplayName;
 
     private ViewModalChats viewModalChats;
+    private ViewModalContacts viewModalContacts;
 
     private RecyclerView listViewMessages;
 
@@ -86,6 +88,8 @@ public class ChatActivity extends AppCompatActivity {
     private String flag;
 
     private MessagesListLiveData messagesListLiveData;
+    private ContactsListLiveData contactsLiveDataList;
+
 
 
     private void getSharedPreferences() {
@@ -97,6 +101,7 @@ public class ChatActivity extends AppCompatActivity {
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
         flag = getIntent().getStringExtra("flag");
         messagesListLiveData = MessagesListLiveData.getInstance();
+        contactsLiveDataList = ContactsListLiveData.getInstance();
     }
 
     @Override
@@ -122,6 +127,7 @@ public class ChatActivity extends AppCompatActivity {
             // need to fetch only from db
             AsyncTask.execute(() -> {
                 viewModalChats = new ViewModalChats(serverUrl);
+                viewModalContacts =  new ViewModalContacts(serverUrl);
                 List<Message> messagesList = messagesDao.index();
                 if (!messagesList.isEmpty()) {
                     runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
@@ -146,6 +152,7 @@ public class ChatActivity extends AppCompatActivity {
             messagesDao = db.messagesDao();
             contactDao = db.ContactsDao();
             viewModalChats = new ViewModalChats(serverUrl);
+            viewModalContacts =  new ViewModalContacts(serverUrl);
             contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
             runOnUiThread(this::showContactDetails);
             runOnUiThread(this::observeContactsChanges);
@@ -298,12 +305,59 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void newContactArrived() {
+        viewModalContacts.performGetContacts(serverToken, this::handleGetContactsCallback);
+    }
+
+    private void handleGetContactsCallback(Contact[] contacts) {
+        AsyncTask.execute(() -> {
+            for (Contact contact : contacts) {
+                Contact existingContact = contactDao.get(contact.getId());
+                if (existingContact == null) {
+                    contactDao.insert(contact);
+                    contactsLiveDataList.addContact(contact);
+                } else {
+                    if (contact.getLastMessage() != null) {
+                        contactDao.update(contact);
+                    }
+                }
+            }
+        });
+        progressBar.setVisibility(View.GONE);
+    }
+
     private void observeContactsChanges() {
         messagesListLiveData.getList().observe(this, new Observer<List<Message>>() {
             @Override
             public void onChanged(List<Message> messageList) {
                 // Handle the onChanged event here
                 updateUIWithMessages(messageList);
+            }
+        });
+
+        contactsLiveDataList.getSomeoneDeleteMe().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean value) {
+                // Handle the onChanged event here
+                if (value) {
+                    exitChat();
+                    contactsLiveDataList.setSomeoneDeleteMe(false);
+                }
+            }
+        });
+
+        contactsLiveDataList.getSomeoneAddMe().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean value) {
+                // Handle the onChanged event here
+                if (value) {
+                    // Someone added you
+                    //get all contacts rom server
+                    runOnUiThread(ChatActivity.this::newContactArrived);
+                    // Perform the desired action
+                    // Update the value of someoneAddMe to false
+                    contactsLiveDataList.setSomeoneAddMe(false);
+                }
             }
         });
     }

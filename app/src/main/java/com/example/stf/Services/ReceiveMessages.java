@@ -18,6 +18,7 @@ import androidx.room.Room;
 
 import com.example.stf.AppDB;
 import com.example.stf.Chat.ChatActivity;
+import com.example.stf.Contacts.ViewModalContacts;
 import com.example.stf.ContactsListLiveData;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
@@ -37,6 +38,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     ContactsDao contactsDao;
     MessagesDao messagesDao;
     private String chatID;
+    private ViewModalContacts viewModalContacts;
     private SharedPreferences sharedPreferences;
     private final String SERVERTOKEN = "serverToken";
     private final String DISPLAYNAME = "displayName";
@@ -44,6 +46,8 @@ public class ReceiveMessages extends FirebaseMessagingService {
     private final String CURRENTCHAT = "currentChat";
     private final String SERVERURL = "serverUrl";
     private final String USERNAME = "userName";
+    private String serverToken;
+    private String baseUrl;
     private ContactsListLiveData contactsLiveDataList;
     private MessagesListLiveData messagesListLiveData;
 
@@ -65,18 +69,44 @@ public class ReceiveMessages extends FirebaseMessagingService {
         messagesListLiveData = MessagesListLiveData.getInstance();
     }
 
-    public void getChatId() {
+    public void getSharedPreferences() {
         chatID = sharedPreferences.getString(CURRENTCHAT, "");
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+        baseUrl = sharedPreferences.getString(SERVERURL, "");
+        viewModalContacts = new ViewModalContacts(baseUrl);
+
     }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-        getChatId();
+        String type = message.getData().get("type");
+        getSharedPreferences();
         String newChatId = message.getData().get("chatId");
-        Log.d("new chat id: ", newChatId);
-        Log.d("click chat id: ", chatID);
         assert newChatId != null;
+        switch (type) {
+            case "message":
+                receiveMessage(message, newChatId);
+                break;
+            case "new contact":
+                performGetNewContact();
+                break;
+            default:
+                deleteChat(newChatId);
+                break;
+        }
+    }
+
+    private void performGetNewContact() {
+        contactsLiveDataList.setSomeoneAddMe(true);
+    }
+
+    private void deleteChat(String newChatId) {
+        AsyncTask.execute(() -> {contactsDao.deleteByChatId(Integer.parseInt(newChatId));});
+        contactsLiveDataList.setSomeoneDeleteMe(true);
+    }
+
+    private void receiveMessage(@NonNull RemoteMessage message, String newChatId) {
         if (!newChatId.equals(chatID)) {
             // not in the chat render the localdb to be in the right order
             // add the new message to the messages db
@@ -91,7 +121,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             resetNotfications(newChatId);
         }
     }
-
 
     private void resetNotfications(String newChatId) {
         //dont know what to do

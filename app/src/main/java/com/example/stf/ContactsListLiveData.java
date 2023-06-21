@@ -12,10 +12,16 @@ import java.util.List;
 public class ContactsListLiveData {
     private static ContactsListLiveData instance;
     private MutableLiveData<List<Contact>> data;
+    private MutableLiveData<Boolean> someoneAddMe;
+    private MutableLiveData<Boolean> someoneDeleteMe;
 
     private ContactsListLiveData() {
         data = new MutableLiveData<>();
         data.postValue(new ArrayList<>());
+        someoneAddMe = new MutableLiveData<>();
+        someoneAddMe.postValue(false);
+        someoneDeleteMe = new MutableLiveData<>();
+        someoneDeleteMe.postValue(false);
     }
 
     public static synchronized ContactsListLiveData getInstance() {
@@ -23,6 +29,22 @@ public class ContactsListLiveData {
             instance = new ContactsListLiveData();
         }
         return instance;
+    }
+
+    public LiveData<Boolean> getSomeoneAddMe() {
+        return someoneAddMe;
+    }
+
+    public void setSomeoneAddMe(boolean value) {
+        someoneAddMe.postValue(value);
+    }
+
+    public LiveData<Boolean> getSomeoneDeleteMe() {
+        return someoneDeleteMe;
+    }
+
+    public void setSomeoneDeleteMe(boolean value) {
+        someoneDeleteMe.postValue(value);
     }
 
     public void setContactsList(List<Contact> contactsList) {

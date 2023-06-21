@@ -385,6 +385,24 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 updateUIWithContacts(contacts);
             }
         });
+
+        contactsLiveDataList.getSomeoneAddMe().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean value) {
+                // Handle the onChanged event here
+                if (value) {
+                    // Someone added you
+                    //get all contacts rom server
+                    runOnUiThread(ContactsActivity.this::getContacts);
+                    // Perform the desired action
+                    // Update the value of someoneAddMe to false
+                    contactsLiveDataList.setSomeoneAddMe(false);
+                }
+            }
+        });
+
+
+
     }
 
 }
