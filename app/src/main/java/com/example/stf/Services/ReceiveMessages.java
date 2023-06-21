@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -30,6 +31,7 @@ import com.example.stf.entities.User;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ReceiveMessages extends FirebaseMessagingService {
@@ -173,7 +175,12 @@ public class ReceiveMessages extends FirebaseMessagingService {
             int integerNewChatId = Integer.parseInt(newChatId);
             Log.d("Tag", "After change to int: " + integerNewChatId);
             Message newLastMessage = new Message(Integer.parseInt(messageId), created, sender, content,integerNewChatId);
-            AsyncTask.execute(() -> {messagesDao.insert(newLastMessage);});
+            AsyncTask.execute(() -> {
+                List<Message> messagesList = messagesDao.getAllMessages(Integer.parseInt(newChatId));
+                if (!messagesList.isEmpty()) {
+                    messagesDao.insert(newLastMessage);
+                }
+            });
             updateLastMessage(integerNewChatId, newLastMessage, sender);
             //not in the chat need to open this chat
             sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "exist chat");
@@ -184,6 +191,9 @@ public class ReceiveMessages extends FirebaseMessagingService {
             sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "new chat");
         }
     }
+
+
+
 
     private void updateLastMessage(int newChatId, Message newLastMessage, User sender) {
         //TODO: check if need to update in the server the notfications ??
@@ -202,7 +212,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             // so it will open the right chat with the right messeages.
             Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
             intent.putExtra("contactDisplayName", displayName);
-            intent.putExtra("flag", flag);
             intent.putExtra("newchatId", newchatId);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             // Updated code

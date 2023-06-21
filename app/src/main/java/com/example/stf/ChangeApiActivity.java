@@ -110,29 +110,30 @@ public class ChangeApiActivity extends AppCompatActivity {
     }
 
     public String checkUrlValidation(String text) {
-        String pattern1 = "(?i)http://((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9])|([1-9][0-9][0-9][0-9][0-9]))/api/";
-        String pattern2 = "((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9])|([1-9][0-9][0-9][0-9][0-9]))";
-
-        // Create a Pattern object
-        Pattern regex1 = Pattern.compile(pattern1);
-        // Create a Pattern object
-        Pattern regex2 = Pattern.compile(pattern2);
-
-        // Create a Matcher object
-        Matcher matcher1 = regex1.matcher(text);
-        // Create a Matcher object
-        Matcher matcher2 = regex2.matcher(text);
-
-        if (matcher1.matches()) {
-            String match = matcher1.group();
-            return match.substring(0, 4).toLowerCase() + match.substring(4);
-        } else if (matcher2.matches()) {
-            String match = matcher2.group();
-            return "http://" + match + "/api/";
-        } else {
-            //error
-            return "error";
-        }
+//        String pattern1 = "(?i)http://((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9])|([1-9][0-9][0-9][0-9][0-9]))";
+//        String pattern2 = "(?i)https://((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9])|([1-9][0-9][0-9][0-9][0-9]))";
+//
+//        // Create a Pattern object
+//        Pattern regex1 = Pattern.compile(pattern1);
+//        // Create a Pattern object
+//        Pattern regex2 = Pattern.compile(pattern2);
+//
+//        // Create a Matcher object
+//        Matcher matcher1 = regex1.matcher(text);
+//        // Create a Matcher object
+//        Matcher matcher2 = regex2.matcher(text);
+//
+//        if (matcher1.matches()) {
+//            String match = matcher1.group();
+//            return match.substring(0, 4).toLowerCase() + match.substring(4);
+//        } else if (matcher2.matches()) {
+//            String match = matcher2.group();
+//            return match.substring(0, 4).toLowerCase() + match.substring(4);
+//        } else {
+//            //error
+//            return "error";
+//        }
+        return text;
     }
 
     private void resetSharedPreferences(String newBaseUrl) {

@@ -86,7 +86,6 @@ public class ChatActivity extends AppCompatActivity {
     private final String DISPLAYNAME = "displayName";
     private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
-    private String flag;
 
     private MessagesListLiveData messagesListLiveData;
     private ContactsListLiveData contactsLiveDataList;
@@ -111,7 +110,6 @@ public class ChatActivity extends AppCompatActivity {
         }
         // Retrieve the Parcelable extra "picture" as a Bitmap
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
-        flag = getIntent().getStringExtra("flag");
         messagesListLiveData = MessagesListLiveData.getInstance();
         contactsLiveDataList = ContactsListLiveData.getInstance();
 
@@ -146,28 +144,22 @@ public class ChatActivity extends AppCompatActivity {
         // create listeners
         createListeners();
         // fecth from localdb
-        fetchFromLocalDB(flag);
+        fetchFromLocalDB();
 
     }
 
-    private void fetchFromLocalDB(String flag) {
-        if (Objects.equals(flag, "exist chat")) {
-            // need to fetch only from db
-            AsyncTask.execute(() -> {
-                List<Message> messagesList = messagesDao.getAllMessages(chatId);
-                if (!messagesList.isEmpty()) {
-                    Log.d("TAG", "test");
-                    runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
-                } else {
-                    // Handle the case when the list of dao is empty
-                    //get all messages.
-                    runOnUiThread(this::getMessages);
-                }
-            });
-        } else if (Objects.equals(flag, "new chat")) {
-            // not ready
-            runOnUiThread(this::getMessages);
-        }
+    private void fetchFromLocalDB() {
+        // need to fetch only from db
+        AsyncTask.execute(() -> {
+            List<Message> messagesList = messagesDao.getAllMessages(chatId);
+            if (!messagesList.isEmpty()) {
+                runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
+            } else {
+                // Handle the case when the list of dao is empty
+                //get all messages.
+                runOnUiThread(this::getMessages);
+            }
+        });
     }
 
     private void initDB() {
@@ -228,13 +220,6 @@ public class ChatActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         // request to the server - running on new thread
         viewModalChats.performGetMessages(serverToken, Integer.toString(chatId), this::handleGetMessagesCallback);
-
-        // request to the local database - running on new thread
-        AsyncTask.execute(() -> {
-            List<Message> messages = messagesDao.getAllMessages(chatId);
-            runOnUiThread(() -> messagesListLiveData.setMessagesList(messages));
-        });
-
     }
 
     private void handleGetMessagesCallback(@NonNull List<Message> messages) {
