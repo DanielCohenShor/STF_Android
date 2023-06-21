@@ -5,11 +5,13 @@ function socketHandler() {
     io.on('connection', socket => {
 
         socket.on("sendMessage", (data) => {
+            console.log("heyyyy")
             // send to the client the id of the chat with the new message
             socket.to(data.id).emit("receive_message", data);
         })
 
         socket.on("join_chat", (id) => {
+            console.log("test")
             socket.join(id)
         })
 

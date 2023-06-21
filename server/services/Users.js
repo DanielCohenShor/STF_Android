@@ -28,7 +28,6 @@ const returnInformationUser = async (username) => {
 }
 
 const saveAndroidToken = async (username, androidToken) => {
-    // console.log(androidToken)
     const user = await User.findOne({ username })
     if (user) {
         user.androidToken = androidToken;

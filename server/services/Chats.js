@@ -2,6 +2,9 @@ const User = require('../models/Users');
 const Chats = require('../models/Chats');
 const Message = require('../models/Message');
 const admin = require('firebase-admin');
+const { io } = require('../server.js');
+
+// Invoke the socketHandler function to activate the socket event handlers
 
 const checkWhichUserToReturn = (chat, username) => {
     if (chat.users[0].username === username) {
@@ -178,13 +181,36 @@ const addNewMessage = async (username, messageContent, id) => {
     }
     const contact = await User.findOne({ username: contactUsername });
 
+    // check if we are sending to android
+    sendingToAndroid(contact, id, messageContent, user.displayName, messageDate, newMessage.id, username);
+
+    androidToReact(user, contact, newMessage, id);
+
+    return newMessage;
+}
+
+function androidToReact(user, contact, newMessage, chatId) {
+    console.log(user.androidToken)
+    console.log(contact.androidToken)
+    if(user.androidToken != "") {
+        if(contact.androidToken == "") {
+            console.log("in")
+            const data = { 
+                currentMessage: newMessage,
+                id: chatId,
+                sender: user.username }
+            // Emit the "sendMessage" event to the connected sockets
+            io.emit("sendMessage", data);
+        }
+    }
+}
+
+async function sendingToAndroid (contact, chatId, messageContent, userDisplayName, messageDate, newMessageId, senderUsername) {
     // check if the contact has android token - if the contact is connected from the android
     if (contact.androidToken != "") {
         // sending message throw the firebase
-        sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, newMessage.id, username);
+        sendMessageToFireBase(messageContent, userDisplayName, contact.androidToken, chatId, messageDate, newMessageId, senderUsername);
     }
-
-    return newMessage;
 }
 
 function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, messageId, senderUsername) {
@@ -197,7 +223,7 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
         data: {
             chatId: chatId,
             messageDate: messageDate.toString(),
-            messageId: messageId,
+            messageId: messageId.toString(),
             senderUsername: senderUsername
         }
     };

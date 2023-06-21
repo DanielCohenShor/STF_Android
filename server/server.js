@@ -43,7 +43,6 @@ admin.initializeApp({
   // credential: admin.credential.refreshToken(serverKey),
 });
 
-const socketHandler = require('./HandleSocketServer');
 const users = require('./routes/Users');
 const tokens = require('./routes/Tokens');
 const chats = require('./routes/Chats');
