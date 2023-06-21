@@ -230,6 +230,5 @@ public class ReceiveMessages extends FirebaseMessagingService {
     private void newChatAdded(String newChatId) {
         // create req to the server to get this contact and add him to the local db
 
-
     }
 }
