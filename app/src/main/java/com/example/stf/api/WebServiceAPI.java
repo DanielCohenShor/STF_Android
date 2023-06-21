@@ -7,6 +7,8 @@ import com.example.stf.entities.Message;
 import com.example.stf.entities.User;
 
 
+import java.util.List;
+
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -47,7 +49,7 @@ public interface WebServiceAPI {
     Call<Contact> addContact(@Header("Authorization") String token, @Body RequestBody username);
 
     @GET("Chats/{id}/Messages")
-    Call<Message[]> getMessages(@Header("Authorization") String token, @Path("id") String id);
+    Call<List<Message>> getMessages(@Header("Authorization") String token, @Path("id") String id);
 
     @POST("Chats/{id}/Messages")
     Call<Message> addMessage(@Header("Authorization") String token, @Path("id") String id, @Body RequestBody message);

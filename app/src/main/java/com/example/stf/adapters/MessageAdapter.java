@@ -14,8 +14,10 @@ import com.example.stf.entities.Message;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -55,11 +57,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private final LayoutInflater mInflater;
 
-    private Message[] messages;
+    private List<Message> messages;
 
     private final String currentUserUsername;
 
-    public MessageAdapter(Context context, Message[] messages, String currentUserUsername) {
+    public MessageAdapter(Context context, List<Message> messages, String currentUserUsername) {
         this.mInflater = LayoutInflater.from(context);
         this.messages = messages;
         this.currentUserUsername = currentUserUsername;
@@ -67,7 +69,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        if (!Objects.equals(messages[position].getSender().getUsername(), currentUserUsername)) {
+        if (!Objects.equals(messages.get(position).getSender().getUsername(), currentUserUsername)) {
             return VIEW_TYPE_2;
         } else {
             return VIEW_TYPE_1;
@@ -111,7 +113,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         // Bind data to the appropriate view holder based on the view type
         if (messages != null) {
-            final Message currentMessage = messages[position];
+            final Message currentMessage = messages.get(position);
             String createdDateString = currentMessage.getCreated();
             SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.US);
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
@@ -124,7 +126,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     myMessageViewHolder.tvContent.setText(currentMessage.getContent());
 
                     if (position != 0) {
-                        final Message prevMessage = messages[position - 1];
+                        final Message prevMessage = messages.get(position - 1);
                         String prevDateString = prevMessage.getCreated();
                         try {
                             Date myCreatedDate = inputFormat.parse(createdDateString);
@@ -163,7 +165,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     contactMessageViewHolder.tvContent.setText(currentMessage.getContent());
 
                     if (position != 0) {
-                        final Message prevMessage = messages[position - 1];
+                        final Message prevMessage = messages.get(position - 1);
                         String prevDateString = prevMessage.getCreated();
                         try {
                             Date myCreatedDate = inputFormat.parse(createdDateString);
@@ -201,28 +203,28 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        return messages.length;
+        return messages.size();
     }
 
-    public void setMessages(Message[] messages) {
+    public void setMessages(List<Message> messages) {
         this.messages = messages;
     }
 
-    public Message[] getMessages() {
+    public List<Message> getMessages() {
         return messages;
     }
 
     public void addMessage(Message newMessage) {
-        // Create a new array with increased size
-        Message[] newMessages = new Message[getItemCount() + 1];
+        // Create a new list with increased size
+        List<Message> messageList = new ArrayList<>(getItemCount() + 1);
 
-        // Copy elements from the original array to the new array
-        System.arraycopy(messages, 0, newMessages, 0, getItemCount());
+        // Copy elements from the original list to the new list
+        messageList.addAll(messages);
 
-        // Add the new message to the new array
-        newMessages[getItemCount()] = newMessage;
+        // Add the new message to the new list
+        messageList.add(newMessage);
 
-        // Assign the new array back to the original reference
-        messages = newMessages;
+        // Assign the new list back to the original reference
+        messages = messageList;
     }
 }

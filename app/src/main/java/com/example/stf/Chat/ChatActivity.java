@@ -2,6 +2,7 @@ package com.example.stf.Chat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -24,13 +25,18 @@ import android.widget.TextView;
 
 import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
+import com.example.stf.ContactsListLiveData;
 import com.example.stf.Dao.ContactsDao;
 import com.example.stf.Dao.MessagesDao;
+import com.example.stf.MessagesListLiveData;
 import com.example.stf.R;
 import com.example.stf.adapters.MessageAdapter;
 import com.example.stf.entities.Contact;
 import com.example.stf.entities.Message;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -77,6 +83,9 @@ public class ChatActivity extends AppCompatActivity {
     private final String DISPLAYNAME = "displayName";
     private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
+    private String flag;
+
+    private MessagesListLiveData messagesListLiveData;
 
 
     private void getSharedPreferences() {
@@ -86,6 +95,8 @@ public class ChatActivity extends AppCompatActivity {
         chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
         // Retrieve the Parcelable extra "picture" as a Bitmap
         contactDisplayName = getIntent().getStringExtra("contactDisplayName");
+        flag = getIntent().getStringExtra("flag");
+        messagesListLiveData = MessagesListLiveData.getInstance();
     }
 
     @Override
@@ -95,26 +106,37 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         getSharedPreferences();
-
         // init the xml and his stuff.
         init();
+        // init the db
         initDB();
-
+        // create listeners
         createListeners();
-        fetchFromLocalDB();
+        // fecth from localdb
+        fetchFromLocalDB(flag);
+
     }
 
-    private void fetchFromLocalDB() {
-        AsyncTask.execute(() -> {
-            if (messagesDao.index().length != 0) {
+    private void fetchFromLocalDB(String flag) {
+        if (Objects.equals(flag, "exist chat")) {
+            // need to fetch only from db
+            AsyncTask.execute(() -> {
                 viewModalChats = new ViewModalChats(serverUrl);
-                Message[] messages = messagesDao.index();
-                runOnUiThread(() -> updateUIWithMessages(messages));
-            }
-            //get all messagegs.
+                List<Message> messagesList = messagesDao.index();
+                if (!messagesList.isEmpty()) {
+                    runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
+                } else {
+                    // Handle the case when the list of dao is empty
+                    //get all messages.
+                    runOnUiThread(this::getMessages);
+                }
+            });
+        } else if (Objects.equals(flag, "new chat")) {
+            // not ready
             runOnUiThread(this::getMessages);
-        });
+        }
     }
+
 
     public void initDB() {
         AsyncTask.execute(() -> {
@@ -126,6 +148,7 @@ public class ChatActivity extends AppCompatActivity {
             viewModalChats = new ViewModalChats(serverUrl);
             contactProfilePic = contactDao.get(chatId).getUser().getProfilePic();
             runOnUiThread(this::showContactDetails);
+            runOnUiThread(this::observeContactsChanges);
         });
     }
 
@@ -169,12 +192,12 @@ public class ChatActivity extends AppCompatActivity {
 
         // request to the local database - running on new thread
         AsyncTask.execute(() -> {
-            Message[] messages = messagesDao.getAllMessages(chatId);
+            List<Message> messages = messagesDao.getAllMessages(chatId);
             runOnUiThread(() -> updateUIWithMessages(messages));
         });
     }
 
-    private void handleGetMessagesCallback(@NonNull Message[] messages) {
+    private void handleGetMessagesCallback(@NonNull List<Message> messages) {
         AsyncTask.execute(() -> {
             for (Message message : messages) {
                 Message existingMessage = messagesDao.get(message.getId());
@@ -187,7 +210,7 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUIWithMessages(Message[] messages) {
+    private void updateUIWithMessages(List<Message> messages) {
         // Change the UI using the adapter
         messageAdapter = new MessageAdapter(this, messages, currentUserUsername);
         messageAdapter.setMessages(messages);
@@ -273,5 +296,15 @@ public class ChatActivity extends AppCompatActivity {
         if (lastPosition >= 0) {
             listViewMessages.scrollToPosition(lastPosition);
         }
+    }
+
+    private void observeContactsChanges() {
+        messagesListLiveData.getList().observe(this, new Observer<List<Message>>() {
+            @Override
+            public void onChanged(List<Message> messageList) {
+                // Handle the onChanged event here
+                updateUIWithMessages(messageList);
+            }
+        });
     }
 }
