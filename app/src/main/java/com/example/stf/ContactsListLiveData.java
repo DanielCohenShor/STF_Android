@@ -15,6 +15,8 @@ public class ContactsListLiveData {
     private MutableLiveData<Boolean> someoneAddMe;
     private MutableLiveData<Boolean> someoneDeleteMe;
 
+
+
     private ContactsListLiveData() {
         data = new MutableLiveData<>();
         data.postValue(new ArrayList<>());
@@ -34,6 +36,7 @@ public class ContactsListLiveData {
     public LiveData<Boolean> getSomeoneAddMe() {
         return someoneAddMe;
     }
+
 
     public void setSomeoneAddMe(boolean value) {
         someoneAddMe.postValue(value);

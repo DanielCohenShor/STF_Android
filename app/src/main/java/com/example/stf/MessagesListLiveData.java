@@ -12,9 +12,11 @@ public class MessagesListLiveData {
     private static MessagesListLiveData instance;
     private MutableLiveData<List<Message>> data;
 
+
     private MessagesListLiveData() {
         data = new MutableLiveData<>();
         data.postValue(new ArrayList<>());
+
     }
 
     public static synchronized MessagesListLiveData getInstance() {
@@ -23,6 +25,8 @@ public class MessagesListLiveData {
         }
         return instance;
     }
+
+
 
     public void setMessagesList(List<Message> messagesList) {
         data.postValue(messagesList);
