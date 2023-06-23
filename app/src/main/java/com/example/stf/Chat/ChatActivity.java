@@ -310,7 +310,7 @@ public class ChatActivity extends AppCompatActivity {
             Contact currentContact = contactDao.get(newMessage.getChatId());
             currentContact.setLastMessage(newMessage);
             contactDao.update(currentContact);
-            runOnUiThread(() -> updateUIWithNewMessage(newMessage));
+            messagesListLiveData.addMessage(newMessage);
         });
     }
 

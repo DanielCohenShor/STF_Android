@@ -1,5 +1,7 @@
 package com.example.stf;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -39,9 +41,10 @@ public class MessagesListLiveData {
     public void addMessage(Message message) {
         List<Message> currentList = data.getValue();
         if (currentList != null) {
-            List<Message> updatedList = new ArrayList<>(currentList); // Create a mutable copy
-            updatedList.add(message); // Add the new message
-            data.postValue(updatedList); // Update the LiveData with the updated list
+            Log.d("Tag", "get the list size: " + currentList.size());
+            currentList.add(message);
+            Log.d("Tag", "get the new list size: " + currentList.size());
+            data.postValue(currentList); // Update the LiveData with the updated list
         }
     }
 
