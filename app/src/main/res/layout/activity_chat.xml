@@ -27,7 +27,8 @@
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_exit" />
+            app:srcCompat="@drawable/ic_exit"
+            android:contentDescription="@string/backImg" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contactImg"
@@ -83,7 +84,8 @@
             android:ems="10"
             android:hint="@string/ed_new_message_hint"
             android:inputType="text"
-            android:paddingStart="10dp" />
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnSendMessage"
@@ -96,7 +98,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_send_message"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/white"
+            android:contentDescription="@string/sendmessage" />
     </LinearLayout>
 
     <LinearLayout
@@ -114,5 +117,5 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
     </LinearLayout>
-]
+
 </androidx.constraintlayout.widget.ConstraintLayout>

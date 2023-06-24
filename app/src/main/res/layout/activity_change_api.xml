@@ -28,7 +28,8 @@
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_exit" />
+            app:srcCompat="@drawable/ic_exit"
+            android:contentDescription="@string/backImg" />
 
         <TextView
             android:id="@+id/tvHeadline"
@@ -80,7 +81,8 @@
                     android:ems="10"
                     android:hint="@string/ed_insert_server_address"
                     android:inputType="text"
-                    android:minHeight="48dp" />
+                    android:minHeight="48dp"
+                    android:paddingEnd="10dp"/>
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton
