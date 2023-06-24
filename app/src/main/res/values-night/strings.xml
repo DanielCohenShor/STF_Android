@@ -38,4 +38,8 @@
     <string name="btn_change">Change</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_continue">Continue</string>
+    <string name="backImg">backImg</string>
+    <string name="sendmessage">sendMessage</string>
+    <string name="btnAdd">Add</string>
+    <string name="settingimg">settingImg</string>
 </resources>
