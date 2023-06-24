@@ -16,7 +16,6 @@ const printKeysAndTypes = (obj, prefix = '') => {
 
 function socketHandler() {
     io.on('connection', socket => {
-        console.log("globalSocket");
 
         socket.on("sendMessage", (data) => {
             // send to the client the id of the chat with the new message

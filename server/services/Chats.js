@@ -247,7 +247,6 @@ const addNewMessage = async (username, messageContent, id) => {
         id: id,
         currentMessage: newMessage
     }
-    
     sendMessageToClients(data)
 
     return newMessage;
@@ -256,8 +255,9 @@ const addNewMessage = async (username, messageContent, id) => {
 // Emit a message to all connected clients
 const sendMessageToClients = (data) => {
     if (typeof data.id === "string") {
-      data.id = parseInt(data.id);
-      io.to(data.id).emit("receive_message", data);
+        id = data.id
+        data.id = parseInt(data.id);
+        io.to(id).emit("receive_message", data);
     } else {
       console.log("Invalid data format: 'id' should be a string.");
     }
