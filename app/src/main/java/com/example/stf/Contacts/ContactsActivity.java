@@ -128,14 +128,17 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         Log.d("TAG", "receiverDisplayName: " + receiverDisplayName);
         if (chatId != null && receiverDisplayName != null) {
             fromBackGround = true;
-            // Use the retrieved values
-            Log.d("TAG", "chatId: " + chatId);
-            Log.d("TAG", "receiverDisplayName: " + receiverDisplayName);
-            // Start ContactsActivity
-            Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-            startActivity(intent);
-            finish();
+            List<Contact> contactsList = contactsLiveDataList.getList().getValue();
+            for (Contact contact : contactsList) {
+                if (contact.getId() == Integer.parseInt(chatId)) {
+                    // Start ChatActivity
+                    Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
         }
+        fromBackGround = false;
     }
 
     @Override
