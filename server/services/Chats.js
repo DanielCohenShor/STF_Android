@@ -275,7 +275,8 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
             messageDate: messageDate.toString(),
             messageId: messageId.toString(),
             senderUsername: senderUsername,
-            type: "message"
+            type: "message",
+            reciverDisplayName: userDisplayName
         }
     };
 

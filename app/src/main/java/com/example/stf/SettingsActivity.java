@@ -195,17 +195,13 @@ public class SettingsActivity extends AppCompatActivity {
         // Apply the changes
         editor.apply();
     }
-
+    @Override
+    public void onBackPressed() {
+        backToPrevScreen();
+    }
 
     public void backToPrevScreen() {
         if (Objects.equals(currentUserProfilePic, "")) {
-            // Clear the activity stack and start the new activity
-            // Delete the local database
-//            resetSharedPreferences();
-//            AsyncTask.execute(() -> {
-//                contactsDao.deleteAllContacts();
-//                messagesDao.deleteAllMessages();
-//            });
             Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);

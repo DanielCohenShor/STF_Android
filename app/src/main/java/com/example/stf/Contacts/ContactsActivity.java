@@ -1,5 +1,7 @@
 package com.example.stf.Contacts;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -10,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -79,11 +82,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private MessagesListLiveData messagesListLiveData;
 
+    private boolean fromBackGround = false;
     private void getSharedPreferences() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, "");
-        editor.apply();
+        if (!fromBackGround) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(CURRENTCHAT, "");
+            editor.apply();
+        }
         serverUrl = sharedPreferences.getString(SERVERURL, "");
+        viewModalContacts = new ViewModalContacts(serverUrl);
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
@@ -91,15 +98,76 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         contactsLiveDataList = ContactsListLiveData.getInstance();
         messagesListLiveData = MessagesListLiveData.getInstance();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getContacts();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Really Exit?")
+                .setMessage("Are you sure you want to exit?")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        logOut();
+                    }
+                }).create().show();
+    }
+
+
+    private void checkIfBackGround() {
+        // Retrieve the values from SharedPreferences
+        String chatId = sharedPreferences.getString(CURRENTCHAT, null);
+        String receiverDisplayName = sharedPreferences.getString("receiverDisplayName", null);
+        Log.d("TAG", "chatId: " + chatId);
+        Log.d("TAG", "receiverDisplayName: " + receiverDisplayName);
+        if (chatId != null && receiverDisplayName != null) {
+            fromBackGround = true;
+            // Use the retrieved values
+            Log.d("TAG", "chatId: " + chatId);
+            Log.d("TAG", "receiverDisplayName: " + receiverDisplayName);
+            // Start ContactsActivity
+            Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        if (fromBackGround) {
+            AsyncTask.execute(() -> {
+                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+                        .fallbackToDestructiveMigration()
+                        .build();
+                contactsDao = db.ContactsDao();
+                runOnUiThread(this::getContacts);
+            });
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+
+        // check if i open from background
+        checkIfBackGround();
+
         getSharedPreferences();
 
         // init the data base
         initDB();
+
+
+
 
         fetchFromLocalDB();
 
@@ -114,9 +182,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         AsyncTask.execute(() -> {
             if (contactsDao.getAllContacts().isEmpty()) {
                 // zero contacts
-                viewModalContacts = new ViewModalContacts(serverUrl);
                 //get all contacts rom server
-                Log.d("TAG", "12234242144") ;
                 runOnUiThread(this::getContacts);
             } else {
                 // not zero contacts
@@ -162,7 +228,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_logOut) {
-            logOut();
+            onBackPressed();
             return true;
         } else if (itemId == R.id.action_setting) {
             openSettings();
@@ -198,7 +264,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         btnAddContact = findViewById(R.id.btnAddContact);
         progressBar = findViewById(R.id.progressBar);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        viewModalContacts = new ViewModalContacts(serverUrl);
         //init the search bar
         // Set the custom toolbar as the activity's action bar
         toolbar = findViewById(R.id.toolbar);
@@ -331,7 +396,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
         intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());// If the picture is a Bitmap
-        intent.putExtra("flag", "exist chat");
         startActivity(intent);
         finish();
     }
