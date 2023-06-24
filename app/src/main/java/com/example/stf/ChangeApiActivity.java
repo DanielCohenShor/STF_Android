@@ -99,13 +99,17 @@ public class ChangeApiActivity extends AppCompatActivity {
         });
     }
 
+    private void backToPrevScreen() {
+        Intent intent = new Intent(ChangeApiActivity.this, SettingsActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    @Override
+    public void onBackPressed() {
+        backToPrevScreen();
+    }
     public void createListeners() {
-        btnExitChangeApi.setOnClickListener(v -> {
-            Intent intent = new Intent(ChangeApiActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
+        btnExitChangeApi.setOnClickListener(v -> {backToPrevScreen();});
         btnChangeApi.setOnClickListener(this::onButtonShowPopupWindowClick);
     }
 
