@@ -367,7 +367,7 @@ const deleteChat = async (username, id) => {
 
 // Emit a message to all connected clients
 const sendDeleteChatToClients = (id) => {
-    io.to(id).emit("notifyDelete");
+    io.to(id.toString()).emit("notifyDelete");
 };
 
 
