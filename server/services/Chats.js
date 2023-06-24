@@ -2,6 +2,8 @@ const User = require('../models/Users');
 const Chats = require('../models/Chats');
 const Message = require('../models/Message');
 const admin = require('firebase-admin');
+const { io } = require("../server");
+
 
 const checkWhichUserToReturn = (chat, username) => {
     if (chat.users[0].username === username) {
@@ -105,7 +107,17 @@ const createChat = async (usernameContact, username) => {
         if(userContact.androidToken != "") {
             updateWithFireBase(userContact.androidToken, newChat.id, "new contact")
         }
-
+        //send to socket io to create the new chat
+        const data = {
+            sender: username,
+            data: {
+              id: newChat.id,
+              displayNameReciver: newChat.users[1].displayName,
+              profilePic: newChat.users[1].profilePic,
+              username: newChat.users[1].username
+            }
+          };
+        sendNewChatToClients(data)
         // return the new chat.
         return answer;
     } else {
@@ -113,6 +125,30 @@ const createChat = async (usernameContact, username) => {
         return -1;
     }
 }
+
+// Emit a message to all connected clients
+const sendNewChatToClients = (data) => {
+    // let id = data.data.id.toString()
+    // let displayNameReciver = data.data.displayNameReciver
+    // let profilePic = data.data.profilePic
+    // let username = data.data.username
+    // console.log("{sender: " + data.sender + ",")
+    // console.log("data : {id: " + data.data.id + ",")
+    // console.log("{displayNameReciver: " + data.data.displayNameReciver + ",")
+    // console.log("{profilePic: " + "photo" + ",")
+    // console.log("{username: " + data.data.username + "}")
+    //  console.log("}")
+
+    // console.log(`data.id: ${typeof id}`);
+    // console.log(`data.displayNameReciver: ${typeof displayNameReciver}`);
+    // console.log(`data.profilePic: ${typeof profilePic}`);
+    // console.log(`data.username: ${typeof username}`);
+    // data.id: number
+    // data.displayNameReciver: string
+    // data.profilePic: string
+    // data.username: string
+    io.emit("receive_newContact", data);
+  };
 
 function updateWithFireBase(contactAndroidToken, chatId, type) {
     const message = {
@@ -170,6 +206,7 @@ async function createMessageSchema(sender, messageContent, messageDate) {
         sender: userNameForChat,
         content: messageContent
     });
+
     return newMessage;
 }
 
@@ -206,9 +243,25 @@ const addNewMessage = async (username, messageContent, id) => {
         // sending message throw the firebase
         sendMessageToFireBase(messageContent, user.displayName, contact.androidToken, id, messageDate, newMessage.id, username);
     }
+    const data = {
+        id: id,
+        currentMessage: newMessage
+    }
+    
+    sendMessageToClients(data)
 
     return newMessage;
 }
+
+// Emit a message to all connected clients
+const sendMessageToClients = (data) => {
+    if (typeof data.id === "string") {
+      data.id = parseInt(data.id);
+      io.to(data.id).emit("receive_message", data);
+    } else {
+      console.log("Invalid data format: 'id' should be a string.");
+    }
+  };
 
 function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, messageId, senderUsername) {
     const message = {
@@ -288,6 +341,8 @@ const deleteChat = async (username, id) => {
     }
     const contact = await User.findOne({ username: contactUsername }).populate('chats');
 
+    sendDeleteChatToClients(id)
+
     if(contact.androidToken != "") {
         updateWithFireBase(contact.androidToken, id, "delete chat")
     }
@@ -309,6 +364,13 @@ const deleteChat = async (username, id) => {
 
     return 1;
 }
+
+// Emit a message to all connected clients
+const sendDeleteChatToClients = (id) => {
+    io.to(id).emit("notifyDelete");
+};
+
+
 
 const getNotifications = async (username) => {
     const user = await User.findOne({ username }).populate('chats');

@@ -1,8 +1,22 @@
 const Chats = require("./models/Chats");
 const { io } = require("./server");
 
+
+// Function to recursively print keys and types
+const printKeysAndTypes = (obj, prefix = '') => {
+    Object.keys(obj).forEach((key) => {
+      const fullPath = prefix ? `${prefix}.${key}` : key;
+      console.log(`${fullPath}: ${typeof obj[key]}`);
+      if (typeof obj[key] === 'object') {
+        printKeysAndTypes(obj[key], fullPath);
+      }
+    });
+  };
+
+
 function socketHandler() {
     io.on('connection', socket => {
+        console.log("globalSocket");
 
         socket.on("sendMessage", (data) => {
             // send to the client the id of the chat with the new message
@@ -10,10 +24,15 @@ function socketHandler() {
         })
 
         socket.on("join_chat", (id) => {
-            socket.join(id)
+            console.log("the type id: " + typeof id); 
+            console.log("the room number: " + id)
+            socket.join(id.toString())
         })
 
         socket.on("add_contact", async (data) => {
+            // Print keys and types
+            console.log("Keys and types:");
+            printKeysAndTypes(data);
             io.emit("receive_newContact", data);
         })
 
@@ -29,5 +48,4 @@ function socketHandler() {
     })
 }
 
-module.exports = socketHandler;
 socketHandler();
