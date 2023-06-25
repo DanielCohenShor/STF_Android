@@ -58,9 +58,9 @@ The settings screen allows you to customize various app settings. The available 
 ### Change API Screen
 The change API screen allows you to modify the server address used by the app. You can enter the new server address in the desired format: http://d.d.d.d:port/api/. After changing the API, you will be redirected back to the login screen to log in again with the updated server address.
 
-## Notifications
+### Notifications
 If you are connected to the Android app, you will receive notifications when another user sends you a new message and you are not currently in the chat with them. You can click on the notification on your phone to open the conversation with the sender.
 
-# Please note: Make sure to enable notifications for this app in the settings of your Android device. If notifications are not enabled, you will not receive the notifications.
+#### Please note: Make sure to enable notifications for this app in the settings of your Android device. If notifications are not enabled, you will not receive the notifications.
 
 Note: All the client-side code is built inside the public folder of the server, so the app runs on the server with client-side rendering. The client is built using React and Android Studio.
