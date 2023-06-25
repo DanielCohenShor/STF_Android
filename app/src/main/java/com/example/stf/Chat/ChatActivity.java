@@ -90,7 +90,7 @@ public class ChatActivity extends AppCompatActivity {
     private MessagesListLiveData messagesListLiveData;
     private ContactsListLiveData contactsLiveDataList;
 
-
+    private boolean fromBackGround = false;
 
     private void getSharedPreferences() {
         serverUrl = sharedPreferences.getString(SERVERURL, "");
@@ -98,22 +98,23 @@ public class ChatActivity extends AppCompatActivity {
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
         viewModalContacts =  new ViewModalContacts(serverUrl);
         viewModalChats = new ViewModalChats(serverUrl);
-        if (sharedPreferences.getString(CURRENTCHAT, "").isEmpty()) {
-            // enter this if only if we arrive from notifications.
-            chatId = Integer.parseInt(getIntent().getStringExtra("newchatId"));
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(CURRENTCHAT, String.valueOf(chatId));
-            editor.apply();
-            viewModalContacts.performResetNotifications(serverToken, String.valueOf(chatId), this::handleResetNotificationsCallback);
-        } else {
-            chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
-        }
         // Retrieve the Parcelable extra "picture" as a Bitmap
-        contactDisplayName = getIntent().getStringExtra("contactDisplayName");
         messagesListLiveData = MessagesListLiveData.getInstance();
         contactsLiveDataList = ContactsListLiveData.getInstance();
+        if (!fromBackGround) {
+            if (sharedPreferences.getString(CURRENTCHAT, "").isEmpty()) {
+                // enter this if only if we arrive from notifications.
+                chatId = Integer.parseInt(getIntent().getStringExtra("newchatId"));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(CURRENTCHAT, String.valueOf(chatId));
+                editor.apply();
+                viewModalContacts.performResetNotifications(serverToken, String.valueOf(chatId), this::handleResetNotificationsCallback);
+            } else {
+                chatId = Integer.parseInt(sharedPreferences.getString(CURRENTCHAT, ""));
+            }
+            contactDisplayName = getIntent().getStringExtra("contactDisplayName");
 
-        //reset the notfications in db
+        }
     }
 
     public void handleResetNotificationsCallback(String chatId) {
@@ -124,19 +125,34 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+
+    private void checkIfBackGround() {
+        // Retrieve the values from SharedPreferences
+        String chatIdFromBackGround = sharedPreferences.getString("currentChatFromBAckGround", null);
+        String receiverDisplayName = sharedPreferences.getString("receiverDisplayName", null);
+        Log.d("TAG", "the chat id from background from chat screen: " + chatIdFromBackGround);
+        if (chatIdFromBackGround != null && receiverDisplayName != null && !receiverDisplayName.equals("") && !chatIdFromBackGround.equals("")) {
+            chatId = Integer.parseInt(chatIdFromBackGround);
+            contactDisplayName = receiverDisplayName;
+            //need to take fromserver
+            fromBackGround = true;
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContentView(R.layout.activity_chat);
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+
+        checkIfBackGround();
+
+        getSharedPreferences();
+
         // init the db
         initDB();
 
-        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-
-        getSharedPreferences();
         // init the xml and his stuff.
-
         init();
 
         initViews();
@@ -148,16 +164,49 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getMessages();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("currentChatFromBAckGround", "");
+        editor.putString("receiverDisplayName", null);
+        editor.apply();
+        messagesListLiveData.setMessagesList(Collections.emptyList());
+        Intent intent = new Intent(ChatActivity.this, ContactsActivity.class);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
     private void fetchFromLocalDB() {
         // need to fetch only from db
         AsyncTask.execute(() -> {
-            List<Message> messagesList = messagesDao.getAllMessages(chatId);
-            if (!messagesList.isEmpty()) {
-                runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
+            if (fromBackGround) {
+                List<Message> messagesList = messagesDao.getAllMessages(chatId);
+                runOnUiThread(() -> {
+                    messagesListLiveData.setMessagesList(messagesList);
+                    getMessages();
+                });
+
             } else {
-                // Handle the case when the list of dao is empty
-                //get all messages.
-                runOnUiThread(this::getMessages);
+                List<Message> messagesList = messagesDao.getAllMessages(chatId);
+                if (!messagesList.isEmpty()) {
+                    runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
+                } else {
+                    // Handle the case when the list of dao is empty
+                    //get all messages.
+                    runOnUiThread(this::getMessages);
+                }
             }
         });
     }
@@ -249,7 +298,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void createListeners() {
-        btnExitChat.setOnClickListener(v -> exitChat());
+        btnExitChat.setOnClickListener(v -> finish());
 
         btnSendMessage.setOnClickListener(v -> {
             if (!TextUtils.isEmpty(etSendMessage.getText().toString().trim())) {
@@ -271,17 +320,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(CURRENTCHAT, "");
+        editor.putString("currentChatFromBAckGround","");
+        editor.putString("receiverDisplayName",null);
         editor.apply();
-    }
-
-    public void exitChat() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, "");
-        editor.apply();
-        messagesListLiveData.setMessagesList(Collections.emptyList());
-        Intent intent = new Intent(ChatActivity.this, ContactsActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     private void updateContacts() {
@@ -310,7 +351,7 @@ public class ChatActivity extends AppCompatActivity {
             Contact currentContact = contactDao.get(newMessage.getChatId());
             currentContact.setLastMessage(newMessage);
             contactDao.update(currentContact);
-            runOnUiThread(() -> updateUIWithNewMessage(newMessage));
+            messagesListLiveData.addMessage(newMessage);
         });
     }
 
@@ -359,8 +400,8 @@ public class ChatActivity extends AppCompatActivity {
             public void onChanged(Boolean value) {
                 // Handle the onChanged event here
                 if (value) {
-                    exitChat();
                     contactsLiveDataList.setSomeoneDeleteMe(false);
+                    finish();
                 }
             }
         });

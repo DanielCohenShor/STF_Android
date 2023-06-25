@@ -113,16 +113,17 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     private void receiveMessage(@NonNull RemoteMessage message, String newChatId) {
+        Log.d("Tag", "the cuurent chat id: " + currentChatID);
+        Log.d("Tag", "the newChatId chat id: " + newChatId);
         if (!newChatId.equals(currentChatID)) {
             // not in the chat render the localdb to be in the right order
             // add the new message to the messages db
             addMessageToDB(message, newChatId);
         } else {
             // meant i am in the chat need to update the message live
-            // reset the notfication
             // update last message
-            // update localdb
             createMessageANDupdateLastMessage(message, newChatId);
+            // reset the notification
             resetNotifications(newChatId);
         }
     }
@@ -149,6 +150,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
         User sender = contact.getUser();
         int integerNewChatId = Integer.parseInt(newChatId);
         assert messageId != null;
+
         Message newLastMessage = new Message(Integer.parseInt(messageId), created, sender, content,integerNewChatId);
         AsyncTask.execute(() -> {messagesDao.insert(newLastMessage);});
         messagesListLiveData.addMessage(newLastMessage);
@@ -157,7 +159,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
             Contact updateContact = new Contact(integerNewChatId, sender, newLastMessage, notfications);
             contactsDao.update(updateContact);
         });
-        sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "in chat");
     }
 
     private void addMessageToDB(@NonNull RemoteMessage message, String newChatId) {
@@ -166,34 +167,25 @@ public class ReceiveMessages extends FirebaseMessagingService {
         String created = message.getData().get("messageDate");
         Contact contact = contactsDao.get(Integer.parseInt(newChatId));
         String content = message.getNotification().getBody();
-        User sender = null;
-        if (contact != null) {
-            Log.d("not new chat", "not new chat ");
-            //the contact is exist.
-             sender = contact.getUser();
-            assert messageId != null;
-            int integerNewChatId = Integer.parseInt(newChatId);
-            Log.d("Tag", "After change to int: " + integerNewChatId);
-            Message newLastMessage = new Message(Integer.parseInt(messageId), created, sender, content,integerNewChatId);
-            AsyncTask.execute(() -> {
-                List<Message> messagesList = messagesDao.getAllMessages(Integer.parseInt(newChatId));
-                if (!messagesList.isEmpty()) {
-                    messagesDao.insert(newLastMessage);
-                }
-            });
-            updateLastMessage(integerNewChatId, newLastMessage, sender);
-            //not in the chat need to open this chat
-            sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "exist chat");
-        } else {
-            //the contact not exist
-            // get from server
-            newChatAdded(newChatId);
-            sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle(), "new chat");
-        }
+        User sender;
+        Log.d("not new chat", "not new chat ");
+        //the contact is exist.
+        sender = contact.getUser();
+        assert messageId != null;
+        int integerNewChatId = Integer.parseInt(newChatId);
+        Log.d("Tag", "After change to int: " + integerNewChatId);
+        Message newLastMessage = new Message(Integer.parseInt(messageId), created, sender, content,integerNewChatId);
+        AsyncTask.execute(() -> {
+            List<Message> messagesList = messagesDao.getAllMessages(Integer.parseInt(newChatId));
+            Log.d("Tag", "size of the list: " + messagesList.size());
+            if (!messagesList.isEmpty()) {
+                messagesDao.insert(newLastMessage);
+            }
+        });
+        updateLastMessage(integerNewChatId, newLastMessage, sender);
+        //not in the chat need to open this chat
+        sendNotification(message.getNotification().getBody(), newChatId, message.getNotification().getTitle());
     }
-
-
-
 
     private void updateLastMessage(int newChatId, Message newLastMessage, User sender) {
         //TODO: check if need to update in the server the notfications ??
@@ -205,51 +197,46 @@ public class ReceiveMessages extends FirebaseMessagingService {
         });
     }
 
-    private void sendNotification(String messageBody, String newchatId, String displayName, String flag) {
-        if (!Objects.equals(flag, "in chat")) {
-            //update the current chat to be the right chat.
-            // need to pass the chad id, the displayname.
-            // so it will open the right chat with the right messeages.
-            Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-            intent.putExtra("contactDisplayName", displayName);
-            intent.putExtra("newchatId", newchatId);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            // Updated code
-            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                flags |= PendingIntent.FLAG_MUTABLE;
-            } else {
-                flags |= PendingIntent.FLAG_IMMUTABLE;
-            }
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, flags);
-
-            String channelId = "any_value";
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder =
-                    new NotificationCompat.Builder(this, channelId)
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("my new notification")
-                            .setContentText(messageBody)
-                            .setAutoCancel(true)
-                            .setSound(defaultSoundUri)
-                            .setContentIntent(pendingIntent);
-
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-            // Since android Oreo notification channel is needed.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(channelId,
-                        "Channel human readable title",
-                        NotificationManager.IMPORTANCE_DEFAULT);
-                notificationManager.createNotificationChannel(channel);
-            }
-            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    private void sendNotification(String content, String newchatId, String displayName) {
+        //update the current chat to be the right chat.
+        // need to pass the chad id, the displayname.
+        // so it will open the right chat with the right messeages.
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra("contactDisplayName", displayName);
+        intent.putExtra("newchatId", newchatId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Updated code
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_MUTABLE;
+        } else {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
         }
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, flags);
+
+        String channelId = "any_value";
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(displayName)
+                        .setContentText(content)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+        notificationManager.notify(Integer.parseInt(newchatId), notificationBuilder.build());
     }
 
-    private void newChatAdded(String newChatId) {
-        // create req to the server to get this contact and add him to the local db
 
-    }
 }

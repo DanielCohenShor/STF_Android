@@ -1,5 +1,7 @@
 package com.example.stf.Contacts;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -10,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -79,50 +82,110 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private MessagesListLiveData messagesListLiveData;
 
+    private boolean fromBackGround = false;
+
+    private List<Contact> tempContactList;
     private void getSharedPreferences() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, "");
-        editor.apply();
-        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        if (!fromBackGround) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(CURRENTCHAT, "");
+            editor.apply();
+        }
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
-        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        contactsLiveDataList = ContactsListLiveData.getInstance();
-        messagesListLiveData = MessagesListLiveData.getInstance();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isFirstTime) {
+            isFirstTime = false;
+        } else {
+            getContacts();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Really Exit?")
+                .setMessage("Are you sure you want to exit?")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        logOut();
+                    }
+                }).create().show();
+    }
+
+    private boolean checkIfBackGround() {
+        // Retrieve the values from SharedPreferences
+        String chatId = sharedPreferences.getString("currentChatFromBAckGround", null);
+        Log.d("TAG", "the chat id from background in the contacts activity: " + chatId);
+        String receiverDisplayName = sharedPreferences.getString("receiverDisplayName", null);
+        Log.d("TAG", "the receiverDisplayName from background in the contacts activity: " + receiverDisplayName);
+        if (chatId != null && receiverDisplayName != null && !chatId.equals("")) {
+            fromBackGround = true;
+            for (Contact contact : tempContactList) {
+                if (contact.getId() == Integer.parseInt(chatId)) {
+                    viewModalContacts.performResetNotifications(serverToken, chatId, this::handleResetNotificationsCallbackInBackGround);
+                    // Start ChatActivity
+                    Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                }
+            }
+        }
+        fromBackGround = false;
+        return false;
+    }
+
+
+    private void checkWhereToGo() {
+        if (!checkIfBackGround()) {
+            // stay here
+            // Start observing changes in the ContactsDao
+            getSharedPreferences();
+
+            fetchFromLocalDB();
+
+
+            //listeners
+            createListeners();
+        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        getSharedPreferences();
+        contactsLiveDataList = ContactsListLiveData.getInstance();
+        messagesListLiveData = MessagesListLiveData.getInstance();
 
-        // init the data base
-        initDB();
+        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        viewModalContacts = new ViewModalContacts(serverUrl);
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
 
-        fetchFromLocalDB();
 
         //init the views.
         init();
 
-        //listeners
-        createListeners();
+        // init the data base
+        initDB();
     }
 
     private void fetchFromLocalDB() {
         AsyncTask.execute(() -> {
-            if (contactsDao.getAllContacts().isEmpty()) {
-                // zero contacts
-                viewModalContacts = new ViewModalContacts(serverUrl);
-                //get all contacts rom server
-                Log.d("TAG", "12234242144") ;
-                runOnUiThread(this::getContacts);
-            } else {
+            if (!contactsDao.getAllContacts().isEmpty()) {
                 // not zero contacts
                 contactsLiveDataList.setContactsList(contactsDao.getAllContacts());
                 runOnUiThread(() -> updateUIWithContacts(contactsLiveDataList.getList().getValue()));
             }
+            runOnUiThread(this::getContacts);
+
         });
     }
 
@@ -162,7 +225,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_logOut) {
-            logOut();
+            onBackPressed();
             return true;
         } else if (itemId == R.id.action_setting) {
             openSettings();
@@ -177,9 +240,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
-            // Start observing changes in the ContactsDao
-            runOnUiThread(this::observeContactsChanges);
             messagesDao = db.messagesDao();
+            tempContactList = contactsDao.getAllContacts();
+            // check where to go:
+            runOnUiThread(this::checkWhereToGo);
         });
     }
 
@@ -190,6 +254,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             startActivity(intent);
             finish();
         });
+
+        observeContactsChanges();
     }
 
     private void init() {
@@ -198,7 +264,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         btnAddContact = findViewById(R.id.btnAddContact);
         progressBar = findViewById(R.id.progressBar);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        viewModalContacts = new ViewModalContacts(serverUrl);
         //init the search bar
         // Set the custom toolbar as the activity's action bar
         toolbar = findViewById(R.id.toolbar);
@@ -248,20 +313,18 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void handleGetContactsCallback(List<Contact> contacts) {
         AsyncTask.execute(() -> {
+            Log.d("TAG", "this is inside the handle new thread");
             for (Contact contact : contacts) {
-                String contactId = String.valueOf(contact.getId()); // Convert to string
-                Log.d("test1111", contactId); // Print "Hello" for each iteration
                 Contact existingContact = contactsDao.get(contact.getId());
-                Log.d("test2222", contactId); // Print "Hello" for each iteration
                 if (existingContact == null) {
-                    Log.d("test3333", contactId); // Print "Hello" for each iteration
                     contactsDao.insert(contact);
                 } else {
-                    Log.d("test4444", contactId); // Print "Hello" for each iteration
                     if (contact.getLastMessage() != null) {
+                        Log.d("TAG", "update the last meesage of the existing contact");
                         contactsDao.update(contact);
                     }
                     if (existingContact.getLastMessage() != null) {
+                        Log.d("TAG", "will update the last meesage of the existing contact");
                         String oldLastMessage = existingContact.getLastMessage().getContent();
                         String newLastMessage = contact.getLastMessage().getContent();
                         //and for time
@@ -285,10 +348,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
         progressBar.setVisibility(View.GONE);
-//        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     }
 
-    //        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     private void handleGetNotificationsCallback(UserNotification notifications) {
         AsyncTask.execute(() -> {
             int notification;
@@ -310,13 +371,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         });
     }
 
-    private void updateUIWithNotifications(UserNotification notifications) {
-        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
-        contactAdapter.setNotifications(notifications);
-        listViewContacts.setAdapter(contactAdapter);
-        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        progressBar.setVisibility(View.GONE);
-    }
+//    private void updateUIWithNotifications(UserNotification notifications) {
+//        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
+//        contactAdapter.setNotifications(notifications);
+//        listViewContacts.setAdapter(contactAdapter);
+//        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+//        progressBar.setVisibility(View.GONE);
+//    }
 
     @Override
     public void onItemClick(int position) {
@@ -331,9 +392,16 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         // Start the new activity here
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
         intent.putExtra("contactDisplayName", clickedContact.getUser().getDisplayName());// If the picture is a Bitmap
-        intent.putExtra("flag", "exist chat");
         startActivity(intent);
         finish();
+    }
+
+    public void handleResetNotificationsCallbackInBackGround(String chatId) {
+        AsyncTask.execute(() -> {
+            Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
+            updateContact.setNotifications(0);
+            contactsDao.update(updateContact);
+        });
     }
 
     public void handleResetNotificationsCallback(String chatId) {
@@ -341,7 +409,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
             updateContact.setNotifications(0);
             contactsDao.update(updateContact);
-
             runOnUiThread(() -> updateUIWithResetNotifications(Integer.parseInt(chatId)));
         });
     }

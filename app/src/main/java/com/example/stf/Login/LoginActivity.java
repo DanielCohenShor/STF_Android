@@ -74,6 +74,10 @@ public class LoginActivity extends AppCompatActivity {
     private final String CURRENTCHAT = "currentChat";
 
     private boolean check() {
+        // open from backgorund
+        if (openFromBackGround()) {
+            return false;
+        }
         if (isFirstTimeLogin()) {
             // User is logging in for the first time
             createSharedPreferences();
@@ -129,12 +133,46 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private boolean openFromBackGround() {
+        Bundle dataExtras = getIntent().getExtras();
+        if (dataExtras != null) {
+            String newchatId = null;
+            String receiverDisplayName = null;
+
+            for (String key : dataExtras.keySet()) {
+                if (Objects.equals(key, "chatId")) {
+                    newchatId = dataExtras.getString(key);
+                    Log.d("TAG", "in the if: chatid: " + newchatId);
+                }
+                if (Objects.equals(key, "reciverDisplayName")) {
+                    receiverDisplayName = dataExtras.getString(key);
+                }
+            }
+
+            if (newchatId != null && receiverDisplayName != null) {
+                // Store the values in SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                Log.d("TAG", "from login chatId: " + newchatId);
+                editor.putString("currentChatFromBAckGround", newchatId);
+                editor.putString("receiverDisplayName", receiverDisplayName);
+                editor.apply();
+
+                // Start ContactsActivity
+                Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+
 
         if(check()) {
             //generate token for firebase
@@ -146,19 +184,6 @@ public class LoginActivity extends AppCompatActivity {
             // createListeners
             createListeners();
         }
-
-
-        //        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-//         Retrieve the data extras from the intent
-//        Bundle dataExtras = getIntent().getExtras();
-//        if (dataExtras != null) {
-//            // Iterate over the key-value pairs in the data extras and print them
-//            for (String key : dataExtras.keySet()) {
-//                Object value = dataExtras.get(key);
-//                Log.d("Payload", "Key: " + key + ", Value: " + value);
-//            }
-//        }
-
     }
 
     @Override
