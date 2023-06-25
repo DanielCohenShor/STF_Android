@@ -93,6 +93,14 @@ public class ChatActivity extends AppCompatActivity {
     private boolean fromBackGround = false;
 
     private void getSharedPreferences() {
+        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        currentUserUsername = sharedPreferences.getString(USERNAME, "");
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
+        viewModalContacts =  new ViewModalContacts(serverUrl);
+        viewModalChats = new ViewModalChats(serverUrl);
+        // Retrieve the Parcelable extra "picture" as a Bitmap
+        messagesListLiveData = MessagesListLiveData.getInstance();
+        contactsLiveDataList = ContactsListLiveData.getInstance();
         if (!fromBackGround) {
             if (sharedPreferences.getString(CURRENTCHAT, "").isEmpty()) {
                 // enter this if only if we arrive from notifications.
@@ -107,16 +115,6 @@ public class ChatActivity extends AppCompatActivity {
             contactDisplayName = getIntent().getStringExtra("contactDisplayName");
 
         }
-        serverUrl = sharedPreferences.getString(SERVERURL, "");
-        currentUserUsername = sharedPreferences.getString(USERNAME, "");
-        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        viewModalContacts =  new ViewModalContacts(serverUrl);
-        viewModalChats = new ViewModalChats(serverUrl);
-        // Retrieve the Parcelable extra "picture" as a Bitmap
-        messagesListLiveData = MessagesListLiveData.getInstance();
-        contactsLiveDataList = ContactsListLiveData.getInstance();
-
-        //reset the notfications in db
     }
 
     public void handleResetNotificationsCallback(String chatId) {

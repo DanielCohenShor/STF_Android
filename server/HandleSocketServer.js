@@ -16,15 +16,12 @@ const printKeysAndTypes = (obj, prefix = '') => {
 
 function socketHandler() {
     io.on('connection', socket => {
-
         socket.on("sendMessage", (data) => {
             // send to the client the id of the chat with the new message
             socket.to(data.id).emit("receive_message", data);
         })
 
         socket.on("join_chat", (id) => {
-            console.log("the type id: " + typeof id); 
-            console.log("the room number: " + id)
             socket.join(id.toString())
         })
 
