@@ -79,7 +79,8 @@
                     android:ems="10"
                     android:hint="@string/et_username"
                     android:inputType="text"
-                    android:minHeight="48dp" />
+                    android:minHeight="48dp"
+                    android:paddingEnd="10dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -115,7 +116,8 @@
                         android:ems="10"
                         android:hint="@string/et_password"
                         android:inputType="textPassword"
-                        android:minHeight="48dp" />
+                        android:minHeight="48dp"
+                        android:paddingEnd="40dp"/>
 
                     <ImageButton
                         android:id="@+id/btnShowPassword"
@@ -211,6 +213,7 @@
             app:layout_constraintTop_toTopOf="parent"
             style="@style/LOGIN_SETTINGS"
             android:layout_marginTop="20dp"
-            android:elevation="3dp"/>
+            android:elevation="3dp"
+            android:contentDescription="@string/settingimg" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

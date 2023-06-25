@@ -104,19 +104,19 @@ const createChat = async (usernameContact, username) => {
             lastMessage: null
         };
 
-        if(userContact.androidToken != "") {
+        if (userContact.androidToken != "") {
             updateWithFireBase(userContact.androidToken, newChat.id, "new contact")
         }
         //send to socket io to create the new chat
         const data = {
             sender: username,
             data: {
-              id: newChat.id,
-              displayNameReciver: newChat.users[1].displayName,
-              profilePic: newChat.users[1].profilePic,
-              username: newChat.users[1].username
+                id: newChat.id,
+                displayNameReciver: newChat.users[1].displayName,
+                profilePic: newChat.users[1].profilePic,
+                username: newChat.users[1].username
             }
-          };
+        };
         sendNewChatToClients(data)
         // return the new chat.
         return answer;
@@ -148,7 +148,7 @@ const sendNewChatToClients = (data) => {
     // data.profilePic: string
     // data.username: string
     io.emit("receive_newContact", data);
-  };
+};
 
 function updateWithFireBase(contactAndroidToken, chatId, type) {
     const message = {
@@ -245,7 +245,8 @@ const addNewMessage = async (username, messageContent, id) => {
     }
     const data = {
         id: id,
-        currentMessage: newMessage
+        currentMessage: newMessage,
+        sender: username
     }
     sendMessageToClients(data)
 
@@ -258,10 +259,11 @@ const sendMessageToClients = (data) => {
         id = data.id
         data.id = parseInt(data.id);
         io.to(id).emit("receive_message", data);
+        io.to(id).emit("receiveUpdateChats", data.id);
     } else {
-      console.log("Invalid data format: 'id' should be a string.");
+        console.log("Invalid data format: 'id' should be a string.");
     }
-  };
+};
 
 function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidToken, chatId, messageDate, messageId, senderUsername) {
     const message = {
@@ -344,7 +346,7 @@ const deleteChat = async (username, id) => {
 
     sendDeleteChatToClients(id)
 
-    if(contact.androidToken != "") {
+    if (contact.androidToken != "") {
         updateWithFireBase(contact.androidToken, id, "delete chat")
     }
 
@@ -381,14 +383,18 @@ const getNotifications = async (username) => {
 const addNotification = async (username, id) => {
     const messageList = await Chats.findOne({ id: parseInt(id) });
 
-    if (messageList.users[0].username === username) {
-        messageList.users[0].notifications += 1;
-    } else {
-        messageList.users[1].notifications += 1;
-    }
+    if (messageList) {
+        if (messageList.users[0].username === username) {
+            messageList.users[0].notifications += 1;
+        } else {
+            messageList.users[1].notifications += 1;
+        }
 
-    await messageList.save();
-    return 1;
+        await messageList.save();
+        return 1;
+    } else {
+        return -1;
+    }
 }
 
 const resetNotifications = async (username, id) => {

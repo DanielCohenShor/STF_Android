@@ -28,7 +28,8 @@
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_exit" />
+            app:srcCompat="@drawable/ic_exit"
+            android:contentDescription="@string/backImg" />
 
         <TextView
             android:id="@+id/tvHeadline"
@@ -74,7 +75,8 @@
                 android:ems="10"
                 android:hint="@string/et_choose_contact"
                 android:inputType="text"
-                android:minHeight="48dp" />
+                android:minHeight="48dp"
+                android:paddingEnd="10dp"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnAddContact"
@@ -85,7 +87,7 @@
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
                 android:gravity="center"
-                android:text="Add"
+                android:text="@string/btnAdd"
                 android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
