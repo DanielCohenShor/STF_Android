@@ -83,26 +83,28 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private MessagesListLiveData messagesListLiveData;
 
     private boolean fromBackGround = false;
+
+    private List<Contact> tempContactList;
     private void getSharedPreferences() {
         if (!fromBackGround) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(CURRENTCHAT, "");
             editor.apply();
         }
-        serverUrl = sharedPreferences.getString(SERVERURL, "");
-        viewModalContacts = new ViewModalContacts(serverUrl);
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        contactsLiveDataList = ContactsListLiveData.getInstance();
-        messagesListLiveData = MessagesListLiveData.getInstance();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getContacts();
+        if (isFirstTime) {
+            isFirstTime = false;
+        } else {
+            getContacts();
+        }
     }
 
     @Override
@@ -119,79 +121,86 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 }).create().show();
     }
 
-
-    private void checkIfBackGround() {
+    private boolean checkIfBackGround() {
         // Retrieve the values from SharedPreferences
-        String chatId = sharedPreferences.getString(CURRENTCHAT, null);
+        String chatId = sharedPreferences.getString("currentChatFromBAckGround", null);
+        Log.d("TAG", "the chat id from background in the contacts activity: " + chatId);
         String receiverDisplayName = sharedPreferences.getString("receiverDisplayName", null);
-        Log.d("TAG", "chatId: " + chatId);
-        Log.d("TAG", "receiverDisplayName: " + receiverDisplayName);
-        if (chatId != null && receiverDisplayName != null) {
+        Log.d("TAG", "the receiverDisplayName from background in the contacts activity: " + receiverDisplayName);
+        if (chatId != null && receiverDisplayName != null && !chatId.equals("")) {
             fromBackGround = true;
-            List<Contact> contactsList = contactsLiveDataList.getList().getValue();
-            for (Contact contact : contactsList) {
+            Log.d("TAG", "inside the outside if: " + tempContactList.size());
+            for (Contact contact : tempContactList) {
+                Log.d("TAG", "inside the for loop: " + contact.getId());
                 if (contact.getId() == Integer.parseInt(chatId)) {
+                    Log.d("TAG", "inside the if");
                     // Start ChatActivity
                     Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
                     startActivity(intent);
                     finish();
+                    return true;
                 }
             }
         }
         fromBackGround = false;
+        return false;
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        if (fromBackGround) {
-            AsyncTask.execute(() -> {
-                db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
-                        .fallbackToDestructiveMigration()
-                        .build();
-                contactsDao = db.ContactsDao();
-                runOnUiThread(this::getContacts);
-            });
+//    @Override
+//    public void finish() {
+//        super.finish();
+//        if (fromBackGround) {
+//            Log.d("TAG", "this is from finish in the contacts activity");
+//            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
+//                    .fallbackToDestructiveMigration()
+//                    .build();
+//            contactsDao = db.ContactsDao();
+//        }
+//    }
+
+
+
+    private void checkWhereToGo() {
+        if (!checkIfBackGround()) {
+            // stay here
+            // Start observing changes in the ContactsDao
+            getSharedPreferences();
+
+            fetchFromLocalDB();
+
+
+            //listeners
+            createListeners();
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        contactsLiveDataList = ContactsListLiveData.getInstance();
+        messagesListLiveData = MessagesListLiveData.getInstance();
 
-        // check if i open from background
-        checkIfBackGround();
+        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        viewModalContacts = new ViewModalContacts(serverUrl);
 
-        getSharedPreferences();
-
-        // init the data base
-        initDB();
-
-
-
-
-        fetchFromLocalDB();
 
         //init the views.
         init();
 
-        //listeners
-        createListeners();
+        // init the data base
+        initDB();
     }
 
     private void fetchFromLocalDB() {
         AsyncTask.execute(() -> {
-            if (contactsDao.getAllContacts().isEmpty()) {
-                // zero contacts
-                //get all contacts rom server
-                runOnUiThread(this::getContacts);
-            } else {
+            if (!contactsDao.getAllContacts().isEmpty()) {
                 // not zero contacts
                 contactsLiveDataList.setContactsList(contactsDao.getAllContacts());
                 runOnUiThread(() -> updateUIWithContacts(contactsLiveDataList.getList().getValue()));
             }
+            runOnUiThread(this::getContacts);
+
         });
     }
 
@@ -246,9 +255,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                     .fallbackToDestructiveMigration()
                     .build();
             contactsDao = db.ContactsDao();
-            // Start observing changes in the ContactsDao
-            runOnUiThread(this::observeContactsChanges);
             messagesDao = db.messagesDao();
+            tempContactList = contactsDao.getAllContacts();
+            // check where to go:
+            runOnUiThread(this::checkWhereToGo);
         });
     }
 
@@ -259,6 +269,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             startActivity(intent);
             finish();
         });
+
+        observeContactsChanges();
     }
 
     private void init() {
@@ -316,20 +328,18 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
     private void handleGetContactsCallback(List<Contact> contacts) {
         AsyncTask.execute(() -> {
+            Log.d("TAG", "this is inside the handle new thread");
             for (Contact contact : contacts) {
-                String contactId = String.valueOf(contact.getId()); // Convert to string
-                Log.d("test1111", contactId); // Print "Hello" for each iteration
                 Contact existingContact = contactsDao.get(contact.getId());
-                Log.d("test2222", contactId); // Print "Hello" for each iteration
                 if (existingContact == null) {
-                    Log.d("test3333", contactId); // Print "Hello" for each iteration
                     contactsDao.insert(contact);
                 } else {
-                    Log.d("test4444", contactId); // Print "Hello" for each iteration
                     if (contact.getLastMessage() != null) {
+                        Log.d("TAG", "update the last meesage of the existing contact");
                         contactsDao.update(contact);
                     }
                     if (existingContact.getLastMessage() != null) {
+                        Log.d("TAG", "will update the last meesage of the existing contact");
                         String oldLastMessage = existingContact.getLastMessage().getContent();
                         String newLastMessage = contact.getLastMessage().getContent();
                         //and for time

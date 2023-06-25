@@ -74,6 +74,10 @@ public class LoginActivity extends AppCompatActivity {
     private final String CURRENTCHAT = "currentChat";
 
     private boolean check() {
+        // open from backgorund
+        if (openFromBackGround()) {
+            return false;
+        }
         if (isFirstTimeLogin()) {
             // User is logging in for the first time
             createSharedPreferences();
@@ -129,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void openFromBackGround() {
+    private boolean openFromBackGround() {
         Bundle dataExtras = getIntent().getExtras();
         if (dataExtras != null) {
             String newchatId = null;
@@ -149,7 +153,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Store the values in SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 Log.d("TAG", "from login chatId: " + newchatId);
-                editor.putString(CURRENTCHAT, newchatId);
+                editor.putString("currentChatFromBAckGround", newchatId);
                 editor.putString("receiverDisplayName", receiverDisplayName);
                 editor.apply();
 
@@ -157,8 +161,10 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this, ContactsActivity.class);
                 startActivity(intent);
                 finish();
+                return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -167,7 +173,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 
-        openFromBackGround();
 
         if(check()) {
             //generate token for firebase

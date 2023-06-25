@@ -128,11 +128,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void checkIfBackGround() {
         // Retrieve the values from SharedPreferences
-        String chatidFromBAckGround = sharedPreferences.getString(CURRENTCHAT, null);
+        String chatIdFromBackGround = sharedPreferences.getString("currentChatFromBAckGround", null);
         String receiverDisplayName = sharedPreferences.getString("receiverDisplayName", null);
-
-        if (chatidFromBAckGround != null && receiverDisplayName != null) {
-            chatId = Integer.parseInt(chatidFromBAckGround);
+        Log.d("TAG", "the chat id from background from chat screen: " + chatIdFromBackGround);
+        if (chatIdFromBackGround != null && receiverDisplayName != null && !receiverDisplayName.equals("") && !chatIdFromBackGround.equals("")) {
+            chatId = Integer.parseInt(chatIdFromBackGround);
             contactDisplayName = receiverDisplayName;
             //need to take fromserver
             fromBackGround = true;
@@ -174,7 +174,7 @@ public class ChatActivity extends AppCompatActivity {
     public void finish() {
         super.finish();
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENTCHAT, "");
+        editor.putString("currentChatFromBAckGround", "");
         editor.putString("receiverDisplayName", null);
         editor.apply();
         messagesListLiveData.setMessagesList(Collections.emptyList());
@@ -320,6 +320,8 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(CURRENTCHAT, "");
+        editor.putString("currentChatFromBAckGround","");
+        editor.putString("receiverDisplayName",null);
         editor.apply();
     }
 
