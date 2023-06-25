@@ -94,7 +94,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
-        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
     }
 
     @Override
@@ -129,11 +128,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         Log.d("TAG", "the receiverDisplayName from background in the contacts activity: " + receiverDisplayName);
         if (chatId != null && receiverDisplayName != null && !chatId.equals("")) {
             fromBackGround = true;
-            Log.d("TAG", "inside the outside if: " + tempContactList.size());
             for (Contact contact : tempContactList) {
-                Log.d("TAG", "inside the for loop: " + contact.getId());
                 if (contact.getId() == Integer.parseInt(chatId)) {
-                    Log.d("TAG", "inside the if");
+                    viewModalContacts.performResetNotifications(serverToken, chatId, this::handleResetNotificationsCallbackInBackGround);
                     // Start ChatActivity
                     Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
                     startActivity(intent);
@@ -145,19 +142,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         fromBackGround = false;
         return false;
     }
-
-//    @Override
-//    public void finish() {
-//        super.finish();
-//        if (fromBackGround) {
-//            Log.d("TAG", "this is from finish in the contacts activity");
-//            db = Room.databaseBuilder(getApplicationContext(), AppDB.class, "STF_DB")
-//                    .fallbackToDestructiveMigration()
-//                    .build();
-//            contactsDao = db.ContactsDao();
-//        }
-//    }
-
 
 
     private void checkWhereToGo() {
@@ -183,6 +167,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         viewModalContacts = new ViewModalContacts(serverUrl);
+        serverToken = sharedPreferences.getString(SERVERTOKEN, "");
 
 
         //init the views.
@@ -363,10 +348,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         listViewContacts.setAdapter(contactAdapter);
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
         progressBar.setVisibility(View.GONE);
-//        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     }
 
-    //        viewModalContacts.performGetNotifications(serverToken, this::handleGetNotificationsCallback);
     private void handleGetNotificationsCallback(UserNotification notifications) {
         AsyncTask.execute(() -> {
             int notification;
@@ -388,13 +371,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         });
     }
 
-    private void updateUIWithNotifications(UserNotification notifications) {
-        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
-        contactAdapter.setNotifications(notifications);
-        listViewContacts.setAdapter(contactAdapter);
-        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        progressBar.setVisibility(View.GONE);
-    }
+//    private void updateUIWithNotifications(UserNotification notifications) {
+//        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
+//        contactAdapter.setNotifications(notifications);
+//        listViewContacts.setAdapter(contactAdapter);
+//        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
+//        progressBar.setVisibility(View.GONE);
+//    }
 
     @Override
     public void onItemClick(int position) {
@@ -413,12 +396,19 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         finish();
     }
 
+    public void handleResetNotificationsCallbackInBackGround(String chatId) {
+        AsyncTask.execute(() -> {
+            Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
+            updateContact.setNotifications(0);
+            contactsDao.update(updateContact);
+        });
+    }
+
     public void handleResetNotificationsCallback(String chatId) {
         AsyncTask.execute(() -> {
             Contact updateContact = contactsDao.get(Integer.parseInt(chatId));
             updateContact.setNotifications(0);
             contactsDao.update(updateContact);
-
             runOnUiThread(() -> updateUIWithResetNotifications(Integer.parseInt(chatId)));
         });
     }
