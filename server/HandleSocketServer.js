@@ -5,7 +5,6 @@ const { io } = require("./server");
 const printKeysAndTypes = (obj, prefix = '') => {
     Object.keys(obj).forEach((key) => {
       const fullPath = prefix ? `${prefix}.${key}` : key;
-      console.log(`${fullPath}: ${typeof obj[key]}`);
       if (typeof obj[key] === 'object') {
         printKeysAndTypes(obj[key], fullPath);
       }
@@ -26,7 +25,6 @@ function socketHandler() {
 
         socket.on("add_contact", async (data) => {
             // Print keys and types
-            console.log("Keys and types:");
             printKeysAndTypes(data);
             io.emit("receive_newContact", data);
         })
