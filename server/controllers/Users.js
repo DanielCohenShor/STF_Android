@@ -86,7 +86,6 @@ async function smaller(photo) {
   
       return resizedBase64;
     } catch (error) {
-      console.error('Error resizing image:', error);
       return null;
     }
   }

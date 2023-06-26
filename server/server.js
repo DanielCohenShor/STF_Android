@@ -39,8 +39,6 @@ var serviceAccount = require("./stf-speak-talk-friends-firebase-adminsdk-x3kd7-4
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  // Or use your server key directly:
-  // credential: admin.credential.refreshToken(serverKey),
 });
 
 const socketHandler = require('./HandleSocketServer');

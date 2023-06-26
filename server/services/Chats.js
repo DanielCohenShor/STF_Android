@@ -128,25 +128,6 @@ const createChat = async (usernameContact, username) => {
 
 // Emit a message to all connected clients
 const sendNewChatToClients = (data) => {
-    // let id = data.data.id.toString()
-    // let displayNameReciver = data.data.displayNameReciver
-    // let profilePic = data.data.profilePic
-    // let username = data.data.username
-    // console.log("{sender: " + data.sender + ",")
-    // console.log("data : {id: " + data.data.id + ",")
-    // console.log("{displayNameReciver: " + data.data.displayNameReciver + ",")
-    // console.log("{profilePic: " + "photo" + ",")
-    // console.log("{username: " + data.data.username + "}")
-    //  console.log("}")
-
-    // console.log(`data.id: ${typeof id}`);
-    // console.log(`data.displayNameReciver: ${typeof displayNameReciver}`);
-    // console.log(`data.profilePic: ${typeof profilePic}`);
-    // console.log(`data.username: ${typeof username}`);
-    // data.id: number
-    // data.displayNameReciver: string
-    // data.profilePic: string
-    // data.username: string
     io.emit("receive_newContact", data);
 };
 
@@ -160,13 +141,7 @@ function updateWithFireBase(contactAndroidToken, chatId, type) {
     };
 
     // Send the notification
-    admin.messaging().send(message)
-        .then((response) => {
-            console.log('Notification sent successfully:', response);
-        })
-        .catch((error) => {
-            console.error('Error sending notification:', error);
-        });
+    admin.messaging().send(message);
 }
 
 const returnTheConversation = async (id, username) => {
@@ -260,8 +235,6 @@ const sendMessageToClients = (data) => {
         data.id = parseInt(data.id);
         io.to(id).emit("receive_message", data);
         io.to(id).emit("receiveUpdateChats", data.id);
-    } else {
-        console.log("Invalid data format: 'id' should be a string.");
     }
 };
 
@@ -283,13 +256,7 @@ function sendMessageToFireBase(messageContent, userDisplayName, contactAndroidTo
     };
 
     // Send the notification
-    admin.messaging().send(message)
-        .then((response) => {
-            console.log('Notification sent successfully:', response);
-        })
-        .catch((error) => {
-            console.error('Error sending notification:', error);
-        });
+    admin.messaging().send(message);
 }
 
 const returnAllTheMessages = async (id) => {

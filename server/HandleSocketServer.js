@@ -1,7 +1,6 @@
 const Chats = require("./models/Chats");
 const { io } = require("./server");
 
-
 // Function to recursively print keys and types
 const printKeysAndTypes = (obj, prefix = '') => {
     Object.keys(obj).forEach((key) => {
