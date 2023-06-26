@@ -347,22 +347,73 @@ const getNotifications = async (username) => {
     return user;
 }
 
+// const addNotification = async (username, id) => {
+//     console.log(id);
+//     const messageList = await Chats.findOne({ id: parseInt(id) });
+
+//     if (messageList) {
+//         console.log("in")
+//         if (messageList.users[0].username === username) {
+//             messageList.users[0].notifications += 1;
+//         } else {
+//             messageList.users[1].notifications += 1;
+//         }
+
+//         await messageList.save();
+//         return 1;
+//     } else {
+//         return -1;
+//     }
+// }
+
 const addNotification = async (username, id) => {
-    const messageList = await Chats.findOne({ id: parseInt(id) });
-
+    console.log(id);
+    const messageList = await Chats.findOne({ id: Number(id) });
+    console.log("------------------------------");
+    console.log(messageList);
+    console.log("------------------------------");
+  
     if (messageList) {
-        if (messageList.users[0].username === username) {
-            messageList.users[0].notifications += 1;
-        } else {
-            messageList.users[1].notifications += 1;
-        }
-
+      if (messageList.users[0].username === username) {
+        messageList.users[0].notifications += 1;
+      } else {
+        messageList.users[1].notifications += 1;
+      }
+  
+      // Increment the version number manually
+      messageList.increment();
+  
+      try {
+        console.log("in try")
+        // Save the document with the updated version number
         await messageList.save();
         return 1;
+      } catch (error) {
+        console.log("in catch")
+        // Handle the version conflict error
+        if (error.name === 'VersionError') {
+          // Handle version conflict by refreshing the document and retrying cthe save operation
+          const refreshedMessageList = await Chats.findOne({ id: Number(id) });
+          if (refreshedMessageList && refreshedMessageList.__v !== messageList.__v) {
+            // The version has changed, retry the save operation
+            return addNotification(username, id);
+          } else {
+            // The document no longer exists or the version is still the same, handle the conflict accordingly
+            console.error('Version conflict error:', error);
+            return -1;
+          }
+        } else {
+          // Handle other save errors
+          console.error('Save error:', error);
+          return -1;
+        }
+      }
     } else {
-        return -1;
+        console.log("in else")
+      return -1;
     }
-}
+  };
+  
 
 const resetNotifications = async (username, id) => {
     const conversation = await Chats.findOne({ id: parseInt(id) });
