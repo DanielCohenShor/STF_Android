@@ -28,7 +28,8 @@
             android:layout_weight="0.1"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_exit" />
+            app:srcCompat="@drawable/ic_exit"
+            android:contentDescription="@string/backImg" />
 
         <TextView
             android:id="@+id/tvHeadline"
@@ -105,7 +106,8 @@
                     android:layout_height="34dp"
                     android:layout_marginStart="7dp"
                     android:layout_weight="0.1"
-                    app:srcCompat="@drawable/dark_mode_icon_drawable" />
+                    app:srcCompat="@drawable/dark_mode_icon_drawable"
+                    android:contentDescription="@string/tv_dark_mode" />
 
                 <TextView
                     android:id="@+id/tvDarkMode"
@@ -140,7 +142,8 @@
                     android:layout_height="34dp"
                     android:layout_marginStart="7dp"
                     android:layout_weight="0.1"
-                    app:srcCompat="@drawable/change_api_icon_drawable" />
+                    app:srcCompat="@drawable/change_api_icon_drawable"
+                    android:contentDescription="@string/tv_change_api" />
 
                 <TextView
                     android:id="@+id/tvChangeApi"
@@ -161,7 +164,8 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
                     android:layout_weight="0.1"
-                    app:srcCompat="@drawable/ic_open_setting" />
+                    app:srcCompat="@drawable/ic_open_setting"
+                    android:contentDescription="@string/tv_change_api" />
             </LinearLayout>
 
             <LinearLayout
@@ -177,7 +181,8 @@
                     android:layout_height="34dp"
                     android:layout_marginStart="7dp"
                     android:layout_weight="0.1"
-                    app:srcCompat="@drawable/logout_icon_drawable" />
+                    app:srcCompat="@drawable/logout_icon_drawable"
+                    android:contentDescription="@string/tv_logout" />
 
                 <TextView
                     android:id="@+id/tvLogout"
@@ -198,7 +203,8 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
                     android:layout_weight="0.1"
-                    app:srcCompat="@drawable/ic_open_setting" />
+                    app:srcCompat="@drawable/ic_open_setting"
+                    android:contentDescription="@string/tv_logout" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

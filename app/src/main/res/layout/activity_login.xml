@@ -214,6 +214,6 @@
             style="@style/LOGIN_SETTINGS"
             android:layout_marginTop="20dp"
             android:elevation="3dp"
-            android:contentDescription="@string/settingimg" />
+            android:contentDescription="@string/settingImg" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

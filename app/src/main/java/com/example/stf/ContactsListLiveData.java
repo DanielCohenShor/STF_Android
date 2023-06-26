@@ -11,11 +11,9 @@ import java.util.List;
 
 public class ContactsListLiveData {
     private static ContactsListLiveData instance;
-    private MutableLiveData<List<Contact>> data;
-    private MutableLiveData<Boolean> someoneAddMe;
-    private MutableLiveData<Boolean> someoneDeleteMe;
-
-
+    private final MutableLiveData<List<Contact>> data;
+    private final MutableLiveData<Boolean> someoneAddMe;
+    private final MutableLiveData<Boolean> someoneDeleteMe;
 
     private ContactsListLiveData() {
         data = new MutableLiveData<>();

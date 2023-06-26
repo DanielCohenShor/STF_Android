@@ -6,13 +6,11 @@ import java.util.ArrayList;
 
 public class ChatsNotification {
     private int id;
-    private ArrayList<LinkedTreeMap<String, String>> users;
-    private Object messages;
+    private final ArrayList<LinkedTreeMap<String, String>> users;
 
-    public ChatsNotification(int id, ArrayList<LinkedTreeMap<String, String>> users, Object messages) {
+    public ChatsNotification(int id, ArrayList<LinkedTreeMap<String, String>> users) {
         this.id = id;
         this.users = users;
-        this.messages = messages;
     }
 
     public int getId() {
@@ -25,17 +23,5 @@ public class ChatsNotification {
 
     public ArrayList<LinkedTreeMap<String, String>> getUsers() {
         return users;
-    }
-
-    public void setUsers(ArrayList<LinkedTreeMap<String, String>> users) {
-        this.users = users;
-    }
-
-    public Object getMessages() {
-        return messages;
-    }
-
-    public void setMessages(Object messages) {
-        this.messages = messages;
     }
 }

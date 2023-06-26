@@ -1,30 +1,21 @@
 package com.example.stf.Contacts;
 
-import static android.content.ContentValues.TAG;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.stf.AddNewContactActivity;
@@ -44,7 +35,6 @@ import com.example.stf.adapters.ContactAdapter;
 import com.example.stf.entities.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -64,19 +54,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
     private String currentUserUsername;
-    private String currentUserDisplayName;
-    private String currentUserProfilePic;
-    private Toolbar toolbar;
-
-    private String serverUrl;
 
     private ProgressBar progressBar;
     private  SharedPreferences sharedPreferences;
-    private final String SERVERURL = "serverUrl";
     private final String USERNAME = "userName";
     private final String SERVERTOKEN = "serverToken";
-    private final String DISPLAYNAME = "displayName";
-    private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
     private ContactsListLiveData contactsLiveDataList;
 
@@ -92,8 +74,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
             editor.apply();
         }
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
-        currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
-        currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
     }
 
     @Override
@@ -109,15 +89,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
-                .setTitle("Really Exit?")
-                .setMessage("Are you sure you want to exit?")
-                .setNegativeButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        logOut();
-                    }
-                }).create().show();
+                .setTitle("Logout")
+                .setMessage("You will logout. Are you sure?")
+                .setNegativeButton("No", (dialog, which) -> {
+                    // No action needed, dialog will be automatically dismissed
+                })
+                .setPositiveButton("Yes", (dialog, which) -> logOut())
+                .create().show();
     }
 
     private boolean checkIfBackGround() {
@@ -165,7 +143,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         contactsLiveDataList = ContactsListLiveData.getInstance();
         messagesListLiveData = MessagesListLiveData.getInstance();
 
-        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        String SERVERURL = "serverUrl";
+        String serverUrl = sharedPreferences.getString(SERVERURL, "");
         viewModalContacts = new ViewModalContacts(serverUrl);
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
 
@@ -266,7 +245,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         listViewContacts.setLayoutManager(new LinearLayoutManager(this));
         //init the search bar
         // Set the custom toolbar as the activity's action bar
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
@@ -275,9 +254,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
 
         // Reset each value to its default or empty value
         editor.putString(SERVERTOKEN, "");
+        String DISPLAYNAME = "displayName";
         editor.putString(DISPLAYNAME, "");
         editor.putString(USERNAME, "");
         editor.putString(CURRENTCHAT, "");
+        String PROFILEPIC = "photo";
         editor.putString(PROFILEPIC, "");
 
         // Apply the changes
@@ -371,14 +352,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
         });
     }
 
-//    private void updateUIWithNotifications(UserNotification notifications) {
-//        contactAdapter = new ContactAdapter(this, contactAdapter.getContacts(), this);
-//        contactAdapter.setNotifications(notifications);
-//        listViewContacts.setAdapter(contactAdapter);
-//        listViewContacts.setLayoutManager(new LinearLayoutManager(this));
-//        progressBar.setVisibility(View.GONE);
-//    }
-
     @Override
     public void onItemClick(int position) {
         // Retrieve the clicked contact from the adapter
@@ -444,33 +417,23 @@ public class ContactsActivity extends AppCompatActivity implements ContactClickL
                 contactsDao.deleteByChatId(chatID);
             });
             contactsLiveDataList.deleteContact(chatID);
-        } else {
-            //dont know what to do?
         }
     }
 
     // rendering when new contact add me message.
     private void observeContactsChanges() {
-        contactsLiveDataList.getList().observe(this, new Observer<List<Contact>>() {
-            @Override
-            public void onChanged(List<Contact> contacts) {
-                // Handle the onChanged event here
-                updateUIWithContacts(contacts);
-            }
-        });
+        // Handle the onChanged event here
+        contactsLiveDataList.getList().observe(this, this::updateUIWithContacts);
 
-        contactsLiveDataList.getSomeoneAddMe().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                // Handle the onChanged event here
-                if (value) {
-                    // Someone added you
-                    //get all contacts rom server
-                    runOnUiThread(ContactsActivity.this::getContacts);
-                    // Perform the desired action
-                    // Update the value of someoneAddMe to false
-                    contactsLiveDataList.setSomeoneAddMe(false);
-                }
+        contactsLiveDataList.getSomeoneAddMe().observe(this, value -> {
+            // Handle the onChanged event here
+            if (value) {
+                // Someone added you
+                //get all contacts rom server
+                runOnUiThread(ContactsActivity.this::getContacts);
+                // Perform the desired action
+                // Update the value of someoneAddMe to false
+                contactsLiveDataList.setSomeoneAddMe(false);
             }
         });
     }

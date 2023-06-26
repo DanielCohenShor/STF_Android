@@ -11,10 +11,10 @@ public class Message {
     @ColumnInfo(name = "message_id")
     private int id;
 
-    private String created;
+    private final String created;
 
     @Embedded
-    private User sender;
+    private final User sender;
 
     private String content;
 
@@ -48,16 +48,8 @@ public class Message {
         return created;
     }
 
-    public void setCreated(String created) {
-        this.created = created;
-    }
-
     public User getSender() {
         return sender;
-    }
-
-    public void setSender(User sender) {
-        this.sender = sender;
     }
 
     public String getContent() {

@@ -2,7 +2,6 @@ package com.example.stf.Login;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -29,15 +28,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.stf.AppDB;
 import com.example.stf.Contacts.ContactsActivity;
 import com.example.stf.R;
 import com.example.stf.Register.RegisterActivity;
 import com.example.stf.SettingsActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -58,11 +53,10 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private TextView linkToRegister;
 
-    private HashSet<String> createdTextViews = new HashSet<>();
+    private final HashSet<String> createdTextViews = new HashSet<>();
 
     private String serverUrl;
 
-    private AppDB db;
     private boolean isFirstTime = true;
     private String newToken;
     private SharedPreferences sharedPreferences;
@@ -74,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
     private final String CURRENTCHAT = "currentChat";
 
     private boolean check() {
-        // open from backgorund
+        // open from background
         if (openFromBackGround()) {
             return false;
         }
@@ -142,7 +136,6 @@ public class LoginActivity extends AppCompatActivity {
             for (String key : dataExtras.keySet()) {
                 if (Objects.equals(key, "chatId")) {
                     newchatId = dataExtras.getString(key);
-                    Log.d("TAG", "in the if: chatid: " + newchatId);
                 }
                 if (Objects.equals(key, "reciverDisplayName")) {
                     receiverDisplayName = dataExtras.getString(key);
@@ -152,7 +145,6 @@ public class LoginActivity extends AppCompatActivity {
             if (newchatId != null && receiverDisplayName != null) {
                 // Store the values in SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                Log.d("TAG", "from login chatId: " + newchatId);
                 editor.putString("currentChatFromBAckGround", newchatId);
                 editor.putString("receiverDisplayName", receiverDisplayName);
                 editor.apply();
@@ -202,20 +194,17 @@ public class LoginActivity extends AppCompatActivity {
     public void generateTokenFireBase() {
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        newToken = task.getResult();
-
-                        // Log and toast
-                        Toast.makeText(LoginActivity.this, newToken, Toast.LENGTH_SHORT).show();
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
                     }
+
+                    // Get new FCM registration token
+                    newToken = task.getResult();
+
+                    // Log and toast
+                    Toast.makeText(LoginActivity.this, newToken, Toast.LENGTH_SHORT).show();
                 });
     }
 

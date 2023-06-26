@@ -2,7 +2,6 @@ package com.example.stf.Chat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -38,7 +37,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -76,15 +74,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private String currentUserUsername;
 
-    private String serverUrl;
-
     private ProgressBar progressBar;
     private SharedPreferences sharedPreferences;
-    private final String SERVERURL = "serverUrl";
-    private final String USERNAME = "userName";
-    private final String SERVERTOKEN = "serverToken";
-    private final String DISPLAYNAME = "displayName";
-    private final String PROFILEPIC = "photo";
     private final String CURRENTCHAT = "currentChat";
 
     private MessagesListLiveData messagesListLiveData;
@@ -93,8 +84,11 @@ public class ChatActivity extends AppCompatActivity {
     private boolean fromBackGround = false;
 
     private void getSharedPreferences() {
-        serverUrl = sharedPreferences.getString(SERVERURL, "");
+        String SERVERURL = "serverUrl";
+        String serverUrl = sharedPreferences.getString(SERVERURL, "");
+        String USERNAME = "userName";
         currentUserUsername = sharedPreferences.getString(USERNAME, "");
+        String SERVERTOKEN = "serverToken";
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
         viewModalContacts =  new ViewModalContacts(serverUrl);
         viewModalChats = new ViewModalChats(serverUrl);
@@ -191,15 +185,13 @@ public class ChatActivity extends AppCompatActivity {
     private void fetchFromLocalDB() {
         // need to fetch only from db
         AsyncTask.execute(() -> {
+            List<Message> messagesList = messagesDao.getAllMessages(chatId);
             if (fromBackGround) {
-                List<Message> messagesList = messagesDao.getAllMessages(chatId);
                 runOnUiThread(() -> {
                     messagesListLiveData.setMessagesList(messagesList);
                     getMessages();
                 });
-
             } else {
-                List<Message> messagesList = messagesDao.getAllMessages(chatId);
                 if (!messagesList.isEmpty()) {
                     runOnUiThread(() -> messagesListLiveData.setMessagesList(messagesList));
                 } else {
@@ -355,16 +347,6 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUIWithNewMessage(Message newMessage) {
-        messageAdapter.addMessage(newMessage);
-        listViewMessages.setAdapter(messageAdapter);
-        listViewMessages.setLayoutManager(new LinearLayoutManager(this));
-        int lastPosition = messageAdapter.getItemCount() - 1;
-        if (lastPosition >= 0) {
-            listViewMessages.scrollToPosition(lastPosition);
-        }
-    }
-
     private void newContactArrived() {
         viewModalContacts.performGetContacts(serverToken, this::handleGetContactsCallback);
     }
@@ -387,37 +369,26 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void observeContactsChanges() {
-        messagesListLiveData.getList().observe(this, new Observer<List<Message>>() {
-            @Override
-            public void onChanged(List<Message> messageList) {
-                // Handle the onChanged event here
-                updateUIWithMessages(messageList);
+        // Handle the onChanged event here
+        messagesListLiveData.getList().observe(this, this::updateUIWithMessages);
+
+        contactsLiveDataList.getSomeoneDeleteMe().observe(this, value -> {
+            // Handle the onChanged event here
+            if (value) {
+                contactsLiveDataList.setSomeoneDeleteMe(false);
+                finish();
             }
         });
 
-        contactsLiveDataList.getSomeoneDeleteMe().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                // Handle the onChanged event here
-                if (value) {
-                    contactsLiveDataList.setSomeoneDeleteMe(false);
-                    finish();
-                }
-            }
-        });
-
-        contactsLiveDataList.getSomeoneAddMe().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                // Handle the onChanged event here
-                if (value) {
-                    // Someone added you
-                    //get all contacts rom server
-                    runOnUiThread(ChatActivity.this::newContactArrived);
-                    // Perform the desired action
-                    // Update the value of someoneAddMe to false
-                    contactsLiveDataList.setSomeoneAddMe(false);
-                }
+        contactsLiveDataList.getSomeoneAddMe().observe(this, value -> {
+            // Handle the onChanged event here
+            if (value) {
+                // Someone added you
+                //get all contacts rom server
+                runOnUiThread(ChatActivity.this::newContactArrived);
+                // Perform the desired action
+                // Update the value of someoneAddMe to false
+                contactsLiveDataList.setSomeoneAddMe(false);
             }
         });
     }

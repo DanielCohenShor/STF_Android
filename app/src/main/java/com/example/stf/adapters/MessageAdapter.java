@@ -209,22 +209,4 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void setMessages(List<Message> messages) {
         this.messages = messages;
     }
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void addMessage(Message newMessage) {
-        // Create a new list with increased size
-        List<Message> messageList = new ArrayList<>(getItemCount() + 1);
-
-        // Copy elements from the original list to the new list
-        messageList.addAll(messages);
-
-        // Add the new message to the new list
-        messageList.add(newMessage);
-
-        // Assign the new list back to the original reference
-        messages = messageList;
-    }
 }

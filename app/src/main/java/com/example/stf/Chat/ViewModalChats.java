@@ -14,9 +14,7 @@ public class ViewModalChats extends ViewModel {
 
     private final NotificationsAPI notificationsAPI;
 
-    private String baseUrl;
     public ViewModalChats(String baseUrl) {
-        this.baseUrl = baseUrl;
         this.chatAPI = new ChatAPI(baseUrl);
         this.notificationsAPI = new NotificationsAPI(baseUrl);
     }
