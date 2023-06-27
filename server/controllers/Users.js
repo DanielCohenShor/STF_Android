@@ -42,7 +42,7 @@ const createNewUser = async (req, res) => {
     }
 
     if (invalidFields.length === 0 && invalid > 0) {
-        
+
         const smallerProfilePic = await smaller(profilePic);
         res.json(await userService.createNewUser(username, password, displayName, smallerProfilePic));
         return
@@ -66,37 +66,36 @@ async function smaller(photo) {
     smallerPhoto = await decreasePhoto(smallerPhoto);
     smallerPhoto = addPrefix(smallerPhoto);
     return smallerPhoto;
-  }
-  
-  function removePrefix(input) {
+}
+
+function removePrefix(input) {
     const prefix = 'data:image/png;base64,';
     return input.substring(prefix.length);
-  }
-  
-  async function decreasePhoto(photo) {
+}
+
+async function decreasePhoto(photo) {
     try {
-      const imageBuffer = Buffer.from(photo, 'base64');
-      const image = sharp(imageBuffer);
-  
-      // Resize the image using sharp
-      const resizedImage = await image.resize({ width: 800 }).jpeg({ quality: 80 }).toBuffer();
-  
-      // Encode the resized image back to a Base64 string
-      const resizedBase64 = resizedImage.toString('base64');
-  
-      return resizedBase64;
+        const imageBuffer = Buffer.from(photo, 'base64');
+        const image = sharp(imageBuffer);
+
+        // Resize the image using sharp
+        const resizedImage = await image.resize({ width: 800 }).jpeg({ quality: 80 }).toBuffer();
+
+        // Encode the resized image back to a Base64 string
+        const resizedBase64 = resizedImage.toString('base64');
+
+        return resizedBase64;
     } catch (error) {
-      console.error('Error resizing image:', error);
-      return null;
+        return null;
     }
-  }
-  
-  function addPrefix(input) {
+}
+
+function addPrefix(input) {
     const prefix = 'data:image/png;base64,';
     return prefix + input;
-  }
+}
 
-const returnInformationUser = async (req,res) => {
+const returnInformationUser = async (req, res) => {
     if (req.headers.authorization) {
         const username = getUserNameFromToken(req.headers.authorization);
         if (username !== "Invalid Token") {
@@ -111,7 +110,7 @@ const returnInformationUser = async (req,res) => {
     }
 };
 
-const addAndroidToken = async (req,res) => {
+const addAndroidToken = async (req, res) => {
     if (req.headers.authorization) {
         const username = getUserNameFromToken(req.headers.authorization);
         if (username !== "Invalid Token") {
@@ -127,7 +126,7 @@ const addAndroidToken = async (req,res) => {
     }
 };
 
-const removeAndroidToken = async (req,res) => {
+const removeAndroidToken = async (req, res) => {
     if (req.headers.authorization) {
         const username = getUserNameFromToken(req.headers.authorization);
         if (username !== "Invalid Token") {

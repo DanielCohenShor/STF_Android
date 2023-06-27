@@ -17,7 +17,7 @@ public class ViewModalContacts  extends ViewModel {
     private ContactAPI contactAPI;
     private ChatAPI chatAPI;
     private NotificationsAPI notificationsAPI;
-    private String baseUrl;
+    private final String baseUrl;
 
     public ViewModalContacts(String baseUrl) {
         this.baseUrl = baseUrl;

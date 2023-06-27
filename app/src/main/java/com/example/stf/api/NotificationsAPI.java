@@ -1,8 +1,8 @@
 package com.example.stf.api;
 
-import com.example.stf.MyApplication;
+import androidx.annotation.NonNull;
+
 import com.example.stf.Notifications.UserNotification;
-import com.example.stf.R;
 
 import java.util.function.Consumer;
 
@@ -37,22 +37,18 @@ public class NotificationsAPI {
 
         call.enqueue(new Callback<UserNotification>() {
             @Override
-            public void onResponse(Call<UserNotification> call, Response<UserNotification> response) {
+            public void onResponse(@NonNull Call<UserNotification> call, @NonNull Response<UserNotification> response) {
                 try {
                     if (response.isSuccessful()) {
                         UserNotification notifications = response.body();
                         callback.accept(notifications);
-                    } else {
-                        // error from the get contacts?
-                        //todo: what we need to return ?
                     }
                 } catch (Exception e) {
                 }
             }
 
             @Override
-            public void onFailure(Call<UserNotification> call, Throwable t) {
-                int x =5;
+            public void onFailure(@NonNull Call<UserNotification> call, @NonNull Throwable t) {
             }
         });
     }
@@ -62,20 +58,17 @@ public class NotificationsAPI {
 
         call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 try {
                     if (response.isSuccessful()) {
                         callback.accept(chatId);
-                    } else {
-                        // error from the get contacts?
-                        //todo: what we need to return ?
                     }
                 } catch (Exception e) {
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
             }
         });
     }
@@ -85,20 +78,17 @@ public class NotificationsAPI {
 
         call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 try {
                     if (response.isSuccessful()) {
                         // okay
-                    } else {
-                        // error from the get contacts?
-                        //todo: what we need to return ?
                     }
                 } catch (Exception e) {
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
             }
         });
     }

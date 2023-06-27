@@ -57,10 +57,10 @@ public class RegisterActivity extends AppCompatActivity {
     private RoundedImageView riProfilePic;
 
     // Declare a HashSet to store the IDs of the created TextViews
-    private HashSet<String> createdTextViews = new HashSet<>();
+    private final HashSet<String> createdTextViews = new HashSet<>();
 
     // create map that contains all the text of the errors to show for the user
-    private HashMap<String, String> errorsText = new HashMap<>();
+    private final HashMap<String, String> errorsText = new HashMap<>();
 
     private Uri profilePictureUri;
     private String profilePictureBase64;

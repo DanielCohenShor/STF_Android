@@ -10,8 +10,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -42,14 +40,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     private String currentChatID;
     private ViewModalContacts viewModalContacts;
     private SharedPreferences sharedPreferences;
-    private final String SERVERTOKEN = "serverToken";
-    private final String DISPLAYNAME = "displayName";
-    private final String PROFILEPIC = "photo";
-    private final String CURRENTCHAT = "currentChat";
-    private final String SERVERURL = "serverUrl";
-    private final String USERNAME = "userName";
     private String serverToken;
-    private String baseUrl;
     private ContactsListLiveData contactsLiveDataList;
     private MessagesListLiveData messagesListLiveData;
 
@@ -72,9 +63,12 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     public void getSharedPreferences() {
+        String CURRENTCHAT = "currentChat";
         currentChatID = sharedPreferences.getString(CURRENTCHAT, "");
+        String SERVERTOKEN = "serverToken";
         serverToken = sharedPreferences.getString(SERVERTOKEN, "");
-        baseUrl = sharedPreferences.getString(SERVERURL, "");
+        String SERVERURL = "serverUrl";
+        String baseUrl = sharedPreferences.getString(SERVERURL, "");
         viewModalContacts = new ViewModalContacts(baseUrl);
 
     }
@@ -86,7 +80,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
         getSharedPreferences();
         String newChatId = message.getData().get("chatId");
         assert newChatId != null;
-        switch (type) {
+        switch (Objects.requireNonNull(type)) {
             case "message":
                 receiveMessage(message, newChatId);
                 break;
@@ -105,7 +99,7 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     private void deleteChat(String newChatId) {
-        AsyncTask.execute(() -> {contactsDao.deleteByChatId(Integer.parseInt(newChatId));});
+        AsyncTask.execute(() -> contactsDao.deleteByChatId(Integer.parseInt(newChatId)));
         if (Objects.equals(newChatId, currentChatID)) {
             contactsLiveDataList.setSomeoneDeleteMe(true);
         }
@@ -113,8 +107,6 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     private void receiveMessage(@NonNull RemoteMessage message, String newChatId) {
-        Log.d("Tag", "the cuurent chat id: " + currentChatID);
-        Log.d("Tag", "the newChatId chat id: " + newChatId);
         if (!newChatId.equals(currentChatID)) {
             // not in the chat render the localdb to be in the right order
             // add the new message to the messages db
@@ -142,42 +134,39 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     private void createMessageANDupdateLastMessage(@NonNull RemoteMessage message, String newChatId) {
-        //get contact in the db and get the infromation from the db
+        //get contact in the db and get the information from the db
         String messageId = message.getData().get("messageId");
         String created = message.getData().get("messageDate");
         Contact contact = contactsDao.get(Integer.parseInt(newChatId));
-        String content = message.getNotification().getBody();
+        String content = Objects.requireNonNull(message.getNotification()).getBody();
         User sender = contact.getUser();
         int integerNewChatId = Integer.parseInt(newChatId);
         assert messageId != null;
 
         Message newLastMessage = new Message(Integer.parseInt(messageId), created, sender, content,integerNewChatId);
-        AsyncTask.execute(() -> {messagesDao.insert(newLastMessage);});
+        AsyncTask.execute(() -> messagesDao.insert(newLastMessage));
         messagesListLiveData.addMessage(newLastMessage);
         AsyncTask.execute(() -> {
-            int notfications = contactsDao.get(integerNewChatId).getNotifications() + 1;
-            Contact updateContact = new Contact(integerNewChatId, sender, newLastMessage, notfications);
+            int notifications = contactsDao.get(integerNewChatId).getNotifications() + 1;
+            Contact updateContact = new Contact(integerNewChatId, sender, newLastMessage, notifications);
             contactsDao.update(updateContact);
         });
     }
 
     private void addMessageToDB(@NonNull RemoteMessage message, String newChatId) {
-        //get contact in the db and get the infromation from the db
+        //get contact in the db and get the information from the db
         String messageId = message.getData().get("messageId");
         String created = message.getData().get("messageDate");
         Contact contact = contactsDao.get(Integer.parseInt(newChatId));
-        String content = message.getNotification().getBody();
+        String content = Objects.requireNonNull(message.getNotification()).getBody();
         User sender;
-        Log.d("not new chat", "not new chat ");
         //the contact is exist.
         sender = contact.getUser();
         assert messageId != null;
         int integerNewChatId = Integer.parseInt(newChatId);
-        Log.d("Tag", "After change to int: " + integerNewChatId);
         Message newLastMessage = new Message(Integer.parseInt(messageId), created, sender, content,integerNewChatId);
         AsyncTask.execute(() -> {
             List<Message> messagesList = messagesDao.getAllMessages(Integer.parseInt(newChatId));
-            Log.d("Tag", "size of the list: " + messagesList.size());
             if (!messagesList.isEmpty()) {
                 messagesDao.insert(newLastMessage);
             }
@@ -188,22 +177,21 @@ public class ReceiveMessages extends FirebaseMessagingService {
     }
 
     private void updateLastMessage(int newChatId, Message newLastMessage, User sender) {
-        //TODO: check if need to update in the server the notfications ??
         AsyncTask.execute(() -> {
-            int notfications = contactsDao.get(newChatId).getNotifications() + 1;
-            Contact updateContact = new Contact(newChatId, sender, newLastMessage, notfications);
+            int notifications = contactsDao.get(newChatId).getNotifications() + 1;
+            Contact updateContact = new Contact(newChatId, sender, newLastMessage, notifications);
             contactsDao.update(updateContact);
             contactsLiveDataList.setContactsList(contactsDao.getAllContacts());
         });
     }
 
-    private void sendNotification(String content, String newchatId, String displayName) {
+    private void sendNotification(String content, String newChatId, String displayName) {
         //update the current chat to be the right chat.
-        // need to pass the chad id, the displayname.
-        // so it will open the right chat with the right messeages.
+        // need to pass the chat id, the display name.
+        // so it will open the right chat with the right messages.
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("contactDisplayName", displayName);
-        intent.putExtra("newchatId", newchatId);
+        intent.putExtra("newchatId", newChatId);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         // Updated code
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
@@ -229,14 +217,10 @@ public class ReceiveMessages extends FirebaseMessagingService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Since android Oreo notification channel is needed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            notificationManager.createNotificationChannel(channel);
-        }
-        notificationManager.notify(Integer.parseInt(newchatId), notificationBuilder.build());
+        NotificationChannel channel = new NotificationChannel(channelId,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_DEFAULT);
+        notificationManager.createNotificationChannel(channel);
+        notificationManager.notify(Integer.parseInt(newChatId), notificationBuilder.build());
     }
-
-
 }

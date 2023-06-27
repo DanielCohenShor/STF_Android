@@ -41,25 +41,18 @@ public class UserAPI {
     }
 
     public void get(String username, Consumer<String[]> callback) {
-//        JsonObject usernameRequest = new JsonObject();
-//        usernameRequest.addProperty("androidToken", androidToken);
-//
-//        Gson gson = new Gson();
-//        String jsonBody = gson.toJson(usernameRequest);
-//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody);
-
         Call<User> call = webServiceAPI.getUser("Bearer {\"token\":\"" + token + "\"}", username);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful()) {
                     User res = response.body();
-                    String[] parm = new String[3];
+                    String[] param = new String[3];
                     assert res != null;
-                    parm[0] = res.getUsername();
-                    parm[1] = res.getDisplayName();
-                    parm[2] = res.getProfilePic();
-                    callback.accept(parm);
+                    param[0] = res.getUsername();
+                    param[1] = res.getDisplayName();
+                    param[2] = res.getProfilePic();
+                    callback.accept(param);
                 } else  {
                     try {
                         assert response.errorBody() != null;
@@ -159,7 +152,6 @@ public class UserAPI {
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                //todo: what to return ?
             }
         });
     }

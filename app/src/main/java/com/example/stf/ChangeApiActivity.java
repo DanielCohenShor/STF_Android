@@ -28,8 +28,6 @@ import com.example.stf.Dao.MessagesDao;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ChangeApiActivity extends AppCompatActivity {
 
@@ -46,15 +44,12 @@ public class ChangeApiActivity extends AppCompatActivity {
 
     private String token;
 
-    private HashSet<String> createdTextViews = new HashSet<>();
+    private final HashSet<String> createdTextViews = new HashSet<>();
 
     private  SharedPreferences sharedPreferences;
 
     private ViewModalContacts viewModalContacts;
 
-    private final String SERVERURL = "serverUrl";
-
-    private final String SERVERTOKEN = "serverToken";
     private ContactsListLiveData contactsLiveDataList;
 
     private MessagesListLiveData messagesListLiveData;
@@ -62,7 +57,9 @@ public class ChangeApiActivity extends AppCompatActivity {
 
 
     private void getSharedPreferences() {
+        String SERVERURL = "serverUrl";
         baseUrl = sharedPreferences.getString(SERVERURL, "");
+        String SERVERTOKEN = "serverToken";
         token = sharedPreferences.getString(SERVERTOKEN, "");
         contactsLiveDataList = ContactsListLiveData.getInstance();
         messagesListLiveData = MessagesListLiveData.getInstance();
@@ -109,35 +106,8 @@ public class ChangeApiActivity extends AppCompatActivity {
         backToPrevScreen();
     }
     public void createListeners() {
-        btnExitChangeApi.setOnClickListener(v -> {backToPrevScreen();});
+        btnExitChangeApi.setOnClickListener(v -> backToPrevScreen());
         btnChangeApi.setOnClickListener(this::onButtonShowPopupWindowClick);
-    }
-
-    public String checkUrlValidation(String text) {
-//        String pattern1 = "(?i)http://((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9])|([1-9][0-9][0-9][0-9][0-9]))";
-//        String pattern2 = "(?i)https://((?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)):(?:(102[4-9])|(10[3-9][0-9])|(1[1-9][0-9][0-9])|([2-9][0-9][0-9][0-9])|([1-9][0-9][0-9][0-9][0-9]))";
-//
-//        // Create a Pattern object
-//        Pattern regex1 = Pattern.compile(pattern1);
-//        // Create a Pattern object
-//        Pattern regex2 = Pattern.compile(pattern2);
-//
-//        // Create a Matcher object
-//        Matcher matcher1 = regex1.matcher(text);
-//        // Create a Matcher object
-//        Matcher matcher2 = regex2.matcher(text);
-//
-//        if (matcher1.matches()) {
-//            String match = matcher1.group();
-//            return match.substring(0, 4).toLowerCase() + match.substring(4);
-//        } else if (matcher2.matches()) {
-//            String match = matcher2.group();
-//            return match.substring(0, 4).toLowerCase() + match.substring(4);
-//        } else {
-//            //error
-//            return "error";
-//        }
-        return text;
     }
 
     private void resetSharedPreferences(String newBaseUrl) {
@@ -157,19 +127,18 @@ public class ChangeApiActivity extends AppCompatActivity {
 
     public void onButtonShowPopupWindowClick(View view) {
         String NewBaseUrl = etChangeApi.getText().toString();
-        String result = checkUrlValidation(NewBaseUrl);
-        if (!Objects.equals(result, "error")) {
+        if (!Objects.equals(NewBaseUrl, "error")) {
             new AlertDialog.Builder(ChangeApiActivity.this)
                     .setTitle("Change API")
                     .setMessage("You will change the current server address: " + baseUrl +
-                            " to: " + result+ ". Are you sure?")
+                            " to: " + NewBaseUrl + ". Are you sure?")
                     .setPositiveButton("Yes", (dialog, which) -> {
-                        resetSharedPreferences(result);
+                        resetSharedPreferences(NewBaseUrl);
                         viewModalContacts.removeAndroidToken(token);
                         AsyncTask.execute(() -> {
                             contactsDao.deleteAllContacts();
                             messagesDao.deleteAllMessages();
-                            baseUrl = result;
+                            baseUrl = NewBaseUrl;
                         });
                         contactsLiveDataList.setContactsList(Collections.emptyList());
                         messagesListLiveData.setMessagesList(Collections.emptyList());

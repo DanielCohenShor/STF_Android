@@ -3,8 +3,6 @@ package com.example.stf.api;
 import androidx.annotation.NonNull;
 
 import com.example.stf.entities.Contact;
-import com.example.stf.MyApplication;
-import com.example.stf.R;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -43,14 +41,11 @@ public class ContactAPI {
 
         call.enqueue(new Callback<List<Contact>>() {
             @Override
-            public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
+            public void onResponse(@NonNull Call<List<Contact>> call, @NonNull Response<List<Contact>> response) {
                 try {
                     if (response.isSuccessful()) {
                         List<Contact> contacts = response.body();
                         callback.accept(contacts);
-                    } else {
-                        // error from the get contacts?
-                        //todo: what we need to return ?
                     }
                 } catch (Exception e) {
 
@@ -58,8 +53,7 @@ public class ContactAPI {
             }
 
             @Override
-            public void onFailure(Call<List<Contact>> call, Throwable t) {
-                int x = 5;
+            public void onFailure(@NonNull Call<List<Contact>> call, @NonNull Throwable t) {
             }
         });
 
@@ -78,7 +72,7 @@ public class ContactAPI {
         Call<Contact> call = webServiceAPI.addContact(reqToken, requestBody);
         call.enqueue(new Callback<Contact>() {
             @Override
-            public void onResponse(Call<Contact> call, Response<Contact> response) {
+            public void onResponse(@NonNull Call<Contact> call, @NonNull Response<Contact> response) {
                 if (response.isSuccessful()) {
                     Contact contact = response.body();
                     callback.accept(contact);
@@ -88,7 +82,7 @@ public class ContactAPI {
             }
 
             @Override
-            public void onFailure(Call<Contact> call, Throwable t) {
+            public void onFailure(@NonNull Call<Contact> call, @NonNull Throwable t) {
 
             }
         });
@@ -108,8 +102,6 @@ public class ContactAPI {
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                //todo: what to return ?
-                int x= 4;
             }
         });
     }

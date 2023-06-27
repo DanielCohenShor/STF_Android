@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -57,7 +56,6 @@ public class SettingsActivity extends AppCompatActivity {
     private AppDB db;
     private ContactsDao contactsDao;
     private MessagesDao messagesDao;
-    private boolean isFirstTime = true;
     private SharedPreferences sharedPreferences;
     private boolean nightMode;
     private String serverToken;
@@ -65,16 +63,14 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ViewModalContacts viewModalContacts;
 
-    private final String SERVERURL = "serverUrl";
-    private final String USERNAME = "userName";
     private final String SERVERTOKEN = "serverToken";
     private final String DISPLAYNAME = "displayName";
     private final String PROFILEPIC = "photo";
-    private final String CURRENTCHAT = "currentChat";
     private ContactsListLiveData contactsLiveDataList;
 
     private MessagesListLiveData messagesListLiveData;
     private void getSharedPreferences() {
+        String SERVERURL = "serverUrl";
         serverUrl = sharedPreferences.getString(SERVERURL, "");
         currentUserProfilePic = sharedPreferences.getString(PROFILEPIC, "");
         currentUserDisplayName = sharedPreferences.getString(DISPLAYNAME, "");
@@ -132,12 +128,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private boolean isSystemInNightMode() {
-        if (Objects.equals(getResources().getString(R.string.mode), "Day")) {
-            //day mode
-            return false;
-        } else {
-            return true;
-        }
+        //day mode
+        return !Objects.equals(getResources().getString(R.string.mode), "Day");
     }
 
     private void createListeners() {
@@ -153,22 +145,19 @@ public class SettingsActivity extends AppCompatActivity {
             llLogout.setOnClickListener(this::onButtonShowPopupWindowClick);
         }
 
-        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    nightMode = true;
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    nightMode = false;
-                }
-
-                // Save the selected mode to SharedPreferences
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("nightMode", nightMode);
-                editor.apply();
+        switcher.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                nightMode = true;
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                nightMode = false;
             }
+
+            // Save the selected mode to SharedPreferences
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("nightMode", nightMode);
+            editor.apply();
         });    }
 
 
@@ -189,7 +178,9 @@ public class SettingsActivity extends AppCompatActivity {
         // Reset each value to its default or empty value
         editor.putString(SERVERTOKEN, "");
         editor.putString(DISPLAYNAME, "");
+        String USERNAME = "userName";
         editor.putString(USERNAME, "");
+        String CURRENTCHAT = "currentChat";
         editor.putString(CURRENTCHAT, "");
         editor.putString(PROFILEPIC,"");
         // Apply the changes
@@ -201,17 +192,15 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void backToPrevScreen() {
+        Intent intent;
         if (Objects.equals(currentUserProfilePic, "")) {
-            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
+            intent = new Intent(SettingsActivity.this, LoginActivity.class);
         } else {
-            Intent intent = new Intent(SettingsActivity.this, ContactsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
+            intent = new Intent(SettingsActivity.this, ContactsActivity.class);
         }
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 
     @SuppressLint("ClickableViewAccessibility")

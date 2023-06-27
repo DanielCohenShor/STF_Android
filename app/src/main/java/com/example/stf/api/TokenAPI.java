@@ -1,7 +1,7 @@
 package com.example.stf.api;
 
-import com.example.stf.MyApplication;
-import com.example.stf.R;
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -45,13 +45,13 @@ public class TokenAPI {
         Call<Void> call = webServiceAPI.createToken(requestBody);
         call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
                     String token = removeTokenPrefix(response.headers().get("Set-Cookie"));
                     callback.accept(token);
                     // Handle the token
                 } else {
-                    String errorResponse = null;
+                    String errorResponse;
                     try {
                         errorResponse = response.errorBody().string();
                     } catch (IOException e) {
@@ -64,8 +64,7 @@ public class TokenAPI {
 
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                //todo: what to return ?
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
             }
         });
     }

@@ -1,7 +1,5 @@
 package com.example.stf;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -12,8 +10,7 @@ import java.util.List;
 
 public class MessagesListLiveData {
     private static MessagesListLiveData instance;
-    private MutableLiveData<List<Message>> data;
-
+    private final MutableLiveData<List<Message>> data;
 
     private MessagesListLiveData() {
         data = new MutableLiveData<>();
@@ -28,8 +25,6 @@ public class MessagesListLiveData {
         return instance;
     }
 
-
-
     public void setMessagesList(List<Message> messagesList) {
         data.postValue(messagesList);
     }
@@ -41,13 +36,10 @@ public class MessagesListLiveData {
     public void addMessage(Message message) {
         List<Message> currentList = data.getValue();
         if (currentList != null) {
-            Log.d("Tag", "get the list size: " + currentList.size());
             currentList.add(message);
-            Log.d("Tag", "get the new list size: " + currentList.size());
             data.postValue(currentList); // Update the LiveData with the updated list
         }
     }
-
 }
 
 

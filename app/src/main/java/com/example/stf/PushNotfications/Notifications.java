@@ -1,16 +1,10 @@
 package com.example.stf.PushNotfications;
 
 public class Notifications {
-    private String title;
-    private String message;
+    private final String message;
 
-    public Notifications(String title, String message) {
-        this.title = title;
+    public Notifications(String message) {
         this.message = message;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public String getMessage() {
